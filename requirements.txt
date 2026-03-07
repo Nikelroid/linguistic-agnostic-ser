@@ -1,0 +1,7 @@
+torch
+torchaudio
+transformers
+opensmile
+scikit-learn
+pandas
+numpy
