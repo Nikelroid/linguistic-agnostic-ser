@@ -1,20 +1,25 @@
 import torch
 import torch.nn as nn
-from transformers import AutoModel, AutoConfig
+from transformers import AutoModel, AutoConfig, AutoFeatureExtractor
 
 class TransformerExtractor(nn.Module):
     """
     Extracts intermediate hidden states from pre-trained Speech Transformers 
-    (e.g., wav2vec 2.0, HuBERT, WavLM).
+    (e.g., wav2vec 2.0, HuBERT, WavLM, Whisper).
     """
     def __init__(self, model_name="facebook/wav2vec2-base", device=None):
         super().__init__()
         self.device = device if device else torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model_name = model_name.lower()
+        self.is_whisper = "whisper" in self.model_name
         
         print(f"Loading {model_name}...")
         self.config = AutoConfig.from_pretrained(model_name)
         # Ensure we output all hidden states
         self.config.output_hidden_states = True
+        
+        # Load the feature extractor for correct preprocessing
+        self.feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)
         
         # Load the model and freeze it
         self.model = AutoModel.from_pretrained(model_name, config=self.config)
@@ -26,21 +31,37 @@ class TransformerExtractor(nn.Module):
             
     def get_num_layers(self):
         """Returns the number of hidden layers (including initial embedding layer)."""
-        # Usually num_hidden_layers + 1 (the initial CNN/embedding output)
+        if self.is_whisper:
+            return self.config.encoder_layers + 1
         if hasattr(self.config, 'num_hidden_layers'):
             return self.config.num_hidden_layers + 1
         return len(self.model.config.hidden_sizes)
 
-    def extract_from_waveform(self, waveform):
+    def extract_from_waveform(self, waveform, sample_rate=16000):
         """
         Forward pass to extract layer-wise representations.
         waveform: Tensor of shape (batch_size, sequence_length)
         Returns a list/tuple of hidden states across all layers as numpy arrays.
         """
-        waveform = waveform.to(self.device)
+        # Convert waveform to numpy list for feature extractor
+        waveform_np = waveform.cpu().numpy()
+        waveform_list = [w for w in waveform_np]
+        
+        # Prepare inputs using the correct feature extractor
+        inputs = self.feature_extractor(
+            waveform_list, 
+            sampling_rate=sample_rate, 
+            return_tensors="pt"
+        )
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+
         with torch.no_grad():
-            outputs = self.model(waveform)
-            # hidden_states is a tuple of (batch_size, sequence_length, hidden_size)
+            if self.is_whisper:
+                # Whisper is an encoder-decoder model; we probe the encoder's hidden states
+                outputs = self.model.encoder(**inputs)
+            else:
+                outputs = self.model(**inputs)
+            
             hidden_states = outputs.hidden_states
         
         pooled_states = []
