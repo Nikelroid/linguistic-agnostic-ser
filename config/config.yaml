@@ -1,0 +1,34 @@
+# Linguistic-Agnostic SER - Master Configuration
+
+models:
+  wav2vec2:
+    path: "facebook/wav2vec2-base"
+    is_whisper: false
+  hubert:
+    path: "facebook/hubert-base-ls960"
+    is_whisper: false
+  whisper:
+    path: "openai/whisper-base"
+    is_whisper: true
+
+datasets:
+  - RAVDESS
+  - EmoDB
+  - IEMOCAP
+  - SAVEE
+  - AESDD
+  - MESD
+
+training:
+  batch_size: 4
+  sample_rate: 16000
+  random_state: 42
+  cv_splits: 5
+  classification:
+    max_iter: 1000
+  regression:
+    alpha: 1.0
+    task_types:
+      - F0semitoneFrom27.5Hz_sma3nz_amean
+      - loudness_sma3_amean
+      - jitterLocal_sma3nz_amean

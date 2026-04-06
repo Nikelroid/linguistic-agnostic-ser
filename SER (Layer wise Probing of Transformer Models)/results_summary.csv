@@ -1,7 +1,0 @@
-Experiment,Best Layer,Best Accuracy,Best F1
-wav2vec2 + RAVDESS,Layer 5,0.8639,0.8634
-wav2vec2 + EmoDB,Layer 4,0.972,0.9719
-HuBERT + RAVDESS,Layer 5,0.866,0.866
-HuBERT + EmoDB,Layer 4,0.9776,0.9773
-wav2vec2 + IEMOCAP,Layer 2,0.6363,0.6359
-HuBERT + IEMOCAP,Layer 1,0.648,0.6476

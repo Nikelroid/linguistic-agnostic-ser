@@ -4,3 +4,7 @@ __pycache__/
 *.csv
 .DS_Store
 data/
+results/embeddings/*.npy
+*.out
+*.log
+.env

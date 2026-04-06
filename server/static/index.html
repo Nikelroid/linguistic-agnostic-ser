@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linguistics Agnostic SER</title>
+    <!-- Simple SVG favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>">
+    <meta name="description" content="Speech Emotion Recognition Layer-wise Probing Dashboard">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="background-mesh"></div>
+    <div class="container">
+        <header class="header">
+            <h1>Layer-wise Probing <span>SER</span></h1>
+            <p>Analyze how transformer models encode acoustic emotion over layers.</p>
+        </header>
+
+        <main class="dashboard">
+            <div class="column-left">
+                <!-- Training & Testing Pipeline Section -->
+                <section class="card train-section">
+                    <h2>Run Pipeline (Train & Test)</h2>
+                    <p>Launch the layer-wise extraction and probing pipeline on a dataset.</p>
+                    <form id="train-form" class="train-form">
+                        <div class="form-group">
+                            <label for="dataset-select">Dataset</label>
+                            <select id="dataset-select" name="dataset" required>
+                                <option value="RAVDESS">RAVDESS</option>
+                                <option value="EmoDB">EmoDB</option>
+                                <option value="IEMOCAP">IEMOCAP</option>
+                                <option value="SAVEE">SAVEE</option>
+                                <option value="AESDD">AESDD</option>
+                                <option value="MESD">MESD</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="model-select">Model Architecture</label>
+                            <select id="model-select" name="model" required>
+                                <option value="facebook/wav2vec2-base">wav2vec 2.0 (Base)</option>
+                                <option value="facebook/hubert-base-ls960">HuBERT (Base)</option>
+                                <option value="openai/whisper-base">Whisper (Base)</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="start-btn" class="btn-primary start-btn">Start Training</button>
+                        <button type="button" id="stop-btn" class="btn-danger stop-btn hidden">Force Stop</button>
+                    </form>
+                    
+                    <div id="terminal-wrapper" class="terminal-wrapper hidden">
+                        <div class="terminal-header">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                            <span class="terminal-title">pipeline_runner.sh</span>
+                        </div>
+                        <div id="terminal-body" class="terminal-body">
+                            <!-- Logs injected here via SSE -->
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card upload-section">
+                    <h2>Live Inference</h2>
+                    <div class="upload-area" id="drop-zone">
+                        <p>Drag & Drop an audio file (.wav)</p>
+                        <input type="file" id="audio-input" accept="audio/wav" hidden>
+                        <button class="btn-primary" onclick="document.getElementById('audio-input').click()">Browse Files</button>
+                    </div>
+                    <div id="loader" class="loader hidden">
+                        <div class="spinner"></div>
+                        <p>Analyzing layers...</p>
+                    </div>
+                    <div id="result-box" class="result-box hidden">
+                        <h3>Analysis Complete</h3>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <span class="label">Model Used</span>
+                                <span class="value" id="res-model_used">wav2vec2</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">Emotion</span>
+                                <span class="value highlight" id="res-emotion">Happy</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">Confidence</span>
+                                <span class="value" id="res-confidence">92%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="column-right">
+                <section class="card stats-section">
+                    <h2>Overall Pre-computed Results</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-title">wav2vec 2.0 Best Layer</span>
+                            <span class="stat-value" id="res-w2v2">Loading...</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-title">HuBERT Best Layer</span>
+                            <span class="stat-value" id="res-hubert">Loading...</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-title">Whisper Best Layer</span>
+                            <span class="stat-value" id="res-whisper">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Chart.js container -->
+                    <div class="chart-container">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
