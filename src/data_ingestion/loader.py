@@ -2,8 +2,23 @@ import os
 import glob
 import json
 import re
-import librosa
+import torch
+import torchaudio
+import torchaudio.transforms as T
 from tqdm import tqdm
+
+def load_audio_file(filepath, target_sr):
+    # Replaces librosa.load with torchaudio native implementation
+    waveform, sr = torchaudio.load(filepath)
+    if sr != target_sr:
+        resampler = T.Resample(sr, target_sr, dtype=waveform.dtype)
+        waveform = resampler(waveform)
+    
+    # Downmix to mono if stereo
+    if waveform.shape[0] > 1:
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+        
+    return waveform.squeeze().numpy(), target_sr
 
 def load_ravdess(path, sample_rate=16000, max_length=None):
     RAVDESS_EMOTION_MAP = {
@@ -18,7 +33,7 @@ def load_ravdess(path, sample_rate=16000, max_length=None):
             parts = fn.replace('.wav','').split('-')
             if len(parts) < 3 or parts[2] not in RAVDESS_EMOTION_MAP: continue
             try:
-                audio, sr = librosa.load(os.path.join(root,fn), sr=sample_rate)
+                audio, sr = load_audio_file(os.path.join(root,fn), sample_rate)
                 if max_length and len(audio) > max_length: audio = audio[:max_length]
                 data.append({'file':fn, 'label':RAVDESS_EMOTION_MAP[parts[2]], 'audio':audio})
             except Exception as e:
@@ -35,7 +50,7 @@ def load_emodb(path, sample_rate=16000, max_length=None):
             try:
                 ec = fn[5]
                 if ec not in EMODB_EMOTION_MAP: continue
-                audio, sr = librosa.load(os.path.join(root,fn), sr=sample_rate)
+                audio, sr = load_audio_file(os.path.join(root,fn), sample_rate)
                 if max_length and len(audio) > max_length: audio = audio[:max_length]
                 data.append({'file':fn, 'label':EMODB_EMOTION_MAP[ec], 'audio':audio})
             except:
@@ -59,7 +74,7 @@ def load_iemocap(path, sample_rate=16000, max_length=None):
         found = glob.glob(f'{path}/**/{fname}', recursive=True)
         if not found: continue
         try:
-            audio, sr = librosa.load(found[0], sr=sample_rate)
+            audio, sr = load_audio_file(found[0], sample_rate)
             if max_length and len(audio) > max_length: audio = audio[:max_length]
             data.append({'file':fname, 'label':entry['label'], 'audio':audio})
         except:
@@ -76,7 +91,7 @@ def load_savee(path, sample_rate=16000, max_length=None):
             m = re.match(r'^([A-Z]{2})_([a-z]+)(\d+)\.wav$', fn)
             if not m or m.group(2) not in SAVEE_MAP: continue
             try:
-                audio, sr = librosa.load(os.path.join(root,fn), sr=sample_rate)
+                audio, sr = load_audio_file(os.path.join(root,fn), sample_rate)
                 if max_length and len(audio) > max_length: audio = audio[:max_length]
                 data.append({'file':fn, 'label':SAVEE_MAP[m.group(2)], 'audio':audio})
             except:
@@ -93,7 +108,7 @@ def load_aesdd(path, sample_rate=16000, max_length=None):
         emotion = next((e for e in AESDD_EMOTIONS if e in parent), None)
         if not emotion: continue
         try:
-            audio, sr = librosa.load(fpath, sr=sample_rate)
+            audio, sr = load_audio_file(fpath, sample_rate)
             if max_length and len(audio) > max_length: audio = audio[:max_length]
             data.append({'file':os.path.basename(fpath), 'label':emotion, 'audio':audio})
         except:
@@ -111,7 +126,7 @@ def load_mesd(path, sample_rate=16000, max_length=None):
         emotion = next((e for e in MESD_EMOTIONS if e in parent or e in fn_lower), None)
         if not emotion: continue
         try:
-            audio, sr = librosa.load(fpath, sr=sample_rate)
+            audio, sr = load_audio_file(fpath, sample_rate)
             if max_length and len(audio) > max_length: audio = audio[:max_length]
             data.append({'file':os.path.basename(fpath), 'label':emotion, 'audio':audio})
         except:
