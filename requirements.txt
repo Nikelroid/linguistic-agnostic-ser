@@ -5,3 +5,8 @@ opensmile
 scikit-learn
 pandas
 numpy
+librosa
+fastapi
+uvicorn
+python-multipart
+pyyaml
