@@ -2,23 +2,35 @@ import os
 import glob
 import json
 import re
-import torch
-import torchaudio
-import torchaudio.transforms as T
+from scipy.io import wavfile
+from scipy.signal import resample
+import numpy as np
 from tqdm import tqdm
 
 def load_audio_file(filepath, target_sr):
-    # Replaces librosa.load with torchaudio native implementation
-    waveform, sr = torchaudio.load(filepath)
-    if sr != target_sr:
-        resampler = T.Resample(sr, target_sr, dtype=waveform.dtype)
-        waveform = resampler(waveform)
+    # Pure SciPy implementation (Bulletproof! 0 external audio libraries needed)
+    sr, waveform = wavfile.read(filepath)
     
+    # Normalize to standard float32 between -1.0 and 1.0 (just like librosa)
+    if waveform.dtype == np.int16:
+        waveform = waveform.astype(np.float32) / 32768.0
+    elif waveform.dtype == np.int32:
+        waveform = waveform.astype(np.float32) / 2147483648.0
+    else:
+        waveform = waveform.astype(np.float32)
+        if np.max(np.abs(waveform)) > 1.0:
+            waveform = waveform / np.max(np.abs(waveform))
+            
     # Downmix to mono if stereo
-    if waveform.shape[0] > 1:
-        waveform = torch.mean(waveform, dim=0, keepdim=True)
+    if len(waveform.shape) > 1 and waveform.shape[1] > 1:
+        waveform = np.mean(waveform, axis=1)
         
-    return waveform.squeeze().numpy(), target_sr
+    # Resample if needed
+    if sr != target_sr:
+        num_samples = int(len(waveform) * target_sr / sr)
+        waveform = resample(waveform, num_samples)
+        
+    return waveform, target_sr
 
 def load_ravdess(path, sample_rate=16000, max_length=None):
     RAVDESS_EMOTION_MAP = {
