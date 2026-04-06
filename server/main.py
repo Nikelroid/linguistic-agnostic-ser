@@ -31,11 +31,12 @@ global_config = load_config()
 
 def process_audio_file(file_path: str, model: str):
     time.sleep(2)
+    num_layers = 7 if "whisper" in model.lower() else 13
     return {
         "model": model,
         "predicted_emotion": random.choice(["happy", "sad", "angry", "neutral"]),
         "confidence": round(random.uniform(0.7, 0.99), 2),
-        "layers_f1": {f"Layer {i}": round(random.uniform(0.5, 0.8), 2) for i in range(12)}
+        "layers_f1": {f"Layer {i}": round(random.uniform(0.5, 0.8), 2) for i in range(num_layers)}
     }
 
 @app.post("/api/predict")
@@ -114,7 +115,8 @@ def get_aggregated_results():
     
     w2v2_data = [0.4] + [min(0.98, 0.5 + (i * 0.05) + random.uniform(-0.05, 0.05)) for i in range(12)]
     hubert_data = [0.42] + [min(0.99, 0.52 + (i * 0.06) + random.uniform(-0.04, 0.04)) for i in range(12)]
-    whisper_data = [0.35] + [min(0.95, 0.45 + (i * 0.04) + random.uniform(-0.06, 0.06)) for i in range(12)]
+    whisper_data = [0.35] + [min(0.95, 0.45 + (i * 0.04) + random.uniform(-0.06, 0.06)) for i in range(6)] + [None] * 6
+    
     
     return {
         # Derive list directly from YAML config dictionary

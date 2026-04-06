@@ -53,14 +53,23 @@ class TransformerExtractor(nn.Module):
             sampling_rate=sample_rate, 
             return_tensors="pt"
         )
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+        
+        # WhisperFeatureExtractor creates 'input_features' (log-mel spectograms), 
+        # Wav2Vec2FeatureExtractor creates 'input_values' (raw waveforms)
+        if self.is_whisper and "input_features" in inputs:
+            model_inputs = {"input_features": inputs["input_features"].to(self.device)}
+        elif "input_values" in inputs:
+            model_inputs = {"input_values": inputs["input_values"].to(self.device)}
+        else:
+            # Fallback to unpacking everything
+            model_inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         with torch.no_grad():
             if self.is_whisper:
                 # Whisper is an encoder-decoder model; we probe the encoder's hidden states
-                outputs = self.model.encoder(**inputs)
+                outputs = self.model.encoder(**model_inputs)
             else:
-                outputs = self.model(**inputs)
+                outputs = self.model(**model_inputs)
             
             hidden_states = outputs.hidden_states
         

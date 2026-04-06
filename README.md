@@ -1,4 +1,4 @@
-# Linguistic-Agnostic SER: A Probing Approach to Acoustic Emotion Encoding
+# Linguistic-Agnostic Speech Emotion Recognition: A Probing Approach to Acoustic Emotion Encoding
 
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue?logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-Deep_Learning-EE4C2C?logo=pytorch&logoColor=white)
@@ -7,101 +7,89 @@
 
 ## Project Overview
 
-This repository contains an MLOps-ready framework for probing Speech Emotion Recognition (SER) transformers to detect how paralinguistic, acoustic knowledge is encoded across their layers. 
+Welcome to the **Linguistic-Agnostic SER** repository. Speech emotion recognition (SER) has advanced significantly in recent years, driven by pretrained transformer models. However, because models like **wav2vec 2.0**, **HuBERT**, and **Whisper** are pretrained on massive linguistic datasets, their capacity to recognize emotion often inadvertently relies on *what* is being said, rather than *how* it is said (the paralinguistic tone).
 
-Modern SER systems (e.g., wav2vec 2.0, HuBERT, Whisper) rely on massive transformers that implicitly leverage linguistic cues. This project explicitly maps the acoustic hierarchy by extracting hidden states across all layers and using linear probes to evaluate layer-wise emotion retention.
+In this project, we completely freeze three prominent pretrained transformer architectures and probe their internal layers using a linear Logistic Regression classifier. By explicitly extracting the hidden states layer-by-layer across 6 datasets consisting of 4 wildly different languages (English, German, Greek, Spanish), we map out **where emotion-specific information resides within a neural network matrix**.
 
-## Features & Project Structure
+### Team Members
+- **Nima Kelidari** (kelidari@usc.edu)
+- **Minoo Ahmadi** (minooahm@usc.edu)
+- **Chaitanya Parwatkar** (parwatka@usc.edu)
+- **Xiangxu Lin** (xiangxul@usc.edu)
 
-The codebase has been refactored into a clean, modular MLOps architecture. 
+---
+
+## 🔑 Key Findings
+
+1. **Middle layers excel for acted speech.** Across datasets like RAVDESS and EmoDB, accuracy consistently peaks between Layers 2 and 5. Deeper layers, especially in wav2vec 2.0, catastrophically drop the acoustic information as the network focuses on linguistic structure.
+2. **Spontaneous conversation peaks earlier.** On conversational datasets like IEMOCAP, the models peak immediately at Layer 1 or 2 as real-world emotion relies heavily on sudden fluctuations in immediate pitch and volume.
+3. **HuBERT retains emotion better than wav2vec 2.0.** HuBERT’s offline clustering strategy preserves emotional signatures deep into Layer 12, whereas wav2vec 2.0’s contrastive task aggressively overwrites prosody.
+4. **Emotional encoding is language-agnostic.** Despite pre-training exclusively on English, the layers reacted identically for Spanish (MESD), German (EmoDB), and Greek (AESDD). 
+
+## 📂 Repository Architecture
+
+We have constructed a full MLOps framework mapping a modular logic tree managed structurally by YAML representations:
 
 ```
 linguistic-agnostic-ser/
-├── notebooks/                  # Consolidated unified experiment notebook
-├── src/
-│   ├── data_ingestion/         # Loaders for 6 datasets: RAVDESS, EmoDB, IEMOCAP, SAVEE, AESDD, MESD
-│   ├── preprocessing/          # Audio resampling, cropping, and dataset logic
-│   ├── models/                 # Transformer wrapper and hidden state extractor 
-│   ├── pipelines/              # Training logic (cross-val logreg) and plot generation
-│   └── utils/                  # Helper math functions
-├── scripts/                    # Entrypoints for running headless pipelines
-├── server/                     # FastAPI backend and vanilla Javascript Premium UI
-└── results/                    # Extracted embeddings, raw CSV outputs, and visual plots
+├── config/                     # Core execution configs (config.yaml)
+├── docs/                       # Theoretical and mechanical documentation map
+├── notebooks/                  # Interactive experimentation playground
+│   ├── 01_exploratory_probing_analysis.ipynb
+│   └── 02_mass_experiments.ipynb
+├── src/                        # Modular Core Logic
+│   ├── data_ingestion/         # Parsers for RAVDESS, EmoDB, IEMOCAP, SAVEE, AESDD, MESD
+│   ├── preprocessing/          # torchaudio & opensmile 16kHz processors
+│   ├── models/                 # Transformer and hidden state extractor 
+│   ├── pipelines/              # Layer-wise statistical probing execution
+│   └── utils/                  # Universal YAML parameter fetchers
+├── scripts/                    # Headless CLI endpoints
+└── server/                     # FastAPI backend and vanilla Javascript Dashboard
 ```
-
-### 1. Data Processing Pipeline (`src/data_ingestion/`, `src/preprocessing/`)
-Dynamically parses multiple audio corpora using optimal metadata extraction and standardizes them to 16kHz for uniform Transformer ingest.
-
-### 2. Transformer Representation Extractor (`src/models/feature_extractors.py`)
-Intercepts and freezes representations across all layers of models like `facebook/wav2vec2-base` or `facebook/hubert-base-ls960`. Detaches memory dynamically to maintain low compute overhead.
-
-### 3. Layer-Wise Statistical Probing (`src/pipelines/train.py`)
-Fits lightweight logistic models across hidden states using rigorous 5-Fold Stratified Cross-Validation to guarantee generalized inference over different validation domains.
 
 ---
 
-## Installation
+## 🚀 Installation & Execution
 
-1. **Clone the repository:**
+### 1. Installation
+Clone the repository and install standard requirements:
 ```bash
 git clone https://github.com/nikelroid/linguistic-agnostic-ser.git
 cd linguistic-agnostic-ser
-```
-
-2. **Install Dependencies:**
-The project relies on PyTorch, Transformers, Audio packages, and FastAPI.
-```bash
 pip install -r requirements.txt
-pip install fastapi uvicorn python-multipart  # If not in requirements
 ```
 
----
-
-## Usage
-
-### Method 1: Web Interface (FastAPI UI)
-
-To explore predictions visually via a premium, dark-mode browser dashboard:
-1. Start the server:
+### 2. Live Probing Dashboard (FastAPI)
+The UI incorporates a dark-mode interactive testing lab to chart your layers dynamically and stream live stdout background pipes.
 ```bash
 uvicorn server.main:app --reload
 ```
-2. Navigate to `http://localhost:8000/` locally.
-3. Drag & drop `.wav` files for analysis, or explore dynamically pre-loaded results.
+Navigate to `http://localhost:8000/`.
 
-### Method 2: Command Line Pipeline Execution
-
-To extract features and cross-validate layers on raw datasets from the CLI:
-
+### 3. Headless Pipeline Runs
+Drive the entire logic graph structurally from the command line on any dataset:
 ```bash
 python -m scripts.run_pipeline \
   --task classification \
-  --data_dir /path/to/RAVDESS_folder \
   --dataset_name RAVDESS \
-  --model_name facebook/wav2vec2-base \
-  --batch_size 4
+  --data_dir /path/to/RAVDESS_folder \
+  --model_name facebook/wav2vec2-base
 ```
-
-### Method 3: Notebook Playgrounds
-For iterative R&D, open `notebooks/01_comprehensive_experiment.ipynb` to view our fully aggregated 18 experiments crossing 3 variants (w2v2, HuBERT, Whisper) against 6 domains.
+*Note: Config defaults (like Batch Sizes and Random Seeds) are fetched from `config/config.yaml` automatically.*
 
 ---
 
-## Comprehensive Results Summary
+## 📊 Performance Statistics
 
-Our comprehensive evaluation on over **18 combinations** highlighted the behavior of layered embeddings:
+Our exhaustive evaluations returned the following peak layer characteristics across architectures:
 
-| Model | Dataset | Best Layer | Best Accuracy | Best F1 |
+| Model | Architecture Depth | Dataset | Best Layer | Accuracy |
 |---|---|---|---|---|
-| wav2vec2 | RAVDESS | Layer 5 | 0.9701 | 0.9701 |
-| wav2vec2 | EmoDB | Layer 4 | 0.9720 | 0.9719 |
-| wav2vec2 | IEMOCAP | Layer 1 | 0.6498 | 0.6498 |
-| HuBERT | RAVDESS | Layer 8 | 0.9757 | 0.9757 |
-| HuBERT | EmoDB | Layer 5 | 0.9776 | 0.9774 |
-| Whisper | RAVDESS | Layer 6 | 0.9750 | 0.9751 |
-| Whisper | EmoDB | Layer 5 | 0.9570 | 0.9566 |
+| wav2vec2 | 13 representations | RAVDESS (English) | Layer 5 | 0.9701 |
+| HuBERT | 13 representations | RAVDESS (English) | Layer 8 | 0.9757 |
+| Whisper | 7 representations | RAVDESS (English) | Layer 6 | 0.9750 |
+| wav2vec2 | 13 representations | IEMOCAP (Spontaneous) | Layer 1 | 0.6498 |
+| Whisper | 7 representations | IEMOCAP (Spontaneous) | Layer 2 | 0.7009 |
+| wav2vec2 | 13 representations | AESDD (Greek) | Layer 2 | 0.9039 |
 
-*Check the extensive table inside notebooks documentation for complete numbers on SAVEE, AESDD, and MESD.*
-
-## License
-Open-source for Academic/Research purposes. Please attribute original authors if replicating the pipeline schema.
+*See `docs/project_documentation.md` for full cross-lingual and methodology derivations.*

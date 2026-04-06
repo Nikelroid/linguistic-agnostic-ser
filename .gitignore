@@ -8,3 +8,4 @@ results/embeddings/*.npy
 *.out
 *.log
 .env
+docs/Midterm_Report/
