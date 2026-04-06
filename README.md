@@ -164,7 +164,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 ### 3. Emotion-Specific Confusion Mapping
 
 <div align="center">
-  <img src="docs/Midterm_Report/dataset_distributions.png" width="40%">
+  <img src="docs/Midterm_Report/dataset_distributions.png" width="55%">
   <br/>
   <em>Class distribution of emotional utterances across all evaluated testing datasets mapping the degree of balance.</em>
 </div>
@@ -172,7 +172,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 <br/>
 
 <div align="center">
-  <img src="docs/Midterm_Report/confusion_matrix.png" width="40%">
+  <img src="docs/Midterm_Report/confusion_matrix.png" width="45%">
   <br/>
   <em>Confusion matrix from Layer 5, wav2vec 2.0 on RAVDESS testing predictions vs truth distributions.</em>
 </div>
