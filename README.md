@@ -144,6 +144,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
   <em>Comparison of average probing accuracy across layers for wav2vec 2.0, HuBERT, and Whisper, computed as the mean accuracy over all six datasets at each corresponding layer.</em>
 </div>
 
+ 
 **Key Observations:**
 - **Middle layers excel for acted speech.** Across datasets like RAVDESS and EmoDB, accuracy consistently peaks between Layers 2 and 5. Early layers merely capture raw frequency bounds, while middle layers actively entwine representations of prosody (pitch and rhythm).
 - **Spontaneous conversation peaks earlier.** On raw, conversational datasets like IEMOCAP, the models peak immediately at Layer 1 or 2 as real-world emotion relies heavily on abrupt acoustic fluctuations, not highly structured theatrical contours.
@@ -176,5 +177,21 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
   <em>Confusion matrix from Layer 5, wav2vec 2.0 on RAVDESS testing predictions vs truth distributions.</em>
 </div>
 
+
+ 
 **Key Observation:**
 Fear (high-pitch, shaky amplitude) is consistently the easiest categorical target for the layer probes to decipher successfully since its physical signature is profoundly distinct. On the other hand, *Sadness* heavily confuses the acoustic classifiers—often misidentified as *Calm* due to the structurally slow, low-energy vocal bandwidth overlapping heavily between both states, reinforcing that the probe explicitly maps accurate physical structures.
+
+## Contributing
+
+1.  Fork the project.
+2.  Create your feature branch (`git checkout -b feature/NewAlgorithm`).
+3.  Commit your changes (`git commit -m 'Add new blending mode'`).
+4.  Push to the branch (`git push origin feature/NewAlgorithm`).
+5.  Open a Pull Request.
+
+## License
+
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT) - see the [LICENSE](LICENSE) file for details.
+
