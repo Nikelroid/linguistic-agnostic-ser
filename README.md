@@ -131,7 +131,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 ### 1. Architectural Divergences
 
 <div align="center">
-  <img src="docs/Midterm_Report/model_comparison_accuracy.png" width="90%">
+  <img src="docs/Midterm_Report/all_18_3panel.png" width="90%">
   <br/>
   <em>Layer-wise probing accuracy broken down by architecture. Wav2vec 2.0 constantly collapses in deeper layers as it enforces linguistic understanding, whereas HuBERT retains emotion into the final layer block. Whisper maintains high baseline accuracy directly out of the box against its 7 internal representations.</em>
 </div>
@@ -153,7 +153,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 ### 2. General Representation Maps
 
 <div align="center">
-  <img src="docs/Midterm_Report/all_18_3panel.png" width="90%">
+  <img src="docs/Midterm_Report/model_comparison_accuracy.png" width="90%">
   <br/>
   <em>Layer-wise probing accuracy for all 18 experiments simultaneously, grouped by model. Each color represents a distinct dataset.</em>
 </div>
