@@ -139,7 +139,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 <br/>
 
 <div align="center">
-  <img src="docs/Midterm_Report/comparison_accuracy.png" width="70%">
+  <img src="docs/Midterm_Report/comparison_accuracy.png" width="60%">
   <br/>
   <em>Comparison of average probing accuracy across layers for wav2vec 2.0, HuBERT, and Whisper, computed as the mean accuracy over all six datasets at each corresponding layer.</em>
 </div>
@@ -152,7 +152,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 ### 2. General Representation Maps
 
 <div align="center">
-  <img src="docs/Midterm_Report/all_18_3panel.png" width="70%">
+  <img src="docs/Midterm_Report/all_18_3panel.png" width="90%">
   <br/>
   <em>Layer-wise probing accuracy for all 18 experiments simultaneously, grouped by model. Each color represents a distinct dataset.</em>
 </div>
@@ -163,7 +163,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 ### 3. Emotion-Specific Confusion Mapping
 
 <div align="center">
-  <img src="docs/Midterm_Report/dataset_distributions.png" width="60%">
+  <img src="docs/Midterm_Report/dataset_distributions.png" width="40%">
   <br/>
   <em>Class distribution of emotional utterances across all evaluated testing datasets mapping the degree of balance.</em>
 </div>
@@ -171,7 +171,7 @@ We evaluated topological accuracy trajectories rigorously to confirm our archite
 <br/>
 
 <div align="center">
-  <img src="docs/Midterm_Report/confusion_matrix.png" width="70%">
+  <img src="docs/Midterm_Report/confusion_matrix.png" width="40%">
   <br/>
   <em>Confusion matrix from Layer 5, wav2vec 2.0 on RAVDESS testing predictions vs truth distributions.</em>
 </div>
