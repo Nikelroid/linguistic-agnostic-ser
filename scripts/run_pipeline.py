@@ -17,21 +17,32 @@ def main(args):
     # Load standardized configuration
     config = load_config()
 
-    
+    # Synchronize Model Name from CLI shorthand or full path
+    base_model_key = args.model_name.lower().split('/')[-1].split('-')[0]
+    if args.model_name in config['models']:
+        resolved_model_path = config['models'][args.model_name]['path']
+    elif base_model_key in config['models'] and '/' not in args.model_name:
+        resolved_model_path = config['models'][base_model_key]['path']
+    else:
+        resolved_model_path = args.model_name
+
     # Initialize WandB
-    clean_model_name_init = args.model_name.split('/')[-1]
+    clean_model_name_init = resolved_model_path.split('/')[-1]
     
-    # Use provided args or fall back to config (defaulting to AGSER team)
+    # Use provided args or fall back to config
     wandb_entity = args.wandb_entity if args.wandb_entity else config.get('wandb', {}).get('entity', 'AGSER')
     wandb_project = args.wandb_project if args.wandb_project else config.get('wandb', {}).get('project', 'linguistic-agnostic-ser')
 
+    print(f"--> Initializing W&B Run for {clean_model_name_init} on {args.dataset_name}...")
     wandb.init(
         entity=wandb_entity,
         project=wandb_project,
         name=f"{clean_model_name_init}_{args.dataset_name}",
+        reinit=True,
         config={
             "args": vars(args),
-            "config": config
+            "config": config,
+            "resolved_model": resolved_model_path
         }
     )
     
@@ -39,7 +50,7 @@ def main(args):
     batch_size = args.batch_size if args.batch_size else config['training']['batch_size']
     sample_rate = config['training']['sample_rate']
     
-    print(f"Loaded config: Batch Size={batch_size}, Target Model={args.model_name}")
+    print(f"Loaded config: Batch Size={batch_size}, Target Model={resolved_model_path}")
 
     if args.task == 'regression':
         audio_paths = [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) if f.endswith('.wav')]
@@ -66,11 +77,11 @@ def main(args):
             y_target = y_target[non_nan_idx]
             audio_paths = [p for i, p in enumerate(audio_paths) if non_nan_idx[i]]
 
-        print(f"Extracting hidden states from {args.model_name}...")
+        print(f"Extracting hidden states from {resolved_model_path}...")
         from src.preprocessing.audio_processor import AudioDataset
         dataset = AudioDataset(audio_paths)
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-        extractor = TransformerExtractor(model_name=args.model_name)
+        extractor = TransformerExtractor(model_name=resolved_model_path)
         
         hidden_states = []
         total_batches = len(dataloader)
@@ -118,13 +129,13 @@ def main(args):
             print("No data extracted. Please check dataset path.")
             return
             
-        extractor = TransformerExtractor(model_name=args.model_name)
+        extractor = TransformerExtractor(model_name=resolved_model_path)
         audio_tensors = []
         labels = []
         
         from tqdm import tqdm
         
-        print("Extracting acoustic representations...")
+        print(f"Extracting acoustic representations from {resolved_model_path}...")
         total_data = len(data)
         for i, row in enumerate(tqdm(data, desc=f"Evaluating {args.dataset_name}")):
             # We take audio numpy arrays returned by loaders and convert them
@@ -140,13 +151,12 @@ def main(args):
                     "samples_processed": i + 1
                 })
 
-            
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])
         
 
 
-    lower_model_name = args.model_name.lower()
+    lower_model_name = resolved_model_path.lower()
     if 'wav2vec2' in lower_model_name:
         clean_model_name = 'wav2vec2'
     elif 'hubert' in lower_model_name:
@@ -199,7 +209,7 @@ if __name__ == "__main__":
     parser.add_argument("--task", type=str, choices=['classification', 'regression'], default='classification')
     parser.add_argument("--data_dir", type=str, required=True, help="Path to raw dataset")
     parser.add_argument("--dataset_name", type=str, default="RAVDESS")
-    parser.add_argument("--model_name", type=str, default="facebook/wav2vec2-base")
+    parser.add_argument("--model_name", type=str, default="facebook/wav2vec2-large-960h")
     parser.add_argument("--target_feature", type=str, default="F0semitoneFrom27.5Hz_sma3nz_amean")
     parser.add_argument("--batch_size", type=int, default=None) # Falls back to config if None
     parser.add_argument("--wandb_entity", type=str, default=None)

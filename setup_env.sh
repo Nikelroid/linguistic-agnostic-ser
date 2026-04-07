@@ -77,3 +77,4 @@ echo "=========================================="
 echo " Initialization & Queue Complete!"
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="
+ 

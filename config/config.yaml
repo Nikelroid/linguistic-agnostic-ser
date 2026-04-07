@@ -2,13 +2,13 @@
 
 models:
   wav2vec2:
-    path: "facebook/wav2vec2-base"
+    path: "facebook/wav2vec2-large-960h"
     is_whisper: false
   hubert:
-    path: "facebook/hubert-base-ls960"
+    path: "facebook/hubert-large-ll60k"
     is_whisper: false
   whisper:
-    path: "openai/whisper-base"
+    path: "openai/whisper-medium"
     is_whisper: true
 
 datasets:

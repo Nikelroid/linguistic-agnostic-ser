@@ -26,7 +26,7 @@ conda activate ser_env
 
 cd /home1/$USER/linguistic-agnostic-ser
 
-BATCH_SIZE=8
+BATCH_SIZE=4
 DATASETS=("RAVDESS" "EmoDB" "IEMOCAP" "SAVEE" "AESDD" "MESD")
 MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium")
 
