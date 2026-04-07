@@ -64,7 +64,21 @@ else
 fi
 
 echo "=========================================="
-echo " 5. Queueing Deployment"
+echo " 5. Pre-Caching Models"
+echo "=========================================="
+echo "Downloading models on login node to prevent Slurm timeouts..."
+conda run -n $ENV_NAME python -c "
+from transformers import AutoModel, AutoFeatureExtractor, AutoConfig
+models = ['facebook/wav2vec2-large-960h', 'facebook/hubert-large-ll60k', 'openai/whisper-medium']
+for m in models:
+    print(f'Caching {m}...')
+    AutoConfig.from_pretrained(m)
+    AutoFeatureExtractor.from_pretrained(m)
+    AutoModel.from_pretrained(m)
+"
+
+echo "=========================================="
+echo " 6. Queueing Deployment"
 echo "=========================================="
 
 echo "Initializing cluster background job scheduler..."

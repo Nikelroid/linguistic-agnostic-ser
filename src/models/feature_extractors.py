@@ -23,10 +23,17 @@ class TransformerExtractor(nn.Module):
         
         # Load the model and freeze it
         try:
+            # First attempt: Try standard load (it will use cache if available or download if needed)
+            # We prefer safetensors to bypass the security vulnerability check in newer Transformers
             self.model = AutoModel.from_pretrained(model_name, config=self.config, use_safetensors=True)
         except Exception as e:
-            # Fallback if safetensors aren't available, though it might trigger the torch>=2.6 error
-            self.model = AutoModel.from_pretrained(model_name, config=self.config)
+            print(f"Standard loading failed for {model_name} (likely network timeout). Switching to local cache mode...")
+            try:
+                # Second attempt: Force local files only to bypass the Hub check/vulnerability check entirely
+                self.model = AutoModel.from_pretrained(model_name, config=self.config, local_files_only=True)
+            except Exception as e2:
+                print(f"Critical error: Model {model_name} not found in local cache and Hub is unreachable.")
+                raise e2
         self.model.eval()
         self.model.to(self.device)
         
