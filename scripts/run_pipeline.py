@@ -76,8 +76,16 @@ def main(args):
             data = load_ravdess(args.data_dir, sample_rate=sample_rate)
         elif args.dataset_name == 'EmoDB':
             data = load_emodb(args.data_dir, sample_rate=sample_rate)
+        elif args.dataset_name == 'IEMOCAP':
+            data = load_iemocap(args.data_dir, sample_rate=sample_rate)
+        elif args.dataset_name == 'SAVEE':
+            data = load_savee(args.data_dir, sample_rate=sample_rate)
+        elif args.dataset_name == 'AESDD':
+            data = load_aesdd(args.data_dir, sample_rate=sample_rate)
+        elif args.dataset_name == 'MESD':
+            data = load_mesd(args.data_dir, sample_rate=sample_rate)
         else:
-            print("Dataset not fully wired in script. Use RAVDESS or EmoDB.")
+            print(f"Dataset {args.dataset_name} not fully wired in script. Use RAVDESS, EmoDB, IEMOCAP, SAVEE, AESDD, or MESD.")
             return
             
         if not data:

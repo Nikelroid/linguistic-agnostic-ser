@@ -76,10 +76,12 @@ def load_emodb(path, sample_rate=16000, max_length=None):
 def load_iemocap(path, sample_rate=16000, max_length=None):
     # Depending on how it's extracted, we expect a meta_data.json
     data = []
-    meta_path = os.path.join(path, 'meta_data.json')
+    meta_path = os.path.join(path, 'meta_data', 'meta_data.json')
     if not os.path.exists(meta_path):
-        print("IEMOCAP meta_data.json not found.")
-        return data
+        meta_path = os.path.join(path, 'meta_data.json')
+        if not os.path.exists(meta_path):
+            print("IEMOCAP meta_data.json not found.")
+            return data
         
     with open(meta_path, 'r') as f:
         meta = json.load(f)
