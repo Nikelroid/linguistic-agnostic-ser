@@ -11,14 +11,13 @@ echo "=========================================="
 # 1. GitHub Token Validation safely prompted if not in session memory
 if [ -z "$GITHUB_TOKEN" ]; then
     echo "GitHub PAT not found in environment. Using default fallback..."
-    export GITHUB_TOKEN="REDACTED-CREDENTIAL"
+    export GITHUB_TOKEN=""
 fi
 
 # 2. WandB Configuration for automated tracking
-export WANDB_API_KEY="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"
 
-GITHUB_USER="nikelroid"
-REPO_URL="https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${GITHUB_USER}/linguistic-agnostic-ser.git"
+
+REPO_URL="https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/nikelroid/linguistic-agnostic-ser.git"
 REPO_NAME="linguistic-agnostic-ser"
 WORK_DIR="/home1/$USER"
 
