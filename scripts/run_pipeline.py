@@ -98,17 +98,14 @@ def main(args):
         
         from tqdm import tqdm
         
-        print(f"Extracting acoustic representations (Batch Size: {batch_size})...")
-        for i in tqdm(range(0, len(data), batch_size), desc=f"Evaluating {args.dataset_name}"):
-            batch = data[i:i+batch_size]
-            waveforms = [torch.from_numpy(row['audio']) for row in batch]
-            hidden_layers = extractor.extract_from_waveform(waveforms, sample_rate=sample_rate)
-            
-            # hidden_layers is a list of [batch_size, feature_dim] tensors as numpy arrays
-            for j in range(len(batch)):
-                # audio_tensors expects [num_layers, feature_dim] for each sample
-                audio_tensors.append([layer[j] for layer in hidden_layers])
-                labels.append(batch[j]['label'])
+        print("Extracting acoustic representations...")
+        for row in tqdm(data, desc=f"Evaluating {args.dataset_name}"):
+            # We take audio numpy arrays returned by loaders and convert them
+            waveform = torch.from_numpy(row['audio']).unsqueeze(0)
+            hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
+            audio_tensors.append([h[0] for h in hidden])
+            labels.append(row['label'])
+
             
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])

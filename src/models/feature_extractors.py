@@ -44,15 +44,12 @@ class TransformerExtractor(nn.Module):
     def extract_from_waveform(self, waveform, sample_rate=16000):
         """
         Forward pass to extract layer-wise representations.
-        waveform: Tensor of shape (batch_size, sequence_length) OR list of 1D Tensors
+        waveform: Tensor of shape (batch_size, sequence_length)
         Returns a list/tuple of hidden states across all layers as numpy arrays.
         """
-        if isinstance(waveform, torch.Tensor):
-            if waveform.dim() == 1:
-                waveform = waveform.unsqueeze(0)
-            waveform_list = [w.cpu().numpy() for w in waveform]
-        else:
-            waveform_list = [w.cpu().numpy() if isinstance(w, torch.Tensor) else w for w in waveform]
+        # Convert waveform to numpy list for feature extractor
+        waveform_np = waveform.cpu().numpy()
+        waveform_list = [w for w in waveform_np]
         
         # Prepare inputs using the correct feature extractor
         inputs = self.feature_extractor(
