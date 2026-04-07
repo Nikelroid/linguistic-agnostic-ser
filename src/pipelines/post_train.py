@@ -45,6 +45,7 @@ def plot_layer_results(results_df, model_name, dataset_name, save_dir='results/p
     plt.savefig(save_path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f'Plot saved to: {save_path}')
+    return save_path
 
 def plot_averages_across_models(df, save_dir='results/plots'):
     """

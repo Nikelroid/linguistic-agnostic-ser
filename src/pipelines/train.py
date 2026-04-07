@@ -87,6 +87,13 @@ def probe_all_layers(hidden_states, labels, n_splits=5, random_state=42, task_ty
                 'RMSE': round(rmse, 4)
             })
             print(f'  {layer_name:10s} | RMSE: {rmse:.4f}')
+            
+            import wandb
+            if wandb.run is not None:
+                wandb.log({
+                    "layer": layer_idx,
+                    "rmse": rmse
+                })
         else:
             mean_acc, std_acc, mean_f1 = prober.evaluate(X, y, n_splits, random_state)
             layer_name = 'CNN' if layer_idx == 0 else f'Layer {layer_idx}'
@@ -98,6 +105,15 @@ def probe_all_layers(hidden_states, labels, n_splits=5, random_state=42, task_ty
                 'Weighted_F1': round(mean_f1, 4)
             })
             print(f'  {layer_name:10s} | Accuracy: {mean_acc:.4f} (+/- {std_acc:.4f}) | F1: {mean_f1:.4f}')
+            
+            import wandb
+            if wandb.run is not None:
+                wandb.log({
+                    "layer": layer_idx,
+                    "accuracy": mean_acc,
+                    "std_accuracy": std_acc,
+                    "weighted_f1": mean_f1
+                })
             
     results_df = pd.DataFrame(results)
     if task_type == 'classification':

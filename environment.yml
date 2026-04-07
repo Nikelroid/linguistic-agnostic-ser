@@ -8,6 +8,8 @@ dependencies:
   - pytorch
   - torchaudio
   - transformers
+  - scipy
+  - wandb
   - scikit-learn
   - pandas
   - numpy
@@ -19,3 +21,4 @@ dependencies:
   - pip
   - pip:
       - opensmile
+      - wandb

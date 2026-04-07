@@ -113,6 +113,19 @@ def main(args):
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])
         
+    import wandb
+    
+    # Initialize WandB
+    clean_model_name_init = args.model_name.split('/')[-1]
+    wandb.init(
+        project="linguistic-agnostic-ser",
+        name=f"{clean_model_name_init}_{args.dataset_name}",
+        config={
+            "args": vars(args),
+            "config": config
+        }
+    )
+
     lower_model_name = args.model_name.lower()
     if 'wav2vec2' in lower_model_name:
         clean_model_name = 'wav2vec2'
@@ -121,7 +134,7 @@ def main(args):
     elif 'whisper' in lower_model_name:
         clean_model_name = 'Whisper'
     else:
-        clean_model_name = args.model_name.split('/')[-1]
+        clean_model_name = clean_model_name_init
 
     exp_name = f"{clean_model_name}_{args.dataset_name}"
     
@@ -138,9 +151,28 @@ def main(args):
     
     # Reconstruct graphical plots natively using the standardized names
     from src.pipelines.post_train import plot_layer_results
-    plot_layer_results(results_df, clean_model_name, args.dataset_name)
+    plot_path = plot_layer_results(results_df, clean_model_name, args.dataset_name)
     
-    print(f"[{exp_name}] Run fully committed across results/ (CSV, Plot, NPY).")
+    # Log results to WandB
+    if args.task == 'classification':
+        best_layer = results_df.loc[results_df['Accuracy'].idxmax()]
+        wandb.log({
+            "best_accuracy": best_layer['Accuracy'],
+            "best_f1": best_layer['Weighted_F1'],
+            "best_layer": best_layer['Layer_Num']
+        })
+    elif args.task == 'regression':
+        best_layer = results_df.loc[results_df['RMSE'].idxmin()]
+        wandb.log({
+            "best_rmse": best_layer['RMSE'],
+            "best_layer": best_layer['Layer_Num']
+        })
+
+    if plot_path and os.path.exists(plot_path):
+        wandb.log({"performance_plot": wandb.Image(plot_path)})
+
+    print(f"[{exp_name}] Run fully committed across results/ (CSV, Plot, NPY) and WandB.")
+    wandb.finish()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
