@@ -118,6 +118,7 @@ def main(args):
     # Initialize WandB
     clean_model_name_init = args.model_name.split('/')[-1]
     wandb.init(
+        entity="AGSER",
         project="linguistic-agnostic-ser",
         name=f"{clean_model_name_init}_{args.dataset_name}",
         config={
