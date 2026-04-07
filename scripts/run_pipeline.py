@@ -105,6 +105,8 @@ def main(args):
         hidden_states = np.stack(hidden_states, axis=1) 
         
         results_df = probe_all_layers(hidden_states, y_target, task_type='regression', random_state=config['training']['random_state'])
+        labels_to_save = y_target
+        filenames_to_save = [os.path.basename(p) for p in audio_paths]
         
     elif args.task == 'classification':
         print(f"Loading dataset: {args.dataset_name}")
@@ -132,6 +134,7 @@ def main(args):
         extractor = TransformerExtractor(model_name=resolved_model_path)
         audio_tensors = []
         labels = []
+        filenames = []
         
         from tqdm import tqdm
         
@@ -143,6 +146,7 @@ def main(args):
             hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
             audio_tensors.append([h[0] for h in hidden])
             labels.append(row['label'])
+            filenames.append(row.get('file', f"sample_{i}.wav"))
 
             # Log extraction progress to WandB every 10 samples
             if (i + 1) % 10 == 0 or (i + 1) == total_data:
@@ -153,6 +157,8 @@ def main(args):
 
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])
+        labels_to_save = labels
+        filenames_to_save = filenames
         
 
 
@@ -176,8 +182,20 @@ def main(args):
     # Save tensor layers offline for custom dimensionality mapping (t-SNE/PCA)
     embed_dir = "results/embeddings"
     os.makedirs(embed_dir, exist_ok=True)
+    
+    # Save hidden states
     embed_path = os.path.join(embed_dir, f"hidden_states_{exp_name}.npy")
     np.save(embed_path, hidden_states)
+    
+    # Save labels (matching 18exp.ipynb reference)
+    labels_path = os.path.join(embed_dir, f"labels_{exp_name}.npy")
+    np.save(labels_path, labels_to_save)
+    
+    # Save filenames for traceability
+    files_path = os.path.join(embed_dir, f"filenames_{exp_name}.npy")
+    np.save(files_path, np.array(filenames_to_save, dtype=object))
+    
+    print(f"💾 Embeddings, Labels, and Filenames saved to {embed_dir}")
     
     # Reconstruct graphical plots natively using the standardized names
     from src.pipelines.post_train import plot_layer_results
