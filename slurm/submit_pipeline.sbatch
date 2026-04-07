@@ -1,57 +1,56 @@
 #!/bin/bash
-#SBATCH --account=kelidari        # >> REPLACE THIS with your CARC Project ID <<
+#SBATCH --account=msoleyma_1026
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:v100:1                 # Requested: 1 V100 GPU
+#SBATCH --job-name=agnostic-ser-pipeline
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4                 # Requested: 4 CPU Cores
-#SBATCH --mem=32G                         # Requested: 32 GB RAM (Safe overhead for Safetensors mmap)
-#SBATCH --time=12:00:00                   # 12-hour queue limit
-#SBATCH --output=slurm_logs/pipeline_%j.out
-#SBATCH --error=slurm_logs/pipeline_%j.err
+#SBATCH --cpus-per-task=4
+#SBATCH --gres=gpu:1
+#SBATCH --mem=16G
+#SBATCH --time=3:00:00
+#SBATCH --output=slurm/logs/%x-%A_%a.out
+#SBATCH --error=slurm/logs/%x-%A_%a.err
+#SBATCH --array=0-17
 
-# Safe Exit on failure
 set -e
 
 echo "=========================================="
 echo " Starting Slurm Job: $SLURM_JOB_ID"
 echo " Node Assigned: $SLURMD_NODENAME"
+mkdir -p slurm/logs
 echo "=========================================="
 
-# Automatically connect conda exactly as the interactive shell does
 echo "Initializing Miniconda Core..."
 source $HOME/miniconda/etc/profile.d/conda.sh
 conda activate ser_env
 
-# Navigate directly to where the code rests on home1
 cd /home1/$USER/linguistic-agnostic-ser
 
-# Pipeline Matrices
-BATCH_SIZE=4
+BATCH_SIZE=8
 DATASETS=("RAVDESS" "EmoDB" "IEMOCAP" "SAVEE" "AESDD" "MESD")
-MODELS=("facebook/wav2vec2-base" "facebook/hubert-base-ls960" "openai/whisper-small")
+MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium")
 
-echo "Commencing Aggregated Python Pipeline Execution Matrix..."
+# Calculate Matrix Indices
+N_DATASETS=${#DATASETS[@]}
+ID_DATASET=$((SLURM_ARRAY_TASK_ID % N_DATASETS))
+ID_MODEL=$((SLURM_ARRAY_TASK_ID / N_DATASETS))
 
-for MODEL_NAME in "${MODELS[@]}"; do
-    for DATASET_NAME in "${DATASETS[@]}"; do
-        
-        DATA_DIR="/scratch1/$USER/ser_data/${DATASET_NAME}"
-        
-        echo "=========================================================="
-        echo "--> Processing: $DATASET_NAME | Model: $MODEL_NAME"
-        echo "=========================================================="
-        
-        # Execute run logic for each pair
-        python -u -m scripts.run_pipeline \
-          --task classification \
-          --data_dir "$DATA_DIR" \
-          --dataset_name "$DATASET_NAME" \
-          --model_name "$MODEL_NAME" \
-          --batch_size $BATCH_SIZE
+DATASET_NAME="${DATASETS[$ID_DATASET]}"
+MODEL_NAME="${MODELS[$ID_MODEL]}"
+DATA_DIR="/scratch1/$USER/ser_data/${DATASET_NAME}"
 
-    done
-done
+echo "=========================================================="
+echo "--> Task ID: $SLURM_ARRAY_TASK_ID | Experiment: $DATASET_NAME x $MODEL_NAME"
+echo "=========================================================="
+
+python -u -m scripts.run_pipeline \
+  --task classification \
+  --data_dir "$DATA_DIR" \
+  --dataset_name "$DATASET_NAME" \
+  --model_name "$MODEL_NAME" \
+  --batch_size $BATCH_SIZE \
+  --wandb_entity AGSER \
+  --wandb_project linguistic-agnostic-ser
 
 echo "=========================================="
 echo " Pipeline Finished Successfully"
