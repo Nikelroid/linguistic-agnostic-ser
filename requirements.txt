@@ -5,6 +5,7 @@ opensmile
 scikit-learn
 pandas
 numpy
+matplotlib
 fastapi
 uvicorn
 python-multipart
