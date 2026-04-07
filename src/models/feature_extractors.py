@@ -22,7 +22,11 @@ class TransformerExtractor(nn.Module):
         self.feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)
         
         # Load the model and freeze it
-        self.model = AutoModel.from_pretrained(model_name, config=self.config)
+        try:
+            self.model = AutoModel.from_pretrained(model_name, config=self.config, use_safetensors=True)
+        except Exception as e:
+            # Fallback if safetensors aren't available, though it might trigger the torch>=2.6 error
+            self.model = AutoModel.from_pretrained(model_name, config=self.config)
         self.model.eval()
         self.model.to(self.device)
         

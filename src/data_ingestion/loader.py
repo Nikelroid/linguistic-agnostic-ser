@@ -6,6 +6,10 @@ from scipy.io import wavfile
 from scipy.signal import resample
 import numpy as np
 from tqdm import tqdm
+import warnings
+from scipy.io.wavfile import WavFileWarning
+
+warnings.filterwarnings("ignore", category=WavFileWarning)
 
 def load_audio_file(filepath, target_sr):
     # Pure SciPy implementation (Bulletproof! 0 external audio libraries needed)
