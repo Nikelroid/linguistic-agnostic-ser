@@ -96,8 +96,10 @@ def main(args):
         audio_tensors = []
         labels = []
         
-        print("Extracting features...")
-        for row in data:
+        from tqdm import tqdm
+        
+        print("Extracting acoustic representations...")
+        for row in tqdm(data, desc=f"Evaluating {args.dataset_name}"):
             # We take audio numpy arrays returned by loaders and convert them
             waveform = torch.from_numpy(row['audio']).unsqueeze(0)
             hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)

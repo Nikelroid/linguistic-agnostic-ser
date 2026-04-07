@@ -81,6 +81,12 @@ class TransformerExtractor(nn.Module):
         for state in hidden_states:
             # Mean pooling over the time dimension (dim=1)
             pooled_state = torch.mean(state, dim=1)
-            pooled_states.append(pooled_state.cpu().numpy())
+            pooled_states.append(pooled_state.cpu().detach().numpy().copy())
+            
+        del outputs
+        del hidden_states
+        del model_inputs
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
             
         return pooled_states

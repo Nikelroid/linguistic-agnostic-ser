@@ -5,7 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4                 # Requested: 4 CPU Cores
-#SBATCH --mem=16G                         # Requested: 16 GB RAM
+#SBATCH --mem=32G                         # Requested: 32 GB RAM (Safe overhead for Safetensors mmap)
 #SBATCH --time=12:00:00                   # 12-hour queue limit
 #SBATCH --output=slurm_logs/pipeline_%j.out
 #SBATCH --error=slurm_logs/pipeline_%j.err
