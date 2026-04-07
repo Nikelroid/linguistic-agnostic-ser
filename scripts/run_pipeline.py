@@ -107,10 +107,25 @@ def main(args):
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])
         
-    out_path = os.path.join("results/csv", f"probing_results_{args.model_name.replace('/', '_')}.csv")
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    results_df.to_csv(out_path, index=False)
-    print(f"Results saved to {out_path}")
+    clean_model_name = args.model_name.split('/')[-1]
+    exp_name = f"{clean_model_name}_{args.dataset_name}"
+    
+    # Save statistics directly into CSV routing
+    csv_path = os.path.join("results/csv", f"probing_results_{exp_name}.csv")
+    os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+    results_df.to_csv(csv_path, index=False)
+    
+    # Save tensor layers offline for custom dimensionality mapping (t-SNE/PCA)
+    embed_dir = "results/embeddings"
+    os.makedirs(embed_dir, exist_ok=True)
+    embed_path = os.path.join(embed_dir, f"hidden_states_{exp_name}.npy")
+    np.save(embed_path, hidden_states)
+    
+    # Reconstruct graphical plots natively using the standardized names
+    from src.pipelines.post_train import plot_layer_results
+    plot_layer_results(results_df, clean_model_name, args.dataset_name)
+    
+    print(f"[{exp_name}] Run fully committed across results/ (CSV, Plot, NPY).")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
