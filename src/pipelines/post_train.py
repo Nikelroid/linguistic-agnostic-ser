@@ -1,7 +1,9 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
 import os
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 def plot_layer_results(results_df, model_name, dataset_name, save_dir='results/plots'):
     """
