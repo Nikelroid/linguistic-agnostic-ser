@@ -62,7 +62,53 @@ cd linguistic-agnostic-ser
 The project relies on PyTorch, Transformers, Audio packages, and FastAPI.
 ```bash
 pip install -r requirements.txt
-pip install fastapi uvicorn python-multipart pyyaml  # Core framework requirements
+pip install fastapi uvicorn python-multipart pyyaml wandb  # Core framework requirements
+```
+
+---
+
+## 🚀 HPC Automation (USC CARC)
+
+The pipeline is professionally engineered for high-performance execution on the **USC CARC** clusters (Discovery/Endeavour). 
+
+### 1. Automated Deployment (`setup_env.sh`)
+
+To deploy the repository, build the environment, and queue all 18 experiments in one command from your local machine:
+
+```bash
+ssh $USER@discovery.usc.edu "GITHUB_TOKEN=$GITHUB_TOKEN USER=$USER GITHUB_USER=$GITHUB_USER bash -s" < setup_env.sh
+```
+
+**What it does:**
+- Authenticates and pulls the latest code to your home directory.
+- Preemptively accepts Conda Terms of Service.
+- Synchronizes the `ser_env` Conda environment.
+- Queues the `submit_pipeline.sbatch` matrix.
+
+### 2. Parallel Slurm Matrix (`slurm/submit_pipeline.sbatch`)
+
+The pipeline utilizes a **Slurm Array (0-17)** to execute a 6x3 matrix (6 datasets x 3 models) in parallel.
+
+- **Datasets**: RAVDESS, EmoDB, IEMOCAP, SAVEE, AESDD, MESD
+- **Models**: wav2vec 2.0, HuBERT, Whisper-medium
+- **Resource Management**: Automatically redirects `HF_HOME` and `TRITON_CACHE_DIR` to `/scratch1/$USER/` to preserve home directory quotas.
+- **Log Isolation**: Each of the 18 experiments generates its own unique log file in `slurm/logs/` (e.g., `..._0.out`, `..._1.out`).
+
+---
+
+## 📊 Experiment Tracking (Weights & Biases)
+
+We have integrated **Weights & Biases (W&B)** for real-time observability across the 18-run experimental matrix.
+
+### Features:
+- **Live Progress Tracking**: Monitored via `extraction_progress_pct` and `probing_progress_pct` metrics.
+- **Layer-Wise Performance Maps**: Automated logging of validation accuracy and F1 scores across all transformer layers.
+- **Centralized Dashboard**: All runs are synced to the **`AGSER`** entity under the **`linguistic-agnostic-ser`** project.
+
+**Usage:**
+Ensure your `WANDB_API_KEY` is exported in your environment:
+```bash
+export WANDB_API_KEY="your_api_key_here"
 ```
 
 ---
@@ -86,10 +132,12 @@ To extract features and cross-validate layers on raw datasets from the CLI:
 ```bash
 python -m scripts.run_pipeline \
   --task classification \
-  --data_dir /path/to/RAVDESS_folder \
-  --dataset_name RAVDESS \
-  --model_name facebook/wav2vec2-base \
-  --batch_size 4
+  --data_dir /path/to/dataset \
+  --dataset_name IEMOCAP \
+  --model_name facebook/hubert-large-ll60k \
+  --batch_size 16 \
+  --wandb_entity AGSER \
+  --wandb_project linguistic-agnostic-ser
 ```
 
 ### Method 3: Notebook Playgrounds
