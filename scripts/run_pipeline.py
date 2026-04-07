@@ -109,11 +109,20 @@ def main(args):
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])
         
-    clean_model_name = args.model_name.split('/')[-1]
+    lower_model_name = args.model_name.lower()
+    if 'wav2vec2' in lower_model_name:
+        clean_model_name = 'wav2vec2'
+    elif 'hubert' in lower_model_name:
+        clean_model_name = 'HuBERT'
+    elif 'whisper' in lower_model_name:
+        clean_model_name = 'Whisper'
+    else:
+        clean_model_name = args.model_name.split('/')[-1]
+
     exp_name = f"{clean_model_name}_{args.dataset_name}"
     
     # Save statistics directly into CSV routing
-    csv_path = os.path.join("results/csv", f"probing_results_{exp_name}.csv")
+    csv_path = os.path.join("results/csv", f"results_{exp_name}.csv")
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     results_df.to_csv(csv_path, index=False)
     
