@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import DataLoader
 import torch
+import wandb
 
 from src.data_ingestion.loader import load_ravdess, load_emodb, load_iemocap, load_savee, load_aesdd, load_mesd
 from src.preprocessing.audio_processor import extract_features_opensmile
@@ -15,6 +16,24 @@ from src.utils.config_parser import load_config
 def main(args):
     # Load standardized configuration
     config = load_config()
+
+    
+    # Initialize WandB
+    clean_model_name_init = args.model_name.split('/')[-1]
+    
+    # Use provided args or fall back to config (defaulting to AGSER team)
+    wandb_entity = args.wandb_entity if args.wandb_entity else config.get('wandb', {}).get('entity', 'AGSER')
+    wandb_project = args.wandb_project if args.wandb_project else config.get('wandb', {}).get('project', 'linguistic-agnostic-ser')
+
+    wandb.init(
+        entity=wandb_entity,
+        project=wandb_project,
+        name=f"{clean_model_name_init}_{args.dataset_name}",
+        config={
+            "args": vars(args),
+            "config": config
+        }
+    )
     
     # Resolve batch size or sample rate falling back to config if not provided explicitly
     batch_size = args.batch_size if args.batch_size else config['training']['batch_size']
@@ -54,13 +73,20 @@ def main(args):
         extractor = TransformerExtractor(model_name=args.model_name)
         
         hidden_states = []
-        for batch in dataloader:
+        total_batches = len(dataloader)
+        for i, batch in enumerate(dataloader):
             if batch is None: continue
             h_states = extractor.extract_from_waveform(batch['waveform'], sample_rate=sample_rate)
             if not hidden_states:
                 hidden_states = [[] for _ in range(len(h_states))]
-            for i, h in enumerate(h_states):
-                hidden_states[i].append(h)
+            for j, h in enumerate(h_states):
+                hidden_states[j].append(h)
+            
+            # Log extraction progress to WandB
+            wandb.log({
+                "extraction_progress_pct": round((i + 1) / total_batches * 100, 2),
+                "batches_processed": i + 1
+            })
                 
         for i in range(len(hidden_states)):
             hidden_states[i] = np.concatenate(hidden_states[i], axis=0)
@@ -99,30 +125,26 @@ def main(args):
         from tqdm import tqdm
         
         print("Extracting acoustic representations...")
-        for row in tqdm(data, desc=f"Evaluating {args.dataset_name}"):
+        total_data = len(data)
+        for i, row in enumerate(tqdm(data, desc=f"Evaluating {args.dataset_name}")):
             # We take audio numpy arrays returned by loaders and convert them
             waveform = torch.from_numpy(row['audio']).unsqueeze(0)
             hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
             audio_tensors.append([h[0] for h in hidden])
             labels.append(row['label'])
 
+            # Log extraction progress to WandB every 10 samples
+            if (i + 1) % 10 == 0 or (i + 1) == total_data:
+                wandb.log({
+                    "extraction_progress_pct": round((i + 1) / total_data * 100, 2),
+                    "samples_processed": i + 1
+                })
+
             
         hidden_states = np.array(audio_tensors)
         results_df = probe_all_layers(hidden_states, labels, task_type='classification', random_state=config['training']['random_state'])
         
-    import wandb
-    
-    # Initialize WandB
-    clean_model_name_init = args.model_name.split('/')[-1]
-    wandb.init(
-        entity="AGSER",
-        project="linguistic-agnostic-ser",
-        name=f"{clean_model_name_init}_{args.dataset_name}",
-        config={
-            "args": vars(args),
-            "config": config
-        }
-    )
+
 
     lower_model_name = args.model_name.lower()
     if 'wav2vec2' in lower_model_name:
@@ -180,5 +202,7 @@ if __name__ == "__main__":
     parser.add_argument("--model_name", type=str, default="facebook/wav2vec2-base")
     parser.add_argument("--target_feature", type=str, default="F0semitoneFrom27.5Hz_sma3nz_amean")
     parser.add_argument("--batch_size", type=int, default=None) # Falls back to config if None
+    parser.add_argument("--wandb_entity", type=str, default=None)
+    parser.add_argument("--wandb_project", type=str, default=None)
     args = parser.parse_args()
     main(args)

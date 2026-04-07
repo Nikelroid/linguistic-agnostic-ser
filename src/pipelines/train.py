@@ -92,7 +92,8 @@ def probe_all_layers(hidden_states, labels, n_splits=5, random_state=42, task_ty
             if wandb.run is not None:
                 wandb.log({
                     "layer": layer_idx,
-                    "rmse": rmse
+                    "rmse": rmse,
+                    "probing_progress_pct": round((layer_idx + 1) / num_layers * 100, 2)
                 })
         else:
             mean_acc, std_acc, mean_f1 = prober.evaluate(X, y, n_splits, random_state)
@@ -112,7 +113,8 @@ def probe_all_layers(hidden_states, labels, n_splits=5, random_state=42, task_ty
                     "layer": layer_idx,
                     "accuracy": mean_acc,
                     "std_accuracy": std_acc,
-                    "weighted_f1": mean_f1
+                    "weighted_f1": mean_f1,
+                    "probing_progress_pct": round((layer_idx + 1) / num_layers * 100, 2)
                 })
             
     results_df = pd.DataFrame(results)
