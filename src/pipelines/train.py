@@ -15,7 +15,7 @@ class LayerProber:
         if task_type == 'regression':
             self.model = Ridge(alpha=alpha)
         else:
-            self.model = LogisticRegression(max_iter=2000, solver='saga', C=1.0, n_jobs=-1)
+            self.model = LogisticRegression(max_iter=max_iter, solver='lbfgs', C=1.0)
             
         self.scaler_X = StandardScaler()
         self.scaler_y = StandardScaler() if task_type == 'regression' else None
