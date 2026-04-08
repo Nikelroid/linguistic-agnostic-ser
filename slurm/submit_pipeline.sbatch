@@ -37,7 +37,7 @@ ID_MODEL=$((SLURM_ARRAY_TASK_ID / N_DATASETS))
 
 DATASET_NAME="${DATASETS[$ID_DATASET]}"
 MODEL_NAME="${MODELS[$ID_MODEL]}"
-DATA_DIR="/scratch1/$USER/ser_data/${DATASET_NAME}"
+DATA_DIR="/scratch1/$USER/ser_data_new/${DATASET_NAME}"
 
 echo "=========================================================="
 echo "--> Task ID: $SLURM_ARRAY_TASK_ID | Experiment: $DATASET_NAME x $MODEL_NAME"

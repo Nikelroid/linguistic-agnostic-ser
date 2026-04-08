@@ -19,7 +19,7 @@ def run_cmd(cmd):
 def main():
     parser = argparse.ArgumentParser(description="SER Dataset Aggregator")
     current_user = os.environ.get('USER', 'user')
-    default_base = f"/scratch1/{current_user}/ser_data"
+    default_base = f"/scratch1/{current_user}/ser_data_new"
     parser.add_argument("--base-dir", type=str, default=default_base,
                         help="Target directory for aggregation")
     parser.add_argument("--iemocap-source", type=str, default="/project2/msoleyma_1026/IEMOCAP_full_release",
