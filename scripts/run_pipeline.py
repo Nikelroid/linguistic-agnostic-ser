@@ -5,6 +5,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 import torch
 import wandb
+from tqdm import tqdm
 
 from src.data_ingestion.loader import load_ravdess, load_emodb, load_iemocap, load_savee, load_aesdd, load_mesd
 from src.preprocessing.audio_processor import extract_features_opensmile
@@ -85,7 +86,7 @@ def main(args):
         
         hidden_states = []
         total_batches = len(dataloader)
-        for i, batch in enumerate(dataloader):
+        for i, batch in enumerate(tqdm(dataloader, desc=f"Extracting {args.target_feature}")):
             if batch is None: continue
             h_states = extractor.extract_from_waveform(batch['waveform'], sample_rate=sample_rate)
             if not hidden_states:
