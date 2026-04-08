@@ -10,12 +10,12 @@ class LayerProber:
     Implements regression/classification probes to predict acoustic features 
     or emotion labels from hidden layer representations.
     """
-    def __init__(self, task_type='regression', alpha=1.0, max_iter=1000):
+    def __init__(self, task_type='regression', alpha=1.0, max_iter=2000):
         self.task_type = task_type
         if task_type == 'regression':
             self.model = Ridge(alpha=alpha)
         else:
-            self.model = LogisticRegression(max_iter=max_iter, solver='lbfgs', C=1.0)
+            self.model = LogisticRegression(max_iter=2000, solver='saga', C=1.0, n_jobs=-1)
             
         self.scaler_X = StandardScaler()
         self.scaler_y = StandardScaler() if task_type == 'regression' else None
