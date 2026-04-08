@@ -52,7 +52,7 @@ cd $REPO_NAME
 
 # 4. Environment Syncing mapping exactly to 'run.ipynb'
 
-ENV_NAME="ser_env"
+# ENV_NAME="ser_env"
 # echo "Analyzing target environment footprint: $ENV_NAME"
 
 # if conda env list | grep -q "$ENV_NAME"; then

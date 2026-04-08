@@ -10,7 +10,7 @@
 #SBATCH --time=3:00:00
 #SBATCH --output=slurm/logs/%x-%A_%a.out
 #SBATCH --error=slurm/logs/%x-%A_%a.err
-#SBATCH --array=0-17
+
 
 set -e
 
