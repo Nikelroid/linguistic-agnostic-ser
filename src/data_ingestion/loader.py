@@ -86,16 +86,27 @@ def load_iemocap(path, sample_rate=16000, max_length=None):
     with open(meta_path, 'r') as f:
         meta = json.load(f)
         
-    print("Loading IEMOCAP...")
+    print("Loading IEMOCAP Path Mapping...")
+    # SUPER OPTIMIZATION: Scan directories once and map filenames to paths
+    # instead of calling glob(recursive=True) inside the loop.
+    path_map = {}
+    for root, _, files in os.walk(path):
+        for f in files:
+            if f.endswith('.wav'):
+                path_map[f] = os.path.join(root, f)
+
+    print(f"Mapped {len(path_map)} files. Loading audio data...")
     for entry in tqdm(meta.get('meta_data', []), desc='IEMOCAP'):
         fname = os.path.basename(entry['path'])
-        found = glob.glob(f'{path}/**/{fname}', recursive=True)
-        if not found: continue
+        fpath = path_map.get(fname)
+        if not fpath: continue
+        
         try:
-            audio, sr = load_audio_file(found[0], sample_rate)
+            audio, sr = load_audio_file(fpath, sample_rate)
             if max_length and len(audio) > max_length: audio = audio[:max_length]
             data.append({'file':fname, 'label':entry['label'], 'audio':audio})
-        except:
+        except Exception as e:
+            # print(f"Error loading {fname}: {e}")
             pass
     return data
 

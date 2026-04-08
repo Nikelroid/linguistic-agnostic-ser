@@ -132,27 +132,78 @@ def main(args):
             return
             
         extractor = TransformerExtractor(model_name=resolved_model_path)
+
+        # Batch processing for classification
+        from torch.utils.data import Dataset, DataLoader
+
+        class SimpleInMemoryDataset(Dataset):
+            def __init__(self, data_list):
+                self.data_list = data_list
+            def __len__(self):
+                return len(self.data_list)
+            def __getitem__(self, idx):
+                item = self.data_list[idx]
+                return {
+                    'waveform': torch.from_numpy(item['audio']),
+                    'label': item['label'],
+                    'file': item.get('file', f"sample_{idx}.wav")
+                }
+
+        def collate_fn(batch):
+            # Pad waveforms to the same length in the batch if they differ
+            waveforms = [item['waveform'] for item in batch]
+            labels = [item['label'] for item in batch]
+            files = [item['file'] for item in batch]
+            
+            # Find max length
+            max_len = max(w.shape[0] for w in waveforms)
+            padded_waveforms = []
+            for w in waveforms:
+                if w.shape[0] < max_len:
+                    padding = max_len - w.shape[0]
+                    w = torch.nn.functional.pad(w, (0, padding))
+                padded_waveforms.append(w)
+            
+            return {
+                'waveform': torch.stack(padded_waveforms),
+                'labels': labels,
+                'files': files
+            }
+
+        print(f"Extracting acoustic representations from {resolved_model_path} (Batch Size={batch_size})...")
+        eval_dataset = SimpleInMemoryDataset(data)
+        eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
+        
+        total_batches = len(eval_loader)
         audio_tensors = []
         labels = []
         filenames = []
-        
-        from tqdm import tqdm
-        
-        print(f"Extracting acoustic representations from {resolved_model_path}...")
-        total_data = len(data)
-        for i, row in enumerate(tqdm(data, desc=f"Evaluating {args.dataset_name}")):
-            # We take audio numpy arrays returned by loaders and convert them
-            waveform = torch.from_numpy(row['audio']).unsqueeze(0)
-            hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
-            audio_tensors.append([h[0] for h in hidden])
-            labels.append(row['label'])
-            filenames.append(row.get('file', f"sample_{i}.wav"))
 
-            # Log extraction progress to WandB every 10 samples
-            if (i + 1) % 10 == 0 or (i + 1) == total_data:
+        for i, batch in enumerate(tqdm(eval_loader, desc=f"Evaluating {args.dataset_name}")):
+            # Extract features for the entire batch at once
+            # batch['waveform'] is (B, T)
+            hidden = extractor.extract_from_waveform(batch['waveform'], sample_rate=sample_rate)
+            
+            # hidden is a list of layers, each (B, hidden_dim)
+            # We want to re-structure this to (B, L, hidden_dim) or similar
+            # For now, matching the original format: list of (B, hidden_dim) per sample?
+            # Actually, the original code did: audio_tensors.append([h[0] for h in hidden]) 
+            # where h[0] is the first sample in batch (since batch_size was 1).
+            
+            # Correct batch logic:
+            # hidden[layer_idx] is a numpy array of shape (batch_size, hidden_dim)
+            batch_hidden = np.stack(hidden, axis=1) # (batch_size, num_layers, hidden_dim)
+            
+            audio_tensors.extend(batch_hidden)
+            labels.extend(batch['labels'])
+            filenames.extend(batch['files'])
+
+            # Log extraction progress to WandB
+            if (i + 1) % 5 == 0 or (i + 1) == total_batches:
                 wandb.log({
-                    "extraction_progress_pct": round((i + 1) / total_data * 100, 2),
-                    "samples_processed": i + 1
+                    "extraction_progress_pct": round((i + 1) / total_batches * 100, 2),
+                    "batches_processed": i + 1,
+                    "samples_processed": min((i + 1) * batch_size, len(data))
                 })
 
         hidden_states = np.array(audio_tensors)
