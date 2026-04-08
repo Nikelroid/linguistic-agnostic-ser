@@ -53,15 +53,24 @@ cd $REPO_NAME
 # 4. Environment Syncing mapping exactly to 'run.ipynb'
 
 ENV_NAME="ser_env"
-echo "Analyzing target environment footprint: $ENV_NAME"
+# echo "Analyzing target environment footprint: $ENV_NAME"
 
-if conda env list | grep -q "$ENV_NAME"; then
-    echo "$ENV_NAME payload detected! Synchronizing missing packages..."
-    conda env update -f environment.yml --prune
-else
-    echo "$ENV_NAME payload not found. Constructing fresh conda environment..."
-    conda env create -f environment.yml
-fi
+# if conda env list | grep -q "$ENV_NAME"; then
+#     echo "$ENV_NAME payload detected! Synchronizing missing packages..."
+#     conda env update -f environment.yml --prune
+# else
+#     echo "$ENV_NAME payload not found. Constructing fresh conda environment..."
+#     conda env create -f environment.yml
+# fi
+
+# 4.5 Dataset Aggregation & External Ingestion
+echo "=========================================="
+echo " 4.5. Dataset Aggregation"
+echo "=========================================="
+
+echo "Verifying data synchronization with /scratch1/$USER/ser_data..."
+chmod +x scripts/aggregate_datasets.py
+conda run -n $ENV_NAME python scripts/aggregate_datasets.py --base-dir "/scratch1/$USER/ser_data"
 
 echo "=========================================="
 echo " 5. Pre-Caching Models"
@@ -74,7 +83,7 @@ for m in models:
     print(f'Caching {m}...')
     AutoConfig.from_pretrained(m)
     AutoFeatureExtractor.from_pretrained(m)
-    AutoModel.from_pretrained(m)
+    AutoModel.from_pretrained(m, use_safetensors=True)
 "
 
 echo "=========================================="
