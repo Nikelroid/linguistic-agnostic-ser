@@ -10,7 +10,7 @@
 #SBATCH --time=3:00:00
 #SBATCH --output=slurm/logs/%x-%A_%a.out
 #SBATCH --error=slurm/logs/%x-%A_%a.err
-
+#SBATCH --array=0-17
 
 set -e
 
@@ -27,8 +27,8 @@ conda activate ser_env
 cd /home1/$USER/linguistic-agnostic-ser
 
 BATCH_SIZE=4
-DATASETS=("IEMOCAP")
-MODELS=("openai/whisper-medium")
+DATASETS=("RAVDESS" "EmoDB" "IEMOCAP" "SAVEE" "AESDD" "MESD")
+MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium")
 
 # Calculate Matrix Indices
 N_DATASETS=${#DATASETS[@]}
