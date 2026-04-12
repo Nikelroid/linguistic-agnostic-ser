@@ -102,13 +102,13 @@ sed -i 's/\r$//' slurm/submit_pipeline.sbatch
 EXP_ID=$(python -c "
 import re
 try:
-    print(re.search(r'experiment_id:\s*([\d\.]+)', open('config/config.yaml').read()).group(1))
+    print(re.search(r'experiment_id:\s*(\d+)', open('config/config.yaml').read()).group(1))
 except:
     print('4')
 ")
 
 # Explicitly pass all key parameters to bypass potential header parsing issues
-sbatch --account=msoleyma_1026 --partition=gpu --array=24-29 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
+sbatch --account=msoleyma_1026 --partition=gpu --array=0-35 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
