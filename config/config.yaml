@@ -44,3 +44,10 @@ training:
 
 wandb:
   experiment_id: 5
+
+noise_augmentation:
+  enabled: true
+  noise_dataset: "ESC-50"
+  noise_dir: "ESC-50"
+  snr_levels: [20, 10, 5, 0]
+  seed: 42

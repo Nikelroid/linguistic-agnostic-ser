@@ -98,20 +98,29 @@ echo "=========================================="
 echo "Initializing cluster background job scheduler..."
 # Sanitize script line-endings to avoid Slurm parsing errors
 sed -i 's/\r$//' slurm/submit_pipeline.sbatch
+sed -i 's/\r$//' slurm/submit_noisy_pipeline.sbatch
 
 EXP_ID=$(python -c "
 import re
 try:
-    print(re.search(r'experiment_id:\s*(\d+)', open('config/config.yaml').read()).group(1))
+    match = re.search(r'experiment_id:\s*([0-9.]+)', open('config/config.yaml').read())
+    print(match.group(1))
 except:
-    print('4')
+    print('unknown')
 ")
 
-# Explicitly pass all key parameters to bypass potential header parsing issues
+echo "Detected EXP_ID: $EXP_ID"
+
+# Submit clean pipeline (6 models × 6 datasets = 36 jobs)
 sbatch --account=msoleyma_1026 --partition=gpu --array=0-35 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
+
+# Submit noisy pipeline (3 models × 6 datasets × 5 SNR = 90 jobs)
+sbatch --account=msoleyma_1026 --partition=gpu --array=0-89 --export=ALL,EXP_ID=$EXP_ID slurm/submit_noisy_pipeline.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
+echo " Clean pipeline: 36 jobs (6 models × 6 datasets)"
+echo " Noisy pipeline: 90 jobs (3 models × 6 datasets × 5 SNR)"
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="
 

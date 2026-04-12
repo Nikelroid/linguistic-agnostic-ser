@@ -34,18 +34,22 @@ def main(args):
     wandb_entity = args.wandb_entity if args.wandb_entity else config.get('wandb', {}).get('entity', 'AGSER')
     wandb_project = args.wandb_project if args.wandb_project else config.get('wandb', {}).get('project', 'linguistic-agnostic-ser')
 
-    print(f"--> Initializing W&B Run for {clean_model_name_init} on {args.dataset_name}...")
+    # Build SNR tag for naming
+    snr_tag = f"_SNR{args.snr_db}" if args.snr_db != "clean" else ""
+    
+    print(f"--> Initializing W&B Run for {clean_model_name_init} on {args.dataset_name}{snr_tag}...")
     exp_id = args.exp_id if args.exp_id else config.get('wandb', {}).get('experiment_id', 4)
     wandb.init(
         entity=wandb_entity,
         project=wandb_project,
         group=f"EXP{exp_id}",
-        name=f"{clean_model_name_init}_{args.dataset_name}",
+        name=f"{clean_model_name_init}_{args.dataset_name}{snr_tag}",
         reinit=True,
         config={
             "args": vars(args),
             "config": config,
-            "resolved_model": resolved_model_path
+            "resolved_model": resolved_model_path,
+            "snr_db": args.snr_db
         }
     )
     
@@ -53,7 +57,29 @@ def main(args):
     batch_size = args.batch_size if args.batch_size else config['training']['batch_size']
     sample_rate = config['training']['sample_rate']
     
-    print(f"Loaded config: Batch Size={batch_size}, Target Model={resolved_model_path}")
+    print(f"Loaded config: Batch Size={batch_size}, Target Model={resolved_model_path}, SNR={args.snr_db}")
+
+    # --- Load noise pool if needed ---
+    noise_pool = None
+    noise_rng = None
+    if args.snr_db != "clean":
+        from src.preprocessing.noise_augmentor import load_esc50_noise_pool
+        noise_seed = config.get('noise_augmentation', {}).get('seed', 42)
+        noise_rng = np.random.RandomState(noise_seed)
+        
+        # Resolve noise directory
+        if args.noise_dir:
+            noise_dir = args.noise_dir
+        else:
+            noise_subdir = config.get('noise_augmentation', {}).get('noise_dir', 'ESC-50')
+            noise_dir = os.path.join(f"/scratch1/{os.environ.get('USER', 'user')}/ser_data", noise_subdir)
+        
+        print(f"Loading noise pool from: {noise_dir}")
+        noise_pool = load_esc50_noise_pool(noise_dir, sample_rate=sample_rate)
+        print(f"Noise pool loaded: {len(noise_pool)} clips, target SNR={args.snr_db}dB")
+
+    # --- Build results directory ---
+    results_base = os.path.join("results", f"EXP{exp_id}")
 
     if args.task == 'regression':
         audio_paths = [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) if f.endswith('.wav')]
@@ -90,7 +116,14 @@ def main(args):
         total_batches = len(dataloader)
         for i, batch in enumerate(tqdm(dataloader, desc=f"Extracting {args.target_feature}")):
             if batch is None: continue
-            h_states = extractor.extract_from_waveform(batch['waveform'], sample_rate=sample_rate)
+
+            waveform = batch['waveform']
+            # Apply noise augmentation if needed
+            if noise_pool is not None:
+                from src.preprocessing.noise_augmentor import apply_noise_to_batch
+                waveform = apply_noise_to_batch(waveform, noise_pool, float(args.snr_db), noise_rng)
+
+            h_states = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
             if not hidden_states:
                 hidden_states = [[] for _ in range(len(h_states))]
             for j, h in enumerate(h_states):
@@ -183,9 +216,15 @@ def main(args):
         filenames = []
 
         for i, batch in enumerate(tqdm(eval_loader, desc=f"Evaluating {args.dataset_name}")):
+            waveform = batch['waveform']
+
+            # Apply noise augmentation if needed
+            if noise_pool is not None:
+                from src.preprocessing.noise_augmentor import apply_noise_to_batch
+                waveform = apply_noise_to_batch(waveform, noise_pool, float(args.snr_db), noise_rng)
+
             # Extract features for the entire batch at once
-            # batch['waveform'] is (B, T)
-            hidden = extractor.extract_from_waveform(batch['waveform'], sample_rate=sample_rate)
+            hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
             
             # hidden is a list of layers, each (B, hidden_dim)
             # We want to re-structure this to (B, L, hidden_dim) or similar
@@ -232,15 +271,15 @@ def main(args):
     else:
         clean_model_name = clean_model_name_init
 
-    exp_name = f"{clean_model_name}_{args.dataset_name}"
+    exp_name = f"{clean_model_name}_{args.dataset_name}{snr_tag}"
     
     # Save statistics directly into CSV routing
-    csv_path = os.path.join("results/csv", f"results_{exp_name}.csv")
+    csv_path = os.path.join(results_base, "csv", f"results_{exp_name}.csv")
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     results_df.to_csv(csv_path, index=False)
     
     # Save tensor layers offline for custom dimensionality mapping (t-SNE/PCA)
-    embed_dir = "results/embeddings"
+    embed_dir = os.path.join(results_base, "embeddings")
     os.makedirs(embed_dir, exist_ok=True)
     
     # Save hidden states
@@ -259,7 +298,8 @@ def main(args):
     
     # Reconstruct graphical plots natively using the standardized names
     from src.pipelines.post_train import plot_layer_results
-    plot_path = plot_layer_results(results_df, clean_model_name, args.dataset_name)
+    plot_dir = os.path.join(results_base, "plots")
+    plot_path = plot_layer_results(results_df, clean_model_name, f"{args.dataset_name}{snr_tag}", save_dir=plot_dir)
     
     # Log results to WandB
     if args.task == 'classification':
@@ -267,19 +307,21 @@ def main(args):
         wandb.log({
             "best_accuracy": best_layer['Accuracy'],
             "best_f1": best_layer['Weighted_F1'],
-            "best_layer": best_layer['Layer_Num']
+            "best_layer": best_layer['Layer_Num'],
+            "snr_db": args.snr_db
         })
     elif args.task == 'regression':
         best_layer = results_df.loc[results_df['RMSE'].idxmin()]
         wandb.log({
             "best_rmse": best_layer['RMSE'],
-            "best_layer": best_layer['Layer_Num']
+            "best_layer": best_layer['Layer_Num'],
+            "snr_db": args.snr_db
         })
 
     if plot_path and os.path.exists(plot_path):
         wandb.log({"performance_plot": wandb.Image(plot_path)})
 
-    print(f"[{exp_name}] Run fully committed across results/ (CSV, Plot, NPY) and WandB.")
+    print(f"[{exp_name}] Run fully committed across {results_base}/ (CSV, Plot, NPY) and WandB.")
     wandb.finish()
 
 if __name__ == "__main__":
@@ -293,5 +335,7 @@ if __name__ == "__main__":
     parser.add_argument("--wandb_entity", type=str, default=None)
     parser.add_argument("--wandb_project", type=str, default=None)
     parser.add_argument("--exp_id", type=str, default=None, help="Force specific experiment ID")
+    parser.add_argument("--snr_db", type=str, default="clean", help="SNR level in dB (clean, 20, 10, 5, 0)")
+    parser.add_argument("--noise_dir", type=str, default=None, help="Path to ESC-50 noise directory")
     args = parser.parse_args()
     main(args)

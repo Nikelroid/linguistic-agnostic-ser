@@ -52,6 +52,10 @@ def main():
             "slug": "piyushagni5/berlin-database-of-emotional-speech-emodb",
             "zip": "berlin-database-of-emotional-speech-emodb.zip",
         },
+        "ESC-50": {
+            "slug": "mmoreaux/environmental-sound-classification-50",
+            "zip": "environmental-sound-classification-50.zip",
+        },
     }
 
     # 1. Handle Kaggle Datasets
@@ -154,8 +158,13 @@ def main():
             iem_count = len(meta.get('meta_data', []))
     print(f"IEMOCAP : {iem_count:5d} files from metadata")
 
+    # ESC-50 (noise pool)
+    c_esc50 = len(glob.glob(os.path.join(BASE_DIR, 'ESC-50', "**/*.wav"), recursive=True))
+    print(f"ESC-50  : {c_esc50:5d} noise clips")
+
     total = c_savee + c_aesdd + c_mesd + c_ravdess + c_emodb + iem_count
-    print(f"\nFinal Totals: {total} files across all datasets.")
+    print(f"\nFinal Totals: {total} SER files across all datasets.")
+    print(f"Noise pool: {c_esc50} ESC-50 clips")
     print(f"Data location: {BASE_DIR}")
 
 if __name__ == "__main__":
