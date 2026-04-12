@@ -27,7 +27,7 @@ conda activate ser_env
 cd /home1/$USER/linguistic-agnostic-ser
 
 BATCH_SIZE=4
-DATASETS=("RAVDESS" "EmoDB" "IEMOCAP" "SAVEE" "AESDD" "MESD")
+DATASETS=("IEMOCAP" "RAVDESS" "EmoDB" "SAVEE" "AESDD" "MESD")
 MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium" "microsoft/wavlm-large" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0")
 
 # Calculate Matrix Indices
