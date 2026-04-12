@@ -25,7 +25,8 @@ class TransformerExtractor(nn.Module):
         try:
             # First attempt: Try standard load (it will use cache if available or download if needed)
             # We prefer safetensors to bypass the security vulnerability check in newer Transformers
-            self.model = AutoModel.from_pretrained(model_name, config=self.config, use_safetensors=True, trust_remote_code=True)
+            safe = False if 'MERT' in model_name else True
+            self.model = AutoModel.from_pretrained(model_name, config=self.config, use_safetensors=safe, trust_remote_code=True)
         except Exception as e:
             print(f"Standard loading failed for {model_name} (likely network timeout). Switching to local cache mode...")
             try:

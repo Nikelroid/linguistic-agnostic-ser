@@ -83,7 +83,8 @@ for m in models:
     print(f'Caching {m}...')
     AutoConfig.from_pretrained(m, trust_remote_code=True)
     AutoFeatureExtractor.from_pretrained(m, trust_remote_code=True)
-    AutoModel.from_pretrained(m, use_safetensors=True, trust_remote_code=True)
+    safe = False if 'MERT' in m else True
+    AutoModel.from_pretrained(m, use_safetensors=safe, trust_remote_code=True)
 "
 
 echo "=========================================="
