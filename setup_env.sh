@@ -76,7 +76,7 @@ export KAGGLE_USERNAME=$KAGGLE_USERNAME
 export KAGGLE_KEY=$KAGGLE_KEY
 
 chmod +x scripts/aggregate_datasets.py
-conda run -n $ENV_NAME --no-banner env KAGGLE_USERNAME=$KAGGLE_USERNAME KAGGLE_KEY=$KAGGLE_KEY python scripts/aggregate_datasets.py --base-dir "/scratch1/$USER/ser_data"
+KAGGLE_USERNAME=$KAGGLE_USERNAME KAGGLE_KEY=$KAGGLE_KEY conda run -n $ENV_NAME python scripts/aggregate_datasets.py --base-dir "/scratch1/$USER/ser_data"
 
 echo "=========================================="
 echo " 5. Pre-Caching Models"
