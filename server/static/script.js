@@ -174,6 +174,9 @@ async function fetchAggregatedResults() {
         document.getElementById('res-w2v2').innerText = data.best_layers.wav2vec2;
         document.getElementById('res-hubert').innerText = data.best_layers.HuBERT;
         document.getElementById('res-whisper').innerText = data.best_layers.Whisper;
+        document.getElementById('res-wavlm').innerText = data.best_layers.WavLM;
+        document.getElementById('res-mert').innerText = data.best_layers.MERT;
+        document.getElementById('res-w2v_bert').innerText = data.best_layers.w2v_bert;
         
         renderChart(data.chart_data);
     } catch (error) {
@@ -214,6 +217,30 @@ function renderChart(chartData) {
                     data: chartData.whisper,
                     borderColor: '#10b981',
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: 'WavLM',
+                    data: chartData.wavlm,
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: 'MERT',
+                    data: chartData.mert,
+                    borderColor: '#ec4899',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: 'w2v-BERT',
+                    data: chartData.w2v_bert,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
                     tension: 0.3,
                     fill: false
                 }

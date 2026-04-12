@@ -14,23 +14,23 @@ class TransformerExtractor(nn.Module):
         self.is_whisper = "whisper" in self.model_name
         
         print(f"Loading {model_name}...")
-        self.config = AutoConfig.from_pretrained(model_name)
+        self.config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
         # Ensure we output all hidden states
         self.config.output_hidden_states = True
         
         # Load the feature extractor for correct preprocessing
-        self.feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)
+        self.feature_extractor = AutoFeatureExtractor.from_pretrained(model_name, trust_remote_code=True)
         
         # Load the model and freeze it
         try:
             # First attempt: Try standard load (it will use cache if available or download if needed)
             # We prefer safetensors to bypass the security vulnerability check in newer Transformers
-            self.model = AutoModel.from_pretrained(model_name, config=self.config, use_safetensors=True)
+            self.model = AutoModel.from_pretrained(model_name, config=self.config, use_safetensors=True, trust_remote_code=True)
         except Exception as e:
             print(f"Standard loading failed for {model_name} (likely network timeout). Switching to local cache mode...")
             try:
                 # Second attempt: Force local files only to bypass the Hub check/vulnerability check entirely
-                self.model = AutoModel.from_pretrained(model_name, config=self.config, local_files_only=True)
+                self.model = AutoModel.from_pretrained(model_name, config=self.config, local_files_only=True, trust_remote_code=True)
             except Exception as e2:
                 print(f"Critical error: Model {model_name} not found in local cache and Hub is unreachable.")
                 raise e2

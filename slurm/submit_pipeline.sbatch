@@ -10,7 +10,7 @@
 #SBATCH --time=3:00:00
 #SBATCH --output=slurm/logs/%x-%A_%a.out
 #SBATCH --error=slurm/logs/%x-%A_%a.err
-#SBATCH --array=0-17
+#SBATCH --array=0-35
 
 set -e
 
@@ -28,7 +28,7 @@ cd /home1/$USER/linguistic-agnostic-ser
 
 BATCH_SIZE=4
 DATASETS=("RAVDESS" "EmoDB" "IEMOCAP" "SAVEE" "AESDD" "MESD")
-MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium")
+MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium" "microsoft/wavlm-large" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0")
 
 # Calculate Matrix Indices
 N_DATASETS=${#DATASETS[@]}
@@ -43,6 +43,11 @@ echo "=========================================================="
 echo "--> Task ID: $SLURM_ARRAY_TASK_ID | Experiment: $DATASET_NAME x $MODEL_NAME"
 echo "=========================================================="
 
+EXTRA_ARGS=""
+if [ -n "$EXP_ID" ]; then
+    EXTRA_ARGS="--exp_id $EXP_ID"
+fi
+
 python -u -m scripts.run_pipeline \
   --task classification \
   --data_dir "$DATA_DIR" \
@@ -50,7 +55,8 @@ python -u -m scripts.run_pipeline \
   --model_name "$MODEL_NAME" \
   --batch_size $BATCH_SIZE \
   --wandb_entity AGSER \
-  --wandb_project linguistic-agnostic-ser
+  --wandb_project linguistic-agnostic-ser \
+  $EXTRA_ARGS
 
 echo "=========================================="
 echo " Pipeline Finished Successfully"

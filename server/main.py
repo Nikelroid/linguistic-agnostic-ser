@@ -31,7 +31,7 @@ global_config = load_config()
 
 def process_audio_file(file_path: str, model: str):
     time.sleep(2)
-    num_layers = 7 if "whisper" in model.lower() else 13
+    num_layers = 7 if "whisper" in model.lower() else 25
     return {
         "model": model,
         "predicted_emotion": random.choice(["happy", "sad", "angry", "neutral"]),
@@ -111,11 +111,14 @@ async def stream_logs(run_id: str, request: Request):
 
 @app.get("/api/results")
 def get_aggregated_results():
-    labels = ['CNN', 'Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5', 'Layer 6', 'Layer 7', 'Layer 8', 'Layer 9', 'Layer 10', 'Layer 11', 'Layer 12']
+    labels = ['CNN'] + [f'Layer {i}' for i in range(1, 25)]
     
-    w2v2_data = [0.4] + [min(0.98, 0.5 + (i * 0.05) + random.uniform(-0.05, 0.05)) for i in range(12)]
-    hubert_data = [0.42] + [min(0.99, 0.52 + (i * 0.06) + random.uniform(-0.04, 0.04)) for i in range(12)]
-    whisper_data = [0.35] + [min(0.95, 0.45 + (i * 0.04) + random.uniform(-0.06, 0.06)) for i in range(6)] + [None] * 6
+    w2v2_data = [0.4] + [min(0.98, 0.5 + (i * 0.05) + random.uniform(-0.05, 0.05)) for i in range(24)]
+    hubert_data = [0.42] + [min(0.99, 0.52 + (i * 0.06) + random.uniform(-0.04, 0.04)) for i in range(24)]
+    whisper_data = [0.35] + [min(0.95, 0.45 + (i * 0.04) + random.uniform(-0.06, 0.06)) for i in range(6)] + [None] * 18
+    wavlm_data = [0.45] + [min(0.995, 0.55 + (i * 0.05) + random.uniform(-0.03, 0.03)) for i in range(24)]
+    mert_data = [0.41] + [min(0.985, 0.48 + (i * 0.05) + random.uniform(-0.04, 0.04)) for i in range(24)]
+    w2v_bert_data = [0.43] + [min(0.99, 0.51 + (i * 0.05) + random.uniform(-0.04, 0.04)) for i in range(24)]
     
     
     return {
@@ -123,15 +126,21 @@ def get_aggregated_results():
         "models": list(global_config['models'].keys()),
         "datasets": global_config['datasets'],
         "best_layers": {
-            "wav2vec2": "Layer 5 (0.970)",
-            "HuBERT": "Layer 8 (0.975)",
-            "Whisper": "Layer 6 (0.975)"
+            "wav2vec2": "Layer 15 (0.970)",
+            "HuBERT": "Layer 18 (0.975)",
+            "Whisper": "Layer 6 (0.975)",
+            "WavLM": "Layer 19 (0.985)",
+            "MERT": "Layer 14 (0.965)",
+            "w2v_bert": "Layer 17 (0.980)"
         },
         "chart_data": {
             "labels": labels,
             "wav2vec2": w2v2_data,
             "hubert": hubert_data,
-            "whisper": whisper_data
+            "whisper": whisper_data,
+            "wavlm": wavlm_data,
+            "mert": mert_data,
+            "w2v_bert": w2v_bert_data
         }
     }
 

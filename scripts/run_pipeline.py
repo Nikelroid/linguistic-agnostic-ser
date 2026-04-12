@@ -35,9 +35,11 @@ def main(args):
     wandb_project = args.wandb_project if args.wandb_project else config.get('wandb', {}).get('project', 'linguistic-agnostic-ser')
 
     print(f"--> Initializing W&B Run for {clean_model_name_init} on {args.dataset_name}...")
+    exp_id = args.exp_id if args.exp_id else config.get('wandb', {}).get('experiment_id', 4)
     wandb.init(
         entity=wandb_entity,
         project=wandb_project,
+        group=f"EXP{exp_id}",
         name=f"{clean_model_name_init}_{args.dataset_name}",
         reinit=True,
         config={
@@ -221,6 +223,12 @@ def main(args):
         clean_model_name = 'HuBERT'
     elif 'whisper' in lower_model_name:
         clean_model_name = 'Whisper'
+    elif 'wavlm' in lower_model_name:
+        clean_model_name = 'WavLM'
+    elif 'mert' in lower_model_name:
+        clean_model_name = 'MERT'
+    elif 'w2v-bert' in lower_model_name or 'w2v_bert' in lower_model_name:
+        clean_model_name = 'w2v-BERT'
     else:
         clean_model_name = clean_model_name_init
 
@@ -284,5 +292,6 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=None) # Falls back to config if None
     parser.add_argument("--wandb_entity", type=str, default=None)
     parser.add_argument("--wandb_project", type=str, default=None)
+    parser.add_argument("--exp_id", type=str, default=None, help="Force specific experiment ID")
     args = parser.parse_args()
     main(args)

@@ -10,6 +10,15 @@ models:
   whisper:
     path: "openai/whisper-medium"
     is_whisper: true
+  wavlm:
+    path: "microsoft/wavlm-large"
+    is_whisper: false
+  mert:
+    path: "m-a-p/MERT-v1-330M"
+    is_whisper: false
+  w2v_bert:
+    path: "facebook/w2v-bert-2.0"
+    is_whisper: false
 
 datasets:
   - RAVDESS
@@ -32,3 +41,6 @@ training:
       - F0semitoneFrom27.5Hz_sma3nz_amean
       - loudness_sma3_amean
       - jitterLocal_sma3nz_amean
+
+wandb:
+  experiment_id: 4

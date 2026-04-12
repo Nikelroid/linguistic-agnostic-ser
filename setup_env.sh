@@ -78,12 +78,12 @@ echo "=========================================="
 echo "Downloading models on login node to prevent Slurm timeouts..."
 conda run -n $ENV_NAME python -c "
 from transformers import AutoModel, AutoFeatureExtractor, AutoConfig
-models = ['facebook/wav2vec2-large-960h', 'facebook/hubert-large-ll60k', 'openai/whisper-medium']
+models = ['facebook/wav2vec2-large-960h', 'facebook/hubert-large-ll60k', 'openai/whisper-medium', 'microsoft/wavlm-large', 'm-a-p/MERT-v1-330M', 'facebook/w2v-bert-2.0']
 for m in models:
     print(f'Caching {m}...')
-    AutoConfig.from_pretrained(m)
-    AutoFeatureExtractor.from_pretrained(m)
-    AutoModel.from_pretrained(m, use_safetensors=True)
+    AutoConfig.from_pretrained(m, trust_remote_code=True)
+    AutoFeatureExtractor.from_pretrained(m, trust_remote_code=True)
+    AutoModel.from_pretrained(m, use_safetensors=True, trust_remote_code=True)
 "
 
 echo "=========================================="
@@ -93,11 +93,32 @@ echo "=========================================="
 echo "Initializing cluster background job scheduler..."
 # Sanitize script line-endings to avoid Slurm parsing errors
 sed -i 's/\r$//' slurm/submit_pipeline.sbatch
+
+EXP_ID=$(python -c "
+import re
+try:
+    print(re.search(r'experiment_id:\s*(\d+)', open('config/config.yaml').read()).group(1))
+except:
+    print('4')
+")
+
 # Explicitly pass all key parameters to bypass potential header parsing issues
-sbatch --account=msoleyma_1026 --partition=gpu --array=0-17 slurm/submit_pipeline.sbatch
+sbatch --account=msoleyma_1026 --partition=gpu --array=0-35 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="
- 
+
+echo "Incrementing WandB Experiment ID for next batch..."
+python -c "
+import re
+try:
+    with open('config/config.yaml', 'r') as f:
+        text = f.read()
+    new_text = re.sub(r'experiment_id:\s*(\d+)', lambda m: f'experiment_id: {int(m.group(1)) + 1}', text)
+    with open('config/config.yaml', 'w') as f:
+        f.write(new_text)
+except Exception as e:
+    print('Failed to increment experiment ID:', e)
+"

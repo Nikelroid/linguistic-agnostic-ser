@@ -41,9 +41,12 @@
                         <div class="form-group">
                             <label for="model-select">Model Architecture</label>
                             <select id="model-select" name="model" required>
-                                <option value="facebook/wav2vec2-base">wav2vec 2.0 (Base)</option>
-                                <option value="facebook/hubert-base-ls960">HuBERT (Base)</option>
-                                <option value="openai/whisper-base">Whisper (Base)</option>
+                                <option value="facebook/wav2vec2-large-960h">wav2vec 2.0 (Large)</option>
+                                <option value="facebook/hubert-large-ll60k">HuBERT (Large)</option>
+                                <option value="openai/whisper-medium">Whisper (Medium)</option>
+                                <option value="microsoft/wavlm-large">WavLM (Large)</option>
+                                <option value="m-a-p/MERT-v1-330M">MERT (330M)</option>
+                                <option value="facebook/w2v-bert-2.0">w2v-BERT (2.0)</option>
                             </select>
                         </div>
                         <button type="submit" id="start-btn" class="btn-primary start-btn">Start Training</button>
@@ -109,6 +112,18 @@
                         <div class="stat-card">
                             <span class="stat-title">Whisper Best Layer</span>
                             <span class="stat-value" id="res-whisper">Loading...</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-title">WavLM Best Layer</span>
+                            <span class="stat-value" id="res-wavlm">Loading...</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-title">MERT Best Layer</span>
+                            <span class="stat-value" id="res-mert">Loading...</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-title">w2v-BERT Best Layer</span>
+                            <span class="stat-value" id="res-w2v_bert">Loading...</span>
                         </div>
                     </div>
                     
