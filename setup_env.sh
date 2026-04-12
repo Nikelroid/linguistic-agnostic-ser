@@ -118,7 +118,7 @@ except:
 echo "Detected EXP_ID: $EXP_ID"
 
 # Submit clean pipeline (6 models × 6 datasets = 36 jobs)
-sbatch --account=msoleyma_1026 --partition=gpu --array=0-35 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
+# sbatch --account=msoleyma_1026 --partition=gpu --array=0-35 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
 
 # Submit noisy pipeline (3 models × 6 datasets × 5 SNR = 90 jobs)
 sbatch --account=msoleyma_1026 --partition=gpu --array=0-89 --export=ALL,EXP_ID=$EXP_ID slurm/submit_noisy_pipeline.sbatch
