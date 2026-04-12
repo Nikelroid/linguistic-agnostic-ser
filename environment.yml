@@ -24,3 +24,4 @@ dependencies:
   - pip:
       - opensmile
       - wandb
+      - kaggle

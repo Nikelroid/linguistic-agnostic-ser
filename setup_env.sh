@@ -69,8 +69,14 @@ echo " 4.5. Dataset Aggregation"
 echo "=========================================="
 
 echo "Verifying data synchronization with /scratch1/$USER/ser_data..."
+
+# Ensure kaggle CLI is available and credentials are set
+conda run -n $ENV_NAME pip install -q kaggle 2>/dev/null || true
+export KAGGLE_USERNAME=$KAGGLE_USERNAME
+export KAGGLE_KEY=$KAGGLE_KEY
+
 chmod +x scripts/aggregate_datasets.py
-conda run -n $ENV_NAME python scripts/aggregate_datasets.py --base-dir "/scratch1/$USER/ser_data"
+conda run -n $ENV_NAME --no-banner env KAGGLE_USERNAME=$KAGGLE_USERNAME KAGGLE_KEY=$KAGGLE_KEY python scripts/aggregate_datasets.py --base-dir "/scratch1/$USER/ser_data"
 
 echo "=========================================="
 echo " 5. Pre-Caching Models"
