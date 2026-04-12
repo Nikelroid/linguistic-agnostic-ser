@@ -43,4 +43,4 @@ training:
       - jitterLocal_sma3nz_amean
 
 wandb:
-  experiment_id: 5
+  experiment_id: 4.5

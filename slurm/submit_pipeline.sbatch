@@ -10,7 +10,7 @@
 #SBATCH --time=3:00:00
 #SBATCH --output=slurm/logs/%x-%A_%a.out
 #SBATCH --error=slurm/logs/%x-%A_%a.err
-#SBATCH --array=0-35
+#SBATCH --array=0-5
 
 set -e
 
@@ -28,7 +28,8 @@ cd /home1/$USER/linguistic-agnostic-ser
 
 BATCH_SIZE=4
 DATASETS=("RAVDESS" "EmoDB" "IEMOCAP" "SAVEE" "AESDD" "MESD")
-MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium" "microsoft/wavlm-large" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0")
+MODELS=("m-a-p/MERT-v1-330M")
+#MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium" "microsoft/wavlm-large" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0")
 
 # Calculate Matrix Indices
 N_DATASETS=${#DATASETS[@]}

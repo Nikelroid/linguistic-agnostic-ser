@@ -115,15 +115,4 @@ echo " Initialization & Queue Complete!"
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="
 
-echo "Incrementing WandB Experiment ID for next batch..."
-python -c "
-import re
-try:
-    with open('config/config.yaml', 'r') as f:
-        text = f.read()
-    new_text = re.sub(r'experiment_id:\s*(\d+)', lambda m: f'experiment_id: {int(m.group(1)) + 1}', text)
-    with open('config/config.yaml', 'w') as f:
-        f.write(new_text)
-except Exception as e:
-    print('Failed to increment experiment ID:', e)
-"
+echo "DONT FORGOT: Increment WandB Experiment ID for next batch yourself."

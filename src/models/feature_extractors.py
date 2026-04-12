@@ -59,6 +59,12 @@ class TransformerExtractor(nn.Module):
         waveform: Tensor of shape (batch_size, sequence_length)
         Returns a list/tuple of hidden states across all layers as numpy arrays.
         """
+        target_sample_rate = getattr(self.feature_extractor, "sampling_rate", sample_rate)
+        if sample_rate != target_sample_rate:
+            import torchaudio.functional as F
+            waveform = F.resample(waveform, orig_freq=sample_rate, new_freq=target_sample_rate)
+            sample_rate = target_sample_rate
+
         # Convert waveform to numpy list for feature extractor
         waveform_np = waveform.cpu().numpy()
         waveform_list = [w for w in waveform_np]
