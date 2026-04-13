@@ -105,7 +105,9 @@ echo "Initializing cluster background job scheduler..."
 # Sanitize script line-endings to avoid Slurm parsing errors
 sed -i 's/\r$//' slurm/submit_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_noisy_pipeline.sbatch
+sed -i 's/\r$//' slurm/submit_msp_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_msp4_pipeline.sbatch
+sed -i 's/\r$//' slurm/submit_msp8_pipeline.sbatch
 
 echo "Parsing variables from config.yaml..."
 VARS=$(python -c "
@@ -150,11 +152,13 @@ MSP_ARRAY="0-$((MSP_NUM_JOBS - 1))"
 # Submit noisy pipeline (commented out by default)
 # sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR",SNR_STR="$SNR_STR" slurm/submit_noisy_pipeline.sbatch
 
-# Submit MSP-Podcast pipeline (6-class)
-# sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp_pipeline.sbatch
+# Submit MSP-Podcast 8-Class pipeline (EXP 6)
+sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp8_pipeline.sbatch
 
 # Submit MSP-Podcast 4-Class pipeline (EXP 7)
-sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=7,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp4_pipeline.sbatch
+# sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp4_pipeline.sbatch
+
+
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"

@@ -176,9 +176,13 @@ def load_msppodcast(path, sample_rate=16000, max_length=None):
     
     MSP_MAP = {
         'A':'anger', 
+        'S':'sadness',
         'H':'happiness', 
-        'N':'neutral', 
-        'S':'sadness'
+        'U':'surprise',
+        'F':'fear',
+        'D':'disgust',
+        'C':'contempt',
+        'N':'neutral'
     }
     
     df = df[df['EmoClass'].isin(MSP_MAP.keys())]
