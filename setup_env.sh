@@ -105,7 +105,6 @@ echo "Initializing cluster background job scheduler..."
 # Sanitize script line-endings to avoid Slurm parsing errors
 sed -i 's/\r$//' slurm/submit_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_noisy_pipeline.sbatch
-sed -i 's/\r$//' slurm/submit_msp_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_msp4_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_msp8_pipeline.sbatch
 
