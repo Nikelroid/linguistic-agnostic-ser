@@ -161,3 +161,41 @@ def load_mesd(path, sample_rate=16000, max_length=None):
         except:
             pass
     return data
+
+def load_msppodcast(path, sample_rate=16000, max_length=None):
+    import pandas as pd
+    data = []
+    labels_file = os.path.join(path, "v1", "labels_consensus.csv")
+    if not os.path.exists(labels_file):
+        print("MSP-Podcast labels_consensus.csv not found.")
+        return data
+    
+    df = pd.read_csv(labels_file)
+    # Use only Test1 partition for standard and quick evaluation
+    df = df[df['Split_Set'] == 'Test1']
+    
+    MSP_MAP = {
+        'A':'anger', 
+        'D':'disgust', 
+        'F':'fear', 
+        'H':'happiness', 
+        'N':'neutral', 
+        'S':'sadness'
+    }
+    
+    df = df[df['EmoClass'].isin(MSP_MAP.keys())]
+    
+    print(f"Loading MSP-Podcast (Test1)... Found {len(df)} files.")
+    audio_dir = os.path.join(path, "v1", "Audio")
+    for _, row in tqdm(df.iterrows(), total=len(df), desc='MSP-Podcast'):
+        fname = row['FileName']
+        fpath = os.path.join(audio_dir, fname)
+        if not os.path.exists(fpath): continue
+        
+        try:
+            audio, sr = load_audio_file(fpath, sample_rate)
+            if max_length and len(audio) > max_length: audio = audio[:max_length]
+            data.append({'file':fname, 'label':MSP_MAP[row['EmoClass']], 'audio':audio})
+        except Exception as e:
+            pass
+    return data

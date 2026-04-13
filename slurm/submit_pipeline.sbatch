@@ -26,9 +26,11 @@ conda activate ser_env
 
 cd /home1/$USER/linguistic-agnostic-ser
 
-BATCH_SIZE=4
-DATASETS=("IEMOCAP" "RAVDESS" "EmoDB" "SAVEE" "AESDD" "MESD")
-MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium" "microsoft/wavlm-large" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0")
+# Variables BATCH_SIZE, MODELS_STR, DATASETS_STR should be passed via --export=ALL from setup_env.sh
+# Convert space-separated strings to arrays, or use fallbacks
+if [ -z "$BATCH_SIZE" ]; then BATCH_SIZE=4; fi
+if [ -n "$MODELS_STR" ]; then MODELS=($MODELS_STR); else MODELS=("facebook/wav2vec2-large-960h" "facebook/hubert-large-ll60k" "openai/whisper-medium" "microsoft/wavlm-large" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0"); fi
+if [ -n "$DATASETS_STR" ]; then DATASETS=($DATASETS_STR); else DATASETS=("IEMOCAP" "RAVDESS" "EmoDB" "SAVEE" "AESDD" "MESD"); fi
 
 # Calculate Matrix Indices
 N_DATASETS=${#DATASETS[@]}

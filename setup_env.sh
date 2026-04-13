@@ -105,28 +105,59 @@ echo "Initializing cluster background job scheduler..."
 # Sanitize script line-endings to avoid Slurm parsing errors
 sed -i 's/\r$//' slurm/submit_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_noisy_pipeline.sbatch
+sed -i 's/\r$//' slurm/submit_msp_pipeline.sbatch
 
-EXP_ID=$(python -c "
-import re
+echo "Parsing variables from config.yaml..."
+VARS=$(python -c "
+import yaml
 try:
-    match = re.search(r'experiment_id:\s*([0-9.]+)', open('config/config.yaml').read())
-    print(match.group(1))
-except:
-    print('unknown')
+    with open('config/config.yaml') as f:
+        cfg = yaml.safe_load(f)
+    
+    exp_id = cfg.get('wandb', {}).get('experiment_id', 'unknown')
+    batch_size = cfg.get('training', {}).get('batch_size', 4)
+    
+    models = [v['path'] for k, v in cfg.get('models', {}).items()]
+    datasets = cfg.get('datasets', [])
+    snr_levels = ['clean'] + [str(x) for x in cfg.get('noise_augmentation', {}).get('snr_levels', [20, 10, 5, 0])]
+    
+    print(f'EXP_ID={exp_id}')
+    print(f'BATCH_SIZE={batch_size}')
+    print(f'MODELS_STR=\"' + ' '.join(models) + '\"')
+    print(f'DATASETS_STR=\"' + ' '.join(datasets) + '\"')
+    print(f'SNR_STR=\"' + ' '.join(snr_levels) + '\"')
+    
+    print(f'CLEAN_NUM_JOBS={max(1, len(models) * len(datasets))}')
+    print(f'NOISY_NUM_JOBS={max(1, len(models) * len(datasets) * len(snr_levels))}')
+    print(f'MSP_NUM_JOBS={max(1, len(models) * len(snr_levels))}')
+except Exception as e:
+    print(f'echo \"Error parsing config.yaml: {e}\"')
 ")
+eval "$VARS"
 
-echo "Detected EXP_ID: $EXP_ID"
+echo "Detected EXP_ID: $EXP_ID | Batch: $BATCH_SIZE"
+echo "Models: $MODELS_STR"
+echo "Datasets: $DATASETS_STR"
+echo "SNRs: $SNR_STR"
 
-# Submit clean pipeline (6 models × 6 datasets = 36 jobs)
-sbatch --account=msoleyma_1026 --partition=gpu --array=0-35 --export=ALL,EXP_ID=$EXP_ID slurm/submit_pipeline.sbatch
+CLEAN_ARRAY="0-$((CLEAN_NUM_JOBS - 1))"
+NOISY_ARRAY="0-$((NOISY_NUM_JOBS - 1))"
+MSP_ARRAY="0-$((MSP_NUM_JOBS - 1))"
 
-# Submit noisy pipeline (3 models × 6 datasets × 5 SNR = 90 jobs)
-# sbatch --account=msoleyma_1026 --partition=gpu --array=0-89 --export=ALL,EXP_ID=$EXP_ID slurm/submit_noisy_pipeline.sbatch
+# Submit clean pipeline (commented out by default)
+# sbatch --account=msoleyma_1026 --partition=gpu --array=$CLEAN_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR" slurm/submit_pipeline.sbatch
+
+# Submit noisy pipeline (commented out by default)
+# sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR",SNR_STR="$SNR_STR" slurm/submit_noisy_pipeline.sbatch
+
+# Submit MSP-Podcast pipeline (using its own array size, force EXP_ID=6)
+sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=6,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp_pipeline.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
-echo " Clean pipeline: 36 jobs (6 models × 6 datasets)"
-echo " Noisy pipeline: 90 jobs (3 models × 6 datasets × 5 SNR)"
+echo " Check 'squeue -u $USER' for queued jobs."
+echo " Clean pipeline queued: $CLEAN_NUM_JOBS jobs."
+echo " MSP pipeline queued: $MSP_NUM_JOBS jobs."
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="
 
