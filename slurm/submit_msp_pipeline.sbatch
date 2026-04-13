@@ -52,10 +52,10 @@ echo "--> Task ID: $SLURM_ARRAY_TASK_ID"
 echo "--> Experiment: $DATASET_NAME x $MODEL_NAME x SNR=${SNR_DB}dB"
 echo "=========================================================="
 
-# Force EXP_ID=6 for MSP-Podcast
-EXP_ID=6
-
-EXTRA_ARGS="--exp_id $EXP_ID"
+EXTRA_ARGS=""
+if [ -n "$EXP_ID" ]; then
+    EXTRA_ARGS="--exp_id $EXP_ID"
+fi
 
 python -u -m scripts.run_pipeline \
   --task classification \
