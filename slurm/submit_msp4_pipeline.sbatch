@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=msoleyma_1026
 #SBATCH --partition=gpu
-#SBATCH --job-name=msp-ser-pipeline
+#SBATCH --job-name=msp4-ser-pipeline
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
@@ -15,7 +15,7 @@
 set -e
 
 echo "=========================================="
-echo " Starting MSP-Podcast Slurm Job: $SLURM_JOB_ID"
+echo " Starting MSP-Podcast (4-Class) Slurm Job: $SLURM_JOB_ID"
 echo " Node Assigned: $SLURMD_NODENAME"
 mkdir -p slurm/logs
 echo "=========================================="
@@ -29,7 +29,7 @@ cd /home1/$USER/linguistic-agnostic-ser
 # Variables BATCH_SIZE, MODELS_STR, SNR_STR should be passed via --export=ALL from setup_env.sh
 # Convert space-separated strings to arrays, or use fallbacks
 if [ -z "$BATCH_SIZE" ]; then BATCH_SIZE=4; fi
-if [ -n "$MODELS_STR" ]; then MODELS=($MODELS_STR); else MODELS=("openai/whisper-medium" "facebook/hubert-large-ll60k" "microsoft/wavlm-large"); fi
+if [ -n "$MODELS_STR" ]; then MODELS=($MODELS_STR); else MODELS=("openai/whisper-medium" "facebook/hubert-large-ll60k" "microsoft/wavlm-large" "facebook/wav2vec2-large-960h" "m-a-p/MERT-v1-330M" "facebook/w2v-bert-2.0"); fi
 if [ -n "$SNR_STR" ]; then SNR_LEVELS=($SNR_STR); else SNR_LEVELS=("clean" "20" "10" "5" "0"); fi
 
 DATASET_NAME="MSP-Podcast"
@@ -49,7 +49,7 @@ NOISE_DIR="/scratch1/$USER/ser_data/ESC-50"
 
 echo "=========================================================="
 echo "--> Task ID: $SLURM_ARRAY_TASK_ID"
-echo "--> Experiment: $DATASET_NAME x $MODEL_NAME x SNR=${SNR_DB}dB"
+echo "--> Experiment: $DATASET_NAME (4-Class) x $MODEL_NAME x SNR=${SNR_DB}dB"
 echo "=========================================================="
 
 EXTRA_ARGS=""
@@ -70,5 +70,5 @@ python -u -m scripts.run_pipeline \
   $EXTRA_ARGS
 
 echo "=========================================="
-echo " MSP-Podcast Pipeline Finished Successfully"
+echo " MSP-Podcast (4-Class) Pipeline Finished Successfully"
 echo "=========================================="

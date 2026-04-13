@@ -176,8 +176,6 @@ def load_msppodcast(path, sample_rate=16000, max_length=None):
     
     MSP_MAP = {
         'A':'anger', 
-        'D':'disgust', 
-        'F':'fear', 
         'H':'happiness', 
         'N':'neutral', 
         'S':'sadness'
