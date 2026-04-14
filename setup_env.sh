@@ -142,7 +142,7 @@ CLEAN_ARRAY="0-$((CLEAN_NUM_JOBS - 1))"
 NOISY_ARRAY="0-$((NOISY_NUM_JOBS - 1))"
 
 # Submit clean pipeline
-sbatch --account=msoleyma_1026 --partition=gpu --array=$CLEAN_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR" slurm/submit_pipeline.sbatch
+# sbatch --account=msoleyma_1026 --partition=gpu --array=$CLEAN_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR" slurm/submit_pipeline.sbatch
 
 # Submit noisy pipeline
 sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR",SNR_STR="$SNR_STR" slurm/submit_noisy_pipeline.sbatch
@@ -150,7 +150,7 @@ sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL
 echo "=========================================="
 echo " Initialization & Queue Complete!"
 echo " Check 'squeue -u $USER' for queued jobs."
-echo " Clean pipeline queued: $CLEAN_NUM_JOBS jobs."
+#echo " Clean pipeline queued: $CLEAN_NUM_JOBS jobs."
 echo " Noisy pipeline queued: $NOISY_NUM_JOBS jobs."
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="

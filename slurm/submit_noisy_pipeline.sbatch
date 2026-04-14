@@ -31,7 +31,7 @@ cd /home1/$USER/linguistic-agnostic-ser
 if [ -z "$BATCH_SIZE" ]; then BATCH_SIZE=4; fi
 if [ -n "$MODELS_STR" ]; then MODELS=($MODELS_STR); else MODELS=("openai/whisper-medium" "facebook/hubert-large-ll60k" "microsoft/wavlm-large"); fi
 if [ -n "$DATASETS_STR" ]; then DATASETS=($DATASETS_STR); else DATASETS=("IEMOCAP" "RAVDESS" "EmoDB" "SAVEE" "AESDD" "MESD"); fi
-if [ -n "$SNR_STR" ]; then SNR_LEVELS=($SNR_STR); else SNR_LEVELS=("clean" "20" "10" "5" "0"); fi
+if [ -n "$SNR_STR" ]; then SNR_LEVELS=($SNR_STR); else SNR_LEVELS=("20" "10" "5" "0" "clean"); fi
 
 # Calculate 3D Matrix Indices:  model × dataset × snr
 # Total = 3 models × 6 datasets × 5 SNR = 90 jobs
