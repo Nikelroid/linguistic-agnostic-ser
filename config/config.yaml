@@ -1,37 +1,16 @@
 # Linguistic-Agnostic SER - Master Configuration
 
 models:
-  wav2vec2:
-    path: "facebook/wav2vec2-large-960h"
-    is_whisper: false
-  hubert:
-    path: "facebook/hubert-large-ll60k"
-    is_whisper: false
   whisper:
     path: "openai/whisper-medium"
     is_whisper: true
-  wavlm:
-    path: "microsoft/wavlm-large"
-    is_whisper: false
-  mert:
-    path: "m-a-p/MERT-v1-330M"
-    is_whisper: false
-  w2v_bert:
-    path: "facebook/w2v-bert-2.0"
-    is_whisper: false
 
 datasets:
-  - RAVDESS
-  - EmoDB
-  - IEMOCAP
-  - SAVEE
-  - AESDD
-  - MESD
   - MSP-Podcast
 
 dataset_config:
   msp_podcast:
-    num_classes: 4
+    num_classes: 8
 
 training:
   batch_size: 4
@@ -48,7 +27,7 @@ training:
       - jitterLocal_sma3nz_amean
 
 wandb:
-  experiment_id: 8
+  experiment_id: 6
 
 noise_augmentation:
   enabled: true
