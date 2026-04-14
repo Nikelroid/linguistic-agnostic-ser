@@ -162,7 +162,7 @@ def load_mesd(path, sample_rate=16000, max_length=None):
             pass
     return data
 
-def load_msppodcast(path, sample_rate=16000, max_length=None):
+def load_msppodcast(path, sample_rate=16000, max_length=None, num_classes=8):
     import pandas as pd
     data = []
     labels_file = os.path.join(path, "v1", "labels_consensus.csv")
@@ -174,20 +174,28 @@ def load_msppodcast(path, sample_rate=16000, max_length=None):
     # Use only Test1 partition for standard and quick evaluation
     df = df[df['Split_Set'] == 'Test1']
     
-    MSP_MAP = {
-        'A':'anger', 
-        'S':'sadness',
-        'H':'happiness', 
-        'U':'surprise',
-        'F':'fear',
-        'D':'disgust',
-        'C':'contempt',
-        'N':'neutral'
-    }
+    if num_classes == 4:
+        MSP_MAP = {
+            'A':'anger', 
+            'S':'sadness',
+            'H':'happiness', 
+            'N':'neutral'
+        }
+    else:
+        MSP_MAP = {
+            'A':'anger', 
+            'S':'sadness',
+            'H':'happiness', 
+            'U':'surprise',
+            'F':'fear',
+            'D':'disgust',
+            'C':'contempt',
+            'N':'neutral'
+        }
     
     df = df[df['EmoClass'].isin(MSP_MAP.keys())]
     
-    print(f"Loading MSP-Podcast (Test1)... Found {len(df)} files.")
+    print(f"Loading MSP-Podcast (Test1) with {num_classes} classes... Found {len(df)} files.")
     audio_dir = os.path.join(path, "v1", "Audio")
     for _, row in tqdm(df.iterrows(), total=len(df), desc='MSP-Podcast'):
         fname = row['FileName']

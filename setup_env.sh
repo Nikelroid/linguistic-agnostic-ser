@@ -105,8 +105,6 @@ echo "Initializing cluster background job scheduler..."
 # Sanitize script line-endings to avoid Slurm parsing errors
 sed -i 's/\r$//' slurm/submit_pipeline.sbatch
 sed -i 's/\r$//' slurm/submit_noisy_pipeline.sbatch
-sed -i 's/\r$//' slurm/submit_msp4_pipeline.sbatch
-sed -i 's/\r$//' slurm/submit_msp8_pipeline.sbatch
 
 echo "Parsing variables from config.yaml..."
 VARS=$(python -c "
@@ -130,7 +128,6 @@ try:
     
     print(f'CLEAN_NUM_JOBS={max(1, len(models) * len(datasets))}')
     print(f'NOISY_NUM_JOBS={max(1, len(models) * len(datasets) * len(snr_levels))}')
-    print(f'MSP_NUM_JOBS={max(1, len(models) * len(snr_levels))}')
 except Exception as e:
     print(f'echo \"Error parsing config.yaml: {e}\"')
 ")
@@ -143,27 +140,18 @@ echo "SNRs: $SNR_STR"
 
 CLEAN_ARRAY="0-$((CLEAN_NUM_JOBS - 1))"
 NOISY_ARRAY="0-$((NOISY_NUM_JOBS - 1))"
-MSP_ARRAY="0-$((MSP_NUM_JOBS - 1))"
 
-# Submit clean pipeline (commented out by default)
-# sbatch --account=msoleyma_1026 --partition=gpu --array=$CLEAN_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR" slurm/submit_pipeline.sbatch
+# Submit clean pipeline
+sbatch --account=msoleyma_1026 --partition=gpu --array=$CLEAN_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR" slurm/submit_pipeline.sbatch
 
-# Submit noisy pipeline (commented out by default)
-# sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR",SNR_STR="$SNR_STR" slurm/submit_noisy_pipeline.sbatch
-
-# Submit MSP-Podcast 8-Class pipeline (EXP 6)
-sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp8_pipeline.sbatch
-
-# Submit MSP-Podcast 4-Class pipeline (EXP 7)
-# sbatch --account=msoleyma_1026 --partition=gpu --array=$MSP_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_msp4_pipeline.sbatch
-
-
+# Submit noisy pipeline
+sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR",SNR_STR="$SNR_STR" slurm/submit_noisy_pipeline.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
 echo " Check 'squeue -u $USER' for queued jobs."
 echo " Clean pipeline queued: $CLEAN_NUM_JOBS jobs."
-echo " MSP pipeline queued: $MSP_NUM_JOBS jobs."
+echo " Noisy pipeline queued: $NOISY_NUM_JOBS jobs."
 echo " Track your job's footprint via 'squeue -u $USER'"
 echo "=========================================="
 

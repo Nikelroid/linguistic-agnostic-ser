@@ -27,6 +27,11 @@ datasets:
   - SAVEE
   - AESDD
   - MESD
+  - MSP-Podcast
+
+dataset_config:
+  msp_podcast:
+    num_classes: 8 # Option: 4 or 8
 
 training:
   batch_size: 4
@@ -43,7 +48,7 @@ training:
       - jitterLocal_sma3nz_amean
 
 wandb:
-  experiment_id: 6
+  experiment_id: 8
 
 noise_augmentation:
   enabled: true

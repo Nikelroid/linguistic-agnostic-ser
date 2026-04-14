@@ -161,7 +161,9 @@ def main(args):
             data = load_mesd(args.data_dir, sample_rate=sample_rate)
         elif args.dataset_name == 'MSP-Podcast':
             from src.data_ingestion.loader import load_msppodcast
-            data = load_msppodcast(args.data_dir, sample_rate=sample_rate)
+            msp_cfg = config.get('dataset_config', {}).get('msp_podcast', {})
+            num_classes = msp_cfg.get('num_classes', 8)
+            data = load_msppodcast(args.data_dir, sample_rate=sample_rate, num_classes=num_classes)
         else:
             print(f"Dataset {args.dataset_name} not fully wired in script. Use RAVDESS, EmoDB, IEMOCAP, SAVEE, AESDD, MESD, or MSP-Podcast.")
             return
