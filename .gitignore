@@ -9,3 +9,16 @@ results/embeddings/*.npy
 *.log
 .env
 docs/Midterm_Report/midterm_report_v2.tex
+
+# keep binary embeddings and audio out of the repo
+*.npy
+*.npz
+*.zip
+*.tar.gz
+data/
+**/data/
+**/AudioWAV/
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.DS_Store
