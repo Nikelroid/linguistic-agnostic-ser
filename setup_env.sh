@@ -148,10 +148,10 @@ NOISY_ARRAY="0-$((NOISY_NUM_JOBS - 1))"
 # sbatch --account=msoleyma_1026 --partition=gpu --array=$NOISY_ARRAY --export=ALL,EXP_ID=$EXP_ID,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",DATASETS_STR="$DATASETS_STR",SNR_STR="$SNR_STR" slurm/submit_noisy_pipeline.sbatch
 
 echo "Submitting Dimensional Emotion Regression (EXP_ID 8)..."
-sbatch --export=ALL,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR" slurm/submit_dimensional.sbatch
+# sbatch --export=ALL,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR" slurm/submit_dimensional.sbatch
 
 echo "Submitting Metadata Probing (EXP_ID 9)..."
-# sbatch slurm/submit_metadata_probing.sbatch
+sbatch slurm/submit_metadata_probing.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
