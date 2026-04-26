@@ -209,3 +209,37 @@ def load_msppodcast(path, sample_rate=16000, max_length=None, num_classes=8):
         except Exception as e:
             pass
     return data
+
+def load_msppodcast_dimensional(path, target, sample_rate=16000, max_length=None):
+    import pandas as pd
+    data = []
+    labels_file = os.path.join(path, "v1", "labels_consensus.csv")
+    if not os.path.exists(labels_file):
+        print("MSP-Podcast labels_consensus.csv not found.")
+        return data
+    
+    df = pd.read_csv(labels_file)
+    # Use only Test1 partition for evaluation (same as categorical loading)
+    df = df[df['Split_Set'] == 'Test1']
+    
+    # Ensure the target column exists and contains valid numeric data
+    if target not in df.columns:
+        print(f"Target column {target} not found in MSP-Podcast labels.")
+        return data
+        
+    df = df.dropna(subset=[target])
+    
+    print(f"Loading MSP-Podcast Dimensional (Test1) for target {target}... Found {len(df)} files.")
+    audio_dir = os.path.join(path, "v1", "Audio")
+    for _, row in tqdm(df.iterrows(), total=len(df), desc=f'MSP-Podcast ({target})'):
+        fname = row['FileName']
+        fpath = os.path.join(audio_dir, fname)
+        if not os.path.exists(fpath): continue
+        
+        try:
+            audio, sr = load_audio_file(fpath, sample_rate)
+            if max_length and len(audio) > max_length: audio = audio[:max_length]
+            data.append({'file':fname, 'label':float(row[target]), 'audio':audio})
+        except Exception as e:
+            pass
+    return data

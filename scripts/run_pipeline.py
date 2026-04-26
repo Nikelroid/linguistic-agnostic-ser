@@ -258,6 +258,97 @@ def main(args):
         labels_to_save = labels
         filenames_to_save = filenames
         
+    elif args.task == 'dimensional_regression':
+        print(f"Loading dataset for Dimensional Regression: {args.dataset_name} ({args.target_feature})")
+        if args.dataset_name == 'MSP-Podcast':
+            from src.data_ingestion.loader import load_msppodcast_dimensional
+            data = load_msppodcast_dimensional(args.data_dir, target=args.target_feature, sample_rate=sample_rate)
+        else:
+            print(f"Dimensional regression not implemented for {args.dataset_name}")
+            return
+            
+        if not data:
+            print("No data extracted. Please check dataset path and labels.")
+            return
+            
+        extractor = TransformerExtractor(model_name=resolved_model_path)
+        
+        # Reuse SimpleInMemoryDataset from classification block
+        from torch.utils.data import Dataset, DataLoader
+
+        class SimpleInMemoryDataset(Dataset):
+            def __init__(self, data_list):
+                self.data_list = data_list
+            def __len__(self):
+                return len(self.data_list)
+            def __getitem__(self, idx):
+                item = self.data_list[idx]
+                return {
+                    'waveform': torch.from_numpy(item['audio']),
+                    'label': item['label'],
+                    'file': item.get('file', f"sample_{idx}.wav")
+                }
+
+        def collate_fn(batch):
+            waveforms = [item['waveform'] for item in batch]
+            labels = [item['label'] for item in batch]
+            files = [item['file'] for item in batch]
+            
+            max_len = max(w.shape[0] for w in waveforms)
+            padded_waveforms = []
+            for w in waveforms:
+                if w.shape[0] < max_len:
+                    padding = max_len - w.shape[0]
+                    w = torch.nn.functional.pad(w, (0, padding))
+                padded_waveforms.append(w)
+            
+            return {
+                'waveform': torch.stack(padded_waveforms),
+                'labels': labels,
+                'files': files
+            }
+
+        print(f"Extracting acoustic representations from {resolved_model_path} (Batch Size={batch_size})...")
+        eval_dataset = SimpleInMemoryDataset(data)
+        eval_loader = DataLoader(eval_dataset, batch_size=batch_size, shuffle=False, collate_fn=collate_fn)
+        
+        total_batches = len(eval_loader)
+        audio_tensors = []
+        labels = []
+        filenames = []
+
+        for i, batch in enumerate(tqdm(eval_loader, desc=f"Evaluating {args.dataset_name} ({args.target_feature})")):
+            waveform = batch['waveform']
+
+            # Apply noise augmentation if needed
+            if noise_pool is not None:
+                from src.preprocessing.noise_augmentor import apply_noise_to_batch
+                waveform = apply_noise_to_batch(waveform, noise_pool, float(args.snr_db), noise_rng)
+
+            # Extract features for the entire batch at once
+            hidden = extractor.extract_from_waveform(waveform, sample_rate=sample_rate)
+            
+            batch_hidden = np.stack(hidden, axis=1) # (batch_size, num_layers, hidden_dim)
+            
+            audio_tensors.extend(batch_hidden)
+            labels.extend(batch['labels'])
+            filenames.extend(batch['files'])
+
+            # Log extraction progress to WandB
+            if (i + 1) % 5 == 0 or (i + 1) == total_batches:
+                wandb.log({
+                    "extraction_progress_pct": round((i + 1) / total_batches * 100, 2),
+                    "batches_processed": i + 1,
+                    "samples_processed": min((i + 1) * batch_size, len(data))
+                })
+
+        hidden_states = np.array(audio_tensors)
+        # We use regression task type for probe_all_layers to compute RMSE and R2
+        results_df = probe_all_layers(hidden_states, labels, task_type='regression', random_state=config['training']['random_state'])
+        labels_to_save = labels
+        filenames_to_save = filenames
+
+        
 
 
     lower_model_name = resolved_model_path.lower()
@@ -276,7 +367,12 @@ def main(args):
     else:
         clean_model_name = clean_model_name_init
 
-    exp_name = f"{clean_model_name}_{args.dataset_name}{snr_tag}"
+    if args.task == 'dimensional_regression':
+        exp_name = f"{clean_model_name}_{args.dataset_name}_{args.target_feature}{snr_tag}"
+        plot_dataset_str = f"{args.dataset_name}_{args.target_feature}{snr_tag}"
+    else:
+        exp_name = f"{clean_model_name}_{args.dataset_name}{snr_tag}"
+        plot_dataset_str = f"{args.dataset_name}{snr_tag}"
     
     # Save statistics directly into CSV routing
     csv_path = os.path.join(results_base, "csv", f"results_{exp_name}.csv")
@@ -304,7 +400,7 @@ def main(args):
     # Reconstruct graphical plots natively using the standardized names
     from src.pipelines.post_train import plot_layer_results
     plot_dir = os.path.join(results_base, "plots")
-    plot_path = plot_layer_results(results_df, clean_model_name, f"{args.dataset_name}{snr_tag}", save_dir=plot_dir)
+    plot_path = plot_layer_results(results_df, clean_model_name, plot_dataset_str, save_dir=plot_dir)
     
     # Log results to WandB
     if args.task == 'classification':
@@ -315,7 +411,7 @@ def main(args):
             "best_layer": best_layer['Layer_Num'],
             "snr_db": args.snr_db
         })
-    elif args.task == 'regression':
+    elif args.task == 'regression' or args.task == 'dimensional_regression':
         best_layer = results_df.loc[results_df['RMSE'].idxmin()]
         wandb.log({
             "best_rmse": best_layer['RMSE'],
@@ -331,7 +427,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--task", type=str, choices=['classification', 'regression'], default='classification')
+    parser.add_argument("--task", type=str, choices=['classification', 'regression', 'dimensional_regression'], default='classification')
     parser.add_argument("--data_dir", type=str, required=True, help="Path to raw dataset")
     parser.add_argument("--dataset_name", type=str, default="RAVDESS")
     parser.add_argument("--model_name", type=str, default="facebook/wav2vec2-large-960h")
