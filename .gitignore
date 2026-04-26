@@ -22,3 +22,10 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 .DS_Store
+
+# allow tracked outputs under results/ even though *.csv is globally ignored
+!results/**/*.csv
+!results/**/*.png
+!results/**/*.pdf
+!results/**/*.md
+!results/**/.gitkeep
