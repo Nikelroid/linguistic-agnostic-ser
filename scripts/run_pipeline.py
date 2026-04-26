@@ -37,13 +37,19 @@ def main(args):
     # Build SNR tag for naming
     snr_tag = f"_SNR{args.snr_db}" if args.snr_db != "clean" else ""
     
-    print(f"--> Initializing W&B Run for {clean_model_name_init} on {args.dataset_name}{snr_tag}...")
+    # Include target feature in WandB name for regression tasks to avoid overwrites
+    if args.task in ['regression', 'dimensional_regression']:
+        run_name = f"{clean_model_name_init}_{args.dataset_name}_{args.target_feature}{snr_tag}"
+    else:
+        run_name = f"{clean_model_name_init}_{args.dataset_name}{snr_tag}"
+    
+    print(f"--> Initializing W&B Run for {run_name}...")
     exp_id = args.exp_id if args.exp_id else config.get('wandb', {}).get('experiment_id', 4)
     wandb.init(
         entity=wandb_entity,
         project=wandb_project,
         group=f"EXP{exp_id}",
-        name=f"{clean_model_name_init}_{args.dataset_name}{snr_tag}",
+        name=run_name,
         reinit=True,
         config={
             "args": vars(args),
