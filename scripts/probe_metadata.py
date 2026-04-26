@@ -33,6 +33,12 @@ def main(args):
     # Filter out missing target or features
     df = df.dropna(subset=['EmoClass', 'EmoAct', 'EmoVal', 'EmoDom', 'Gender'])
 
+    # 4-Class Filtering
+    # Only keep Anger (A), Sadness (S), Happiness (H), Neutral (N)
+    valid_classes = ['A', 'S', 'H', 'N']
+    df = df[df['EmoClass'].isin(valid_classes)]
+    print(f"Filtered to 4-class ({valid_classes}). Remaining records: {len(df)}")
+
     # Prepare features
     # Map Gender to numerical
     le_gender = LabelEncoder()
@@ -44,6 +50,9 @@ def main(args):
     # Map target EmoClass
     le_target = LabelEncoder()
     y = le_target.fit_transform(df['EmoClass'].astype(str))
+    
+    # Save the label mapping for decoding later
+    label_mapping = dict(zip(le_target.transform(le_target.classes_), le_target.classes_))
 
     print(f"Total samples: {len(y)}")
     print(f"Classes: {le_target.classes_}")
@@ -69,6 +78,17 @@ def main(args):
     rf_df = rf_df.sort_values(by='RF_Importance', ascending=False)
     print("\nRandom Forest Feature Importance:")
     print(rf_df.to_string(index=False))
+
+    # Save Feature Importance to CSV
+    results_base = os.path.join("results", f"EXP{exp_id}")
+    os.makedirs(results_base, exist_ok=True)
+    
+    feature_df = pd.DataFrame({
+        'Feature': feature_cols,
+        'Mutual_Information': mi,
+        'RF_Importance': rf_imp
+    })
+    feature_df.to_csv(os.path.join(results_base, "feature_importance.csv"), index=False)
 
     # Log importances to WandB
     wandb.log({
@@ -101,9 +121,18 @@ def main(args):
     }
 
     results = []
+    
+    # Store predictions for detailed analysis
+    from sklearn.model_selection import cross_val_predict
+    predictions_dict = {'True_Label': [label_mapping[val] for val in y]}
 
     for name, model in models.items():
         print(f"Training {name}...")
+        
+        # Get out-of-fold predictions
+        y_pred = cross_val_predict(model, X_selected, y, cv=cv, n_jobs=-1)
+        predictions_dict[f"{name}_Pred"] = [label_mapping[val] for val in y_pred]
+        
         # Accuracy
         acc_scores = cross_val_score(model, X_selected, y, cv=cv, scoring='accuracy', n_jobs=-1)
         # Macro F1
@@ -126,14 +155,17 @@ def main(args):
             f"{name}_Macro_F1": mean_f1
         })
 
+    # Save summary metrics
     results_df = pd.DataFrame(results)
-    
-    # Save results
-    results_base = os.path.join("results", f"EXP{exp_id}")
-    os.makedirs(results_base, exist_ok=True)
     out_path = os.path.join(results_base, "metadata_probing_results.csv")
     results_df.to_csv(out_path, index=False)
-    print(f"\nResults saved to {out_path}")
+    
+    # Save full predictions
+    preds_df = pd.DataFrame(predictions_dict)
+    preds_path = os.path.join(results_base, "metadata_probing_predictions.csv")
+    preds_df.to_csv(preds_path, index=False)
+    
+    print(f"\nResults saved to {results_base}")
     
     wandb.finish()
 
