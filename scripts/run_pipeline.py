@@ -86,6 +86,9 @@ def main(args):
 
     # --- Build results directory ---
     results_base = os.path.join("results", f"EXP{exp_id}")
+    results_base_full = f"/scratch1/kelidari/ser-experiments/EXP{exp_id}"
+    os.makedirs(results_base, exist_ok=True)
+    os.makedirs(results_base_full, exist_ok=True)
 
     if args.task == 'regression':
         audio_paths = [os.path.join(args.data_dir, f) for f in os.listdir(args.data_dir) if f.endswith('.wav')]
@@ -385,28 +388,40 @@ def main(args):
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     results_df.to_csv(csv_path, index=False)
     
+    csv_path_full = os.path.join(results_base_full, "csv", f"results_{exp_name}.csv")
+    os.makedirs(os.path.dirname(csv_path_full), exist_ok=True)
+    results_df.to_csv(csv_path_full, index=False)
+    
     # Save tensor layers offline for custom dimensionality mapping (t-SNE/PCA)
-    embed_dir = os.path.join(results_base, "embeddings")
-    os.makedirs(embed_dir, exist_ok=True)
+    # ONLY save embeddings to the full scratch directory
+    embed_dir_full = os.path.join(results_base_full, "embeddings")
+    os.makedirs(embed_dir_full, exist_ok=True)
     
     # Save hidden states
-    embed_path = os.path.join(embed_dir, f"hidden_states_{exp_name}.npy")
+    embed_path = os.path.join(embed_dir_full, f"hidden_states_{exp_name}.npy")
     np.save(embed_path, hidden_states)
     
-    # Save labels (matching 18exp.ipynb reference)
-    labels_path = os.path.join(embed_dir, f"labels_{exp_name}.npy")
+    # Save labels
+    labels_path = os.path.join(embed_dir_full, f"labels_{exp_name}.npy")
     np.save(labels_path, labels_to_save)
     
     # Save filenames for traceability
-    files_path = os.path.join(embed_dir, f"filenames_{exp_name}.npy")
+    files_path = os.path.join(embed_dir_full, f"filenames_{exp_name}.npy")
     np.save(files_path, np.array(filenames_to_save, dtype=object))
     
-    print(f"💾 Embeddings, Labels, and Filenames saved to {embed_dir}")
+    print(f"💾 Embeddings, Labels, and Filenames saved ONLY to {embed_dir_full}")
     
     # Reconstruct graphical plots natively using the standardized names
     from src.pipelines.post_train import plot_layer_results
     plot_dir = os.path.join(results_base, "plots")
     plot_path = plot_layer_results(results_df, clean_model_name, plot_dataset_str, save_dir=plot_dir)
+    
+    # Duplicate plot to full directory
+    if plot_path and os.path.exists(plot_path):
+        import shutil
+        plot_dir_full = os.path.join(results_base_full, "plots")
+        os.makedirs(plot_dir_full, exist_ok=True)
+        shutil.copy2(plot_path, os.path.join(plot_dir_full, os.path.basename(plot_path)))
     
     # Log results to WandB
     if args.task == 'classification':
@@ -428,7 +443,7 @@ def main(args):
     if plot_path and os.path.exists(plot_path):
         wandb.log({"performance_plot": wandb.Image(plot_path)})
 
-    print(f"[{exp_name}] Run fully committed across {results_base}/ (CSV, Plot, NPY) and WandB.")
+    print(f"[{exp_name}] Run fully committed! CSVs and Plots in {results_base}/ | All + Embeddings in {results_base_full}/ | WandB synced.")
     wandb.finish()
 
 if __name__ == "__main__":
