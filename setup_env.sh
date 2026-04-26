@@ -151,7 +151,10 @@ echo "Submitting Dimensional Emotion Regression (EXP_ID 8)..."
 # sbatch --export=ALL,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR" slurm/submit_dimensional.sbatch
 
 echo "Submitting Metadata Probing (EXP_ID 9)..."
-sbatch slurm/submit_metadata_probing.sbatch
+# sbatch slurm/submit_metadata_probing.sbatch
+
+echo "Submitting Noisy Dimensional Emotion Regression (EXP_ID 10)..."
+sbatch --export=ALL,BATCH_SIZE=$BATCH_SIZE,MODELS_STR="$MODELS_STR",SNR_STR="$SNR_STR" slurm/submit_dimensional_noisy.sbatch
 
 echo "=========================================="
 echo " Initialization & Queue Complete!"
