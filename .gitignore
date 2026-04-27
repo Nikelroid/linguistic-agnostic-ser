@@ -29,3 +29,9 @@ __pycache__/
 !results/**/*.pdf
 !results/**/*.md
 !results/**/.gitkeep
+
+# Minoo: local W&B cache and personal rollback files
+wandb/
+*.bak
+*.bak2
+*.bak_premod
