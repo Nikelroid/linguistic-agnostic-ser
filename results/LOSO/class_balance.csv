@@ -1,0 +1,8 @@
+Dataset,N_Classes,N_Samples,Majority_Class,Majority_Class_Pct,Minority_Class,Minority_Class_Pct,Majority_Baseline,Imbalance_Ratio,Norm_Entropy,Balance_Label
+RAVDESS,8,2880,Calm,13.3,Neutral,6.7,0.1333,2.0,0.9912,Mostly balanced
+EmoDB,7,535,Angry,23.7,Disgust,8.6,0.2374,2.76,0.9777,Imbalanced
+IEMOCAP,4,5531,Neutral,30.9,Sad,19.6,0.3088,1.58,0.984,Mostly balanced
+SAVEE,7,480,Neutral,25.0,Anger,12.5,0.25,2.0,0.9796,Mostly balanced
+AESDD,5,604,Anger,20.0,Sadness,19.9,0.2003,1.01,1.0,Balanced
+MESD,6,862,Anger,16.7,Neutral,16.6,0.1671,1.01,1.0,Balanced
+MSP-Podcast,4,10779,Neutral,50.7,Sadness,5.0,0.5074,10.18,0.761,Severely imbalanced
