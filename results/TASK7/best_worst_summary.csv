@@ -1,5 +1,0 @@
-model,best_target_layer,best_target_acc,worst_target_layer,worst_target_acc,max_bias_layer,max_bias_value,chance
-HuBERT,4,0.8645,20,0.2067,20,0.4682,0.25
-wav2vec2,3,0.7804,14,0.1956,14,0.458,0.25
-Whisper,9,0.7962,24,0.5483,24,-0.2386,0.25
-WavLM,3,0.8405,19,0.2635,19,0.348,0.25

@@ -1,0 +1,19 @@
+{
+  "model": "w2v-BERT",
+  "model_path": "facebook/w2v-bert-2.0",
+  "n_total_samples": 3980,
+  "n_layers": 25,
+  "language_counts": {
+    "English": 2546,
+    "German": 375,
+    "Greek": 483,
+    "Spanish": 576
+  },
+  "label_counts": {
+    "happy": 831,
+    "sad": 1768,
+    "fear": 701,
+    "disgust": 680
+  },
+  "wallclock_seconds": 1306.3
+}

@@ -1,0 +1,16 @@
+torch
+torchaudio
+transformers
+opensmile
+scikit-learn
+pandas
+numpy
+matplotlib
+fastapi
+uvicorn
+python-multipart
+pyyaml
+
+scipy
+wandb
+seaborn

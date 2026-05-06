@@ -1,0 +1,27 @@
+name: ser_env
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch
+  - torchaudio
+  - transformers
+  - scipy
+  - wandb
+  - scikit-learn
+  - pandas
+  - numpy
+  - matplotlib
+  - fastapi
+  - uvicorn
+  - pyyaml
+  - python-multipart
+  - seaborn
+  - tqdm
+  - pip
+  - pip:
+      - opensmile
+      - wandb
+      - kaggle
