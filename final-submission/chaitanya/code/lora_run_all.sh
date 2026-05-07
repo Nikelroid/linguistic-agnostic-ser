@@ -38,7 +38,7 @@ for model in "${MODELS[@]}"; do
                 done_count=$((done_count+1))
             fi
         else
-            mark "FAIL  $model / $dataset (exit $rc) — see $log"
+            mark "FAIL  $model / $dataset (exit $rc), see $log"
             fail_count=$((fail_count+1))
         fi
     done

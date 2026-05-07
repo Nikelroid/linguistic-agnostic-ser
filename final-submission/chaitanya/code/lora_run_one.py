@@ -67,7 +67,7 @@ def main():
     save_hs = os.path.join(RESULTS_DIR, f'tuned_hidden_states_{args.model}_{args.dataset}.npy')
     save_lb = os.path.join(RESULTS_DIR, f'tuned_labels_{args.model}_{args.dataset}.npy')
     if os.path.exists(save_hs) and os.path.exists(save_lb):
-        print(f'CACHED {args.model}/{args.dataset} — skipping')
+        print(f'CACHED {args.model}/{args.dataset}, skipping')
         return 0
 
     hf_name = MODEL_CONFIGS[args.model]

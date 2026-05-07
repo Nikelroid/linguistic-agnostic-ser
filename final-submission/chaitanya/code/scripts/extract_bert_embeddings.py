@@ -2,7 +2,7 @@
 
 Output: per-clip BERT embedding aligned with hidden_states_HuBERT_RAVDESS/SAVEE order.
 - RAVDESS: maps statement code (01 or 02) to known sentence
-- SAVEE:   uses sentence code (a01..su15) as text — BERT tokenizes each distinctly.
+- SAVEE:   uses sentence code (a01..su15) as text, BERT tokenizes each distinctly.
            This is sufficient for CCA which only needs distinct text-side variation.
 """
 import os

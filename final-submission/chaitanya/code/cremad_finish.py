@@ -2,7 +2,7 @@
 Run CREMA-D hidden state extraction for the missing models only (Whisper + MERT).
 
 Standalone script for memory-efficient extraction. Each call runs the heavy work in
-this single process, then exits — letting the OS reclaim everything cleanly.
+this single process, then exits so the OS reclaims everything cleanly.
 
 Includes the two model-specific fixes that the notebook also has:
 - Whisper needs padding='max_length' (3000 mel frames = 30 sec) instead of padding=True
@@ -58,7 +58,7 @@ CREMAD_EMOTION_MAP = {
 
 SAMPLE_RATE = 16000
 MERT_SAMPLE_RATE = 24000
-# Smaller batch for the heavy models -- Whisper pads to 30s and MERT has a beefy frontend
+# Smaller batch for the heavy models. Whisper pads to 30s and MERT has a beefy frontend.
 BATCH_SIZE_PER_MODEL = {
     'Whisper': 2,
     'MERT':    4,
