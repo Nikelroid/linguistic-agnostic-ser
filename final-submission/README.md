@@ -36,8 +36,9 @@ final-submission/
     │                MSP-Podcast, V/A/D regression
     ├── minoo/       LOSO, GRL + BERT-CCA debiasing, EMIS + IEMOCAP disagreement
     ├── chaitanya/   original probing pipeline, BERT alignment on hidden states,
-    │                BERT alignment on IEMOCAP transcripts, layer mixer, LoRA,
-    │                CREMA-D probe, per-actor/per-sentence CREMA-D breakdowns
+    │                BERT alignment on IEMOCAP transcripts, layer mixer, LoRA
+    │                (CARC Slurm), CREMA-D probe, per-actor/per-sentence
+    │                CREMA-D breakdowns
     └── xiangxu/     SpeechCraft cross-lingual benchmark, EN↔ZH transfer
 ```
 

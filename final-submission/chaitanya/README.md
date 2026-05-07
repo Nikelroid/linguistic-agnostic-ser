@@ -5,7 +5,7 @@
 - **Original layer-wise probing pipeline** (hidden-state extraction, mean pooling, StandardScaler + 5-fold logistic regression): the baseline every variant in the paper sits on top of.
 - **BERT representational alignment** between each speech-encoder layer and BERT-base embeddings using linear CKA, Procrustes residual, and centroid transfer; also rerun on IEMOCAP transcripts (§5.5).
 - **Learned layer mixer** with softmax attention over all 25 hidden states (§5.3).
-- **LoRA fine-tuning** (rank 8, q/v projections) at the per-combination best layer across 30 (encoder × dataset) combinations, compared against the frozen baseline (§5.4).
+- **LoRA fine-tuning** (rank 8, q/v projections) at the per-combination best layer across 30 (encoder × dataset) combinations, deployed to USC CARC via Slurm, compared against the frozen baseline (§5.4).
 - **CREMA-D probing** as the cleanest fixed-lexicon falsification: 91 actors saying the same 12 sentences across 6 emotions, 7,442 clips (§5.2).
 - **Original mass-probing notebook** (`original_exploratory_probing_analysis.ipynb`) that powers the 42 (encoder, dataset) per-layer experiments cited throughout the paper, used as the foundation by every downstream variant on the team.
 - **Writing.** Drafted the original Method, Results, and Cross-Model Correlation sections of the midterm report. For the final report, wrote the abstract, problem definition (§1), method (§4), and the core results subsections, layer-wise probing (§5.1), CREMA-D (§5.2), layer mixer (§5.3), Frozen vs. LoRA (§5.4), and BERT representational alignment (§5.5), and contributed substantively to the conclusions and limitations. Co-authored the final presentation deck.
@@ -22,7 +22,8 @@ chaitanya/
 │   ├── cremad.ipynb / cremad_finish.py           §5.2 fixed-lexicon CREMA-D probe
 │   ├── layer_mixer.ipynb                         §5.3 softmax attention over 25 layers
 │   ├── lora_finetune.ipynb / lora_run_one.py     §5.4 LoRA training & re-probe
-│   ├── lora_run_all.sh                           submits all 30 combinations
+│   ├── lora_run_all.sh                           runs all 30 combinations locally
+│   ├── slurm/submit_lora.sbatch                  CARC Slurm submission for LoRA
 │   ├── scripts/extract_bert_*.py                 BERT-base embeddings used by alignment
 │   └── requirements.txt
 └── results_summary/

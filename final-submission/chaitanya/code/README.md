@@ -1,1 +1,1 @@
-chaitanya parwatkar work on cremad probing, lora finetuning, bert alignment and the learned layer mixer. each notebook is self contained and saves outputs into results.
+chaitanya parwatkar work on cremad probing, lora finetuning, bert alignment and the learned layer mixer. each notebook is self contained and saves outputs into results. slurm/submit_lora.sbatch submits the lora training to USC CARC.
