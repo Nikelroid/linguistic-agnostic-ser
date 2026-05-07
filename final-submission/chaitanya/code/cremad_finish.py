@@ -36,9 +36,7 @@ if hasattr(transformers.modeling_utils, 'check_torch_load_is_safe'):
     transformers.modeling_utils.check_torch_load_is_safe = lambda: None
 
 
-# ============================================================
-# PATHS
-# ============================================================
+# Paths
 PROJECT_ROOT = '/Users/chaitanyaparwatkar/Desktop/CSCI535-SER-Final'
 CREMAD_DIR = os.path.join(PROJECT_ROOT, 'my_code', 'data', 'CREMA-D', 'AudioWAV')
 RESULTS_DIR = os.path.join(PROJECT_ROOT, 'my_code', 'results', 'cremad')
@@ -65,9 +63,7 @@ BATCH_SIZE_PER_MODEL = {
 }
 
 
-# ============================================================
-# DEVICE
-# ============================================================
+# Device
 if torch.cuda.is_available():
     DEVICE = torch.device('cuda')
 elif torch.backends.mps.is_available():
@@ -77,9 +73,7 @@ else:
 print(f"Using device: {DEVICE}")
 
 
-# ============================================================
-# AUDIO LOADER (mirrors cremad.ipynb)
-# ============================================================
+# Audio loader (mirrors cremad.ipynb)
 def load_audio_file(filepath, target_sr=16000):
     sr, waveform = wavfile.read(filepath)
     if waveform.dtype == np.int16:
@@ -141,9 +135,7 @@ def collate_pad(batch):
     return padded
 
 
-# ============================================================
-# EXTRACTION (with the two bug fixes)
-# ============================================================
+# Extraction (with the two bug fixes)
 def extract_hidden_states(model_key, hf_name, audio_list, batch_size):
     is_whisper = 'whisper' in hf_name.lower()
     is_mert = 'MERT' in hf_name
@@ -207,9 +199,7 @@ def extract_hidden_states(model_key, hf_name, audio_list, batch_size):
     return np.concatenate(all_layer_means, axis=0)
 
 
-# ============================================================
-# MAIN
-# ============================================================
+# Main
 def main():
     log_lines = [f"=== CREMA-D finish run started at {datetime.now().isoformat()} ===", ""]
 
@@ -234,7 +224,7 @@ def main():
         labels_path = os.path.join(EMBEDDINGS_DIR, f'labels_{model_key}_CREMA-D.npy')
 
         if os.path.exists(save_path) and os.path.exists(labels_path):
-            print(f"\nCACHED {model_key} -- skipping")
+            print(f"\nCACHED {model_key}, skipping")
             succeeded.append(model_key)
             log_lines.append(f"CACHED {model_key}")
             continue
