@@ -22,8 +22,8 @@ CSCI-535 final project. Authors: Nima Kelidari, Minoo Ahmadi, Chaitanya Parwatka
 | 13 | CREMA-D fixed-lexicon falsification (7,442 clips, 6 emotions) | Chaitanya |
 | 14 | BERT alignment on IEMOCAP transcripts (secondary check) | Chaitanya |
 | 15 | Original layer-wise probing pipeline (foundation for all probing variants) | Chaitanya |
+| 16 | Midterm 18-experiment sweep (3 base encoders × 6 datasets, `18exp.ipynb`) | Minoo |
 | Slurm pipeline + `src/` | Shared infrastructure | Nima |
-| Midterm 18-experiment sweep | 3 base encoders × 6 datasets (`18exp.ipynb`) | Minoo |
 
 ## Layout
 
@@ -35,19 +35,13 @@ final-submission/
     ├── nima/        Slurm pipeline, frozen 6-encoder probing, ESC-50 noise,
     │                MSP-Podcast, V/A/D regression
     ├── minoo/       LOSO, GRL + BERT-CCA debiasing, EMIS + IEMOCAP disagreement
-    ├── chaitanya/   original probing pipeline, BERT alignment, layer mixer,
-    │                LoRA, CREMA-D
+    ├── chaitanya/   original probing pipeline, BERT alignment on hidden states,
+    │                BERT alignment on IEMOCAP transcripts, layer mixer, LoRA,
+    │                CREMA-D probe, per-actor/per-sentence CREMA-D breakdowns
     └── xiangxu/     SpeechCraft cross-lingual benchmark, EN↔ZH transfer
 ```
 
 Each folder has a `README.md`, a `code/` directory, and a `results_summary/` directory with the key plots and CSVs that back the paper.
-
-## Midterm notebooks
-
-Two notebooks predate the per-task split and are kept with their author:
-
-- `chaitanya/code/02_mass_experiments.ipynb`: first round of mass probing experiments; the project started here.
-- `minoo/code/18exp.ipynb`: 18-experiment sweep (3 base encoders × 6 datasets) for the midterm report.
 
 ## Sources
 

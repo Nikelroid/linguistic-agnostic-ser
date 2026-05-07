@@ -7,7 +7,6 @@
 - **Learned layer mixer** with softmax attention over all 25 hidden states (§5.3).
 - **LoRA fine-tuning** (rank 8, q/v projections) at the per-combination best layer across 30 (encoder × dataset) combinations, compared against the frozen baseline (§5.4).
 - **CREMA-D probing** as the cleanest fixed-lexicon falsification: 91 actors saying the same 12 sentences across 6 emotions, 7,442 clips (§5.2).
-- **Midterm notebook** `02_mass_experiments.ipynb`: first round of mass probing experiments, the project started here.
 - Wrote the original Method, Results, and Cross-Model Correlation sections of the midterm.
 
 ## Layout
@@ -16,8 +15,7 @@
 chaitanya/
 ├── README.md
 ├── code/
-│   ├── 01_exploratory_probing_analysis.ipynb     baseline probing pipeline
-│   ├── 02_mass_experiments.ipynb                 midterm mass probing
+│   ├── original_exploratory_probing_analysis.ipynb     original probing pipeline
 │   ├── bert_alignment.ipynb                      §5.5 CKA + Procrustes + centroid transfer
 │   ├── bert_alignment_transcripts.ipynb          same on IEMOCAP transcripts
 │   ├── cremad.ipynb / cremad_finish.py           §5.2 fixed-lexicon CREMA-D probe
