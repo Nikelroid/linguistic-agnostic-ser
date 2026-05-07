@@ -1,4 +1,4 @@
-# Linguistic-Agnostic Speech Emotion Recognition — Final Submission
+# Linguistic-Agnostic Speech Emotion Recognition: Final Submission
 
 CSCI-535 final project. Authors: Nima Kelidari, Minoo Ahmadi, Chaitanya Parwatkar, Xiangxu (Henry) Lin.
 
@@ -19,9 +19,10 @@ CSCI-535 final project. Authors: Nima Kelidari, Minoo Ahmadi, Chaitanya Parwatka
 | 10 | V/A/D dimensional regression (clean) | Nima |
 | 11 | V/A/D under noise | Nima |
 | 12 | V/A/D as features for emotion classification | Nima |
-| CREMA-D | Fixed-lexicon falsification | Chaitanya |
+| 13 | CREMA-D fixed-lexicon falsification (7,442 clips, 6 emotions) | Chaitanya |
+| 14 | BERT alignment on IEMOCAP transcripts (secondary check) | Chaitanya |
+| 15 | Original layer-wise probing pipeline (foundation for all probing variants) | Chaitanya |
 | Slurm pipeline + `src/` | Shared infrastructure | Nima |
-| Original probing pipeline | Midterm baseline (`02_mass_experiments.ipynb`) | Chaitanya |
 | Midterm 18-experiment sweep | 3 base encoders × 6 datasets (`18exp.ipynb`) | Minoo |
 
 ## Layout
@@ -45,8 +46,8 @@ Each folder has a `README.md`, a `code/` directory, and a `results_summary/` dir
 
 Two notebooks predate the per-task split and are kept with their author:
 
-- `chaitanya/code/02_mass_experiments.ipynb` — first round of mass probing experiments; the project started here.
-- `minoo/code/18exp.ipynb` — 18-experiment sweep (3 base encoders × 6 datasets) for the midterm report.
+- `chaitanya/code/02_mass_experiments.ipynb`: first round of mass probing experiments; the project started here.
+- `minoo/code/18exp.ipynb`: 18-experiment sweep (3 base encoders × 6 datasets) for the midterm report.
 
 ## Sources
 

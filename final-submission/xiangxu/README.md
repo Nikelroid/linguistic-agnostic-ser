@@ -34,7 +34,7 @@ xiangxu/
 
 - Balanced 4-language pooled (5-fold CV) saturates near 0.94 for every encoder: Whisper L10 **0.949**, HuBERT L8 0.947, WavLM L6 0.945, w2v-BERT L17 0.936, wav2vec 2.0 L8 0.922, MERT L6 0.908.
 - LOLO is asymmetric: German held out generalises (HuBERT 0.952), English held out drops (HuBERT 0.691), Spanish held out is hardest (HuBERT 0.375).
-- Full-scale 5-language pooled (with Mandarin) drops to 0.485–0.523. Whisper's peak shifts to L22 — the only encoder whose deep layer wins.
+- Full-scale 5-language pooled (with Mandarin) drops to 0.485–0.523. Whisper's peak shifts to L22, the only encoder whose deep layer wins.
 - EN↔ZH single-language transfer collapses to 0.28–0.32, only 0.03–0.07 above the 4-class chance baseline (0.25).
 
 ## Drive location

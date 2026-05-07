@@ -3,7 +3,7 @@
 ## Contributions
 
 - **Leave-one-speaker-out evaluation** across 42 (encoder × dataset) pairs to rule out speaker memorization (§5.6). Best layer shifts from middle to deep under LOSO.
-- **Adversarial debiasing — text, not speaker**: gradient-reversal against a sentence-ID head + linear BERT-CCA projection on top of the frozen encoder, to test whether the lexical shortcut can be removed at inference time (§5.7c).
+- **Adversarial debiasing: text, not speaker**: gradient-reversal against a sentence-ID head + linear BERT-CCA projection on top of the frozen encoder, to test whether the lexical shortcut can be removed at inference time (§5.7c).
 - **Congruent vs. incongruent (EMIS)**: gained dataset access and built a sentence-stratified probe trained on synthetic congruent clips, tested on incongruent (§5.7a). Also built the IEMOCAP annotator-disagreement diagnostic that confirms the IEMOCAP ceiling reflects label noise (§5.7b).
 - **Midterm notebook** `18exp.ipynb`: 18-experiment layer-wise probing sweep (3 base encoders × 6 datasets) for the midterm report.
 - Co-authored the proposals.
@@ -38,6 +38,6 @@ minoo/
 ## Headline numbers
 
 - LOSO: speaker-rich datasets retain accuracy (HuBERT/EmoDB drop 0.021); speaker-poor collapse (MESD ~0.30 drop).
-- GRL at λ=1: HuBERT/WavLM keep ~94% emotion accuracy while sentence accuracy drops to ~0.39. CCA projection at most −0.018 Δbias — the SSL shortcut is robust to standard linear/adversarial debiasing.
-- EMIS text bias (explicit slice): HuBERT +0.717, wav2vec 2.0 +0.665, WavLM +0.613, **Whisper −0.191** — only Whisper stays audio-grounded.
+- GRL at λ=1: HuBERT/WavLM keep ~94% emotion accuracy while sentence accuracy drops to ~0.39. CCA projection at most −0.018 Δbias, the SSL shortcut is robust to standard linear/adversarial debiasing.
+- EMIS text bias (explicit slice): HuBERT +0.717, wav2vec 2.0 +0.665, WavLM +0.613, **Whisper −0.191**, only Whisper stays audio-grounded.
 - IEMOCAP agreement gap: +0.145 to +0.191 across encoders (mean +0.169); the 65–70% IEMOCAP ceiling is label noise, not a probe limitation.

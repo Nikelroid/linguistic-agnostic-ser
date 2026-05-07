@@ -2,7 +2,7 @@
 
 ## Contributions
 
-- **Slurm-based experiment pipeline** (`src/`, `run_pipeline.py`, `slurm/`) — shared infrastructure that all six encoders run through.
+- **Slurm-based experiment pipeline** (`src/`, `run_pipeline.py`, `slurm/`): shared infrastructure that all six encoders run through.
 - **Frozen probing extension to six encoders**: added WavLM Large, w2v-BERT 2.0, and MERT v1-330M (all 24-layer) on top of the midterm's wav2vec 2.0 / HuBERT / Whisper.
 - **ESC-50 noise augmentation** at four SNR levels {20, 10, 5, 0 dB} across 6 encoders × 7 datasets (§5.8).
 - **MSP-Podcast** spontaneous-speech evaluation, 4-class probing on all 6 encoders.

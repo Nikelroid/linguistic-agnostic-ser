@@ -2,12 +2,12 @@
 
 ## Contributions
 
-- **Original layer-wise probing pipeline** (hidden-state extraction, mean pooling, StandardScaler + 5-fold logistic regression) — the baseline every variant in the paper sits on top of.
+- **Original layer-wise probing pipeline** (hidden-state extraction, mean pooling, StandardScaler + 5-fold logistic regression): the baseline every variant in the paper sits on top of.
 - **BERT representational alignment** between each speech-encoder layer and BERT-base embeddings using linear CKA, Procrustes residual, and centroid transfer; also rerun on IEMOCAP transcripts (§5.5).
 - **Learned layer mixer** with softmax attention over all 25 hidden states (§5.3).
 - **LoRA fine-tuning** (rank 8, q/v projections) at the per-combination best layer across 30 (encoder × dataset) combinations, compared against the frozen baseline (§5.4).
 - **CREMA-D probing** as the cleanest fixed-lexicon falsification: 91 actors saying the same 12 sentences across 6 emotions, 7,442 clips (§5.2).
-- **Midterm notebook** `02_mass_experiments.ipynb`: first round of mass probing experiments — the project started here.
+- **Midterm notebook** `02_mass_experiments.ipynb`: first round of mass probing experiments, the project started here.
 - Wrote the original Method, Results, and Cross-Model Correlation sections of the midterm.
 
 ## Layout

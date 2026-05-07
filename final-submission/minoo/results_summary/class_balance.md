@@ -1,4 +1,4 @@
-# Task 4 — Dataset class-balance audit
+# Task 4: Dataset class-balance audit
 
 _Source: midterm report Appendix A Table 4. IEMOCAP and MSP-Podcast use the standard 4-class evaluation subsets (the same labels the LOSO probes were trained on)._
 

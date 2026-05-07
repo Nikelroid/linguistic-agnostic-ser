@@ -1,4 +1,4 @@
-# Task 7 — Probe-trustworthiness Diagnostics
+# Task 7: Probe-trustworthiness Diagnostics
 
 This directory contains the per-(model, ...) outputs for Task 7's two probing experiments and the summary plots used in the presentation.
 
@@ -6,8 +6,8 @@ This directory contains the per-(model, ...) outputs for Task 7's two probing ex
 
 Both parts ask: **is this probe's accuracy trustworthy?** They probe different failure modes:
 
-- **Part A — EMIS text-bias.** Train a probe on EMIS_congruent (text emotion = audio emotion) and test on EMIS_incongruent (text ≠ audio). If the probe predicts the *text* emotion, it learned a linguistic shortcut from the frozen encoder. If it predicts the *audio* emotion, it's grounded in acoustics.
-- **Part B — IEMOCAP annotator disagreement.** Split IEMOCAP into clips where every annotator agreed vs. clips where ≥1 annotator disagreed. Train probes on each subset and compare. The gap is the annotator-disagreement ceiling — accuracy lost not to model error but to label noise.
+- **Part A: EMIS text-bias.** Train a probe on EMIS_congruent (text emotion = audio emotion) and test on EMIS_incongruent (text ≠ audio). If the probe predicts the *text* emotion, it learned a linguistic shortcut from the frozen encoder. If it predicts the *audio* emotion, it's grounded in acoustics.
+- **Part B: IEMOCAP annotator disagreement.** Split IEMOCAP into clips where every annotator agreed vs. clips where ≥1 annotator disagreed. Train probes on each subset and compare. The gap is the annotator-disagreement ceiling, accuracy lost not to model error but to label noise.
 
 Coverage:
 - **Part A:** 4 models (HuBERT, wav2vec2, WavLM, Whisper-medium) × 3 categories (all / explicit / implicit) = 12 CSVs. MERT and w2v-BERT excluded (EMIS hidden states not extracted for them).
@@ -44,7 +44,7 @@ Source: [scripts/task7_partA_EMIS.py:285](../../scripts/task7_partA_EMIS.py).
 
 ## CSV column references
 
-### Part A — `probing_{Model}_{Category}.csv`
+### Part A: `probing_{Model}_{Category}.csv`
 25 rows per file (one per layer 0–24).
 
 | Column | Meaning |
@@ -57,7 +57,7 @@ Source: [scripts/task7_partA_EMIS.py:285](../../scripts/task7_partA_EMIS.py).
 | `n_train` / `n_test` | Avg fold sizes (probes trained on EMIS_congruent, tested on incongruent) |
 | `model` / `category` / `chance` | Constant per file |
 
-### Part B — `agreement_probing_{Model}_IEMOCAP.csv`
+### Part B: `agreement_probing_{Model}_IEMOCAP.csv`
 25 rows per file.
 
 | Column | Meaning |
@@ -84,14 +84,14 @@ All run from repo root.
 Six panels, one per model. Each shows three accuracy curves over 25 layers: high-agree (green), low-agree (red), full set (gray dashed). Each panel title gives the peak-layer numbers: `L{best}: high={x}, low={y}, gap={x−y}`. Shows the agreement gap holds across all 6 architectures.
 
 ### `task7_cross_diagnostic.png` (Plot 2)
-Two panels side by side. Left: peak text_bias per (model, category) for Part A's 4 models. Right: peak-layer agreement gap per model for Part B's 6 models. Both diagnostics on one figure — the headline image for the Task 7 slide.
+Two panels side by side. Left: peak text_bias per (model, category) for Part A's 4 models. Right: peak-layer agreement gap per model for Part B's 6 models. Both diagnostics on one figure, the headline image for the Task 7 slide.
 
 ### `task7A_bias_swing.png` (Plot 3)
 Bar chart, 4 models × 3 test slices (all/explicit/implicit). Same model, same encoder, but bias swings sign as the test slice changes. Strongest internal-falsification visual: if probes used acoustics not text, all three bars per model would match.
 
 ## Headline numbers
 
-### Part A (peak text_bias per model, explicit slice — the strongest text-shortcut signal)
+### Part A (peak text_bias per model, explicit slice: the strongest text-shortcut signal)
 
 | Model | Best Layer | text_bias | target_acc | proxy_acc |
 |---|---:|---:|---:|---:|

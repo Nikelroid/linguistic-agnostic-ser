@@ -1,4 +1,4 @@
-# Task 4 — Leave-One-Speaker-Out (LOSO) Results
+# Task 4: Leave-One-Speaker-Out (LOSO) Results
 
 This directory contains the per-(model, dataset) LOSO and 5-fold CV results for the speaker-leakage analysis from Task 4.
 
@@ -8,7 +8,7 @@ This directory contains the per-(model, dataset) LOSO and 5-fold CV results for 
 results/LOSO/
 ├── README.md                       # this file
 ├── csv/
-│   ├── loso_{Model}_{Dataset}.csv  # 42 per-(model, dataset) results — AUTHORITATIVE
+│   ├── loso_{Model}_{Dataset}.csv  # 42 per-(model, dataset) results, AUTHORITATIVE
 │   └── loso_all_combined.csv       # ⚠ STALE: MESD rows have LOSO_Accuracy = 0
 └── per_speaker/
     └── per_speaker_{Model}_{Dataset}.json  # per-fold per-speaker accuracies
@@ -19,7 +19,7 @@ results/LOSO/
 
 ## ⚠ Important: use the per-model CSVs, not the combined one
 
-`csv/loso_all_combined.csv` is stale — every MESD row's `LOSO_Accuracy` is 0.0, which is wrong. The per-model files in the same directory have the correct values. Both summary scripts below already read the per-model files for this reason.
+`csv/loso_all_combined.csv` is stale, every MESD row's `LOSO_Accuracy` is 0.0, which is wrong. The per-model files in the same directory have the correct values. Both summary scripts below already read the per-model files for this reason.
 
 If you want to refresh the combined CSV, re-run `scripts/task4_loso.py --all`. But for any analysis or table generation, prefer the per-model files.
 
@@ -44,7 +44,7 @@ All four live in `scripts/` and read from `results/LOSO/csv/`. Run from repo roo
 | Script | Output | Use |
 |---|---|---|
 | `task4_loso_table.py` | stdout / `docs/task4_table.md` | Headline + MSP markdown tables |
-| `task4_loso_plots.py` | `results/LOSO/plots/*.png` (local-only; not tracked) | 42 individual plots + 2 grid plots — bulky, regenerate as needed |
+| `task4_loso_plots.py` | `results/LOSO/plots/*.png` (local-only; not tracked) | 42 individual plots + 2 grid plots, bulky, regenerate as needed |
 | `task4_loso_heatmaps.py` | `results/LOSO/plots/loso_heatmap_*.png` (tracked) + `results/LOSO/avg_drop_per_layer.csv` | 2 presentation-grade heatmaps (drop + layer shift) and avg-per-layer Q&A backup |
 | `task4_class_balance.py` | `results/LOSO/class_balance.{csv,md}` | Per-dataset imbalance audit; documents why MSP-Podcast was excluded from the headline |
 
@@ -64,9 +64,9 @@ python scripts/task4_loso_table.py --extended
 ```
 
 Output structure:
-1. Headline matrix — 6 models × 6 balanced datasets, sorted by `Drop` descending. Columns: `5F Layer`, `LOSO Layer`, `Δ Layer`, `5F Acc`, `LOSO Acc`, `Drop`, `Chance`, `LOSO Lift`, `# Spk`.
-2. Quick-look summary — best honest (highest LOSO acc + small drop), worst leakage (largest drop), smallest drop, average drop per dataset.
-3. Top-5 largest layer shifts under LOSO (`|Δ Layer|`) — for the "Finding 3" paragraph in the report.
+1. Headline matrix, 6 models × 6 balanced datasets, sorted by `Drop` descending. Columns: `5F Layer`, `LOSO Layer`, `Δ Layer`, `5F Acc`, `LOSO Acc`, `Drop`, `Chance`, `LOSO Lift`, `# Spk`.
+2. Quick-look summary, best honest (highest LOSO acc + small drop), worst leakage (largest drop), smallest drop, average drop per dataset.
+3. Top-5 largest layer shifts under LOSO (`|Δ Layer|`): for the "Finding 3" paragraph in the report.
 4. Separate MSP-Podcast section (excluded from headline due to severe class imbalance).
 
 **`Drop` semantics:** `(best 5F acc) − (best LOSO acc)`, both computed by `idxmax` on the layer-wise CSV. The two "best layers" can be different layers; the script reports both indices in `5F Layer` and `LOSO Layer` and the difference in `Δ Layer`.
@@ -90,7 +90,7 @@ Edit `DATASET_CHANCE` if you update class counts.
 Renders 42 per-(model, dataset) two-panel plots (accuracy curves on top, per-layer drop on bottom) plus a 6×6 grid of small accuracy plots and a separate MSP-Podcast grid.
 
 ```bash
-# Default — write all plots to results/LOSO/plots/
+# Default: write all plots to results/LOSO/plots/
 python scripts/task4_loso_plots.py
 
 # Skip individual plots, only render grids
@@ -121,9 +121,9 @@ python scripts/task4_loso_heatmaps.py
 ```
 
 Outputs:
-- `results/LOSO/plots/loso_heatmap_drop.png` — accuracy drop heatmap (Reds colormap). Cell = `(best 5F acc) − (best LOSO acc)`. Columns sorted left-to-right by avg drop (worst leakage → cleanest).
-- `results/LOSO/plots/loso_heatmap_layer_shift.png` — best-layer shift heatmap (RdBu_r diverging colormap). Cell = `(LOSO best layer) − (5F best layer)`, labeled `5F→LOSO (Δ±N)`. Same column ordering as the drop heatmap so they pair side-by-side.
-- `results/LOSO/avg_drop_per_layer.csv` — for each (model, dataset) cell, both the best-vs-best drop and the avg-per-layer drop (averaged across all 25 layers' `Accuracy_Drop` column). Use this to defend the best-vs-best framing in Q&A.
+- `results/LOSO/plots/loso_heatmap_drop.png`: accuracy drop heatmap (Reds colormap). Cell = `(best 5F acc) − (best LOSO acc)`. Columns sorted left-to-right by avg drop (worst leakage → cleanest).
+- `results/LOSO/plots/loso_heatmap_layer_shift.png`: best-layer shift heatmap (RdBu_r diverging colormap). Cell = `(LOSO best layer) − (5F best layer)`, labeled `5F→LOSO (Δ±N)`. Same column ordering as the drop heatmap so they pair side-by-side.
+- `results/LOSO/avg_drop_per_layer.csv`: for each (model, dataset) cell, both the best-vs-best drop and the avg-per-layer drop (averaged across all 25 layers' `Accuracy_Drop` column). Use this to defend the best-vs-best framing in Q&A.
 
 ### `scripts/task4_class_balance.py`
 
@@ -134,8 +134,8 @@ python scripts/task4_class_balance.py
 ```
 
 Outputs:
-- `results/LOSO/class_balance.csv` — one row per dataset with `N_Classes`, `N_Samples`, majority/minority class + percentages, majority-class baseline, imbalance ratio, normalized Shannon entropy, and a `Balance_Label` (Balanced / Mostly balanced / Imbalanced / Severely imbalanced).
-- `results/LOSO/class_balance.md` — same data as a human-readable markdown table with interpretation paragraph.
+- `results/LOSO/class_balance.csv`: one row per dataset with `N_Classes`, `N_Samples`, majority/minority class + percentages, majority-class baseline, imbalance ratio, normalized Shannon entropy, and a `Balance_Label` (Balanced / Mostly balanced / Imbalanced / Severely imbalanced).
+- `results/LOSO/class_balance.md`: same data as a human-readable markdown table with interpretation paragraph.
 
 The headline finding: **MSP-Podcast is the only `Severely imbalanced` dataset** (50.7% neutral, imbalance ratio 10.2×, normalized entropy 0.76). Every balanced dataset has normalized entropy ≥ 0.94.
 
@@ -151,9 +151,9 @@ The Drive folder also has `csv/` and `per_speaker/` mirrors.
 
 For quick reference without re-running the script:
 
-- **Best honest accuracy:** HuBERT/EmoDB — LOSO 0.9682 at L11 (drop 0.021, 10 speakers)
-- **Worst leakage:** MERT/MESD — drop 0.324 (5F 0.869 → LOSO 0.545, 6 speakers)
-- **Smallest drop:** wav2vec2/SAVEE — drop 0.006 (5F 0.858 → LOSO 0.852)
+- **Best honest accuracy:** HuBERT/EmoDB, LOSO 0.9682 at L11 (drop 0.021, 10 speakers)
+- **Worst leakage:** MERT/MESD, drop 0.324 (5F 0.869 → LOSO 0.545, 6 speakers)
+- **Smallest drop:** wav2vec2/SAVEE, drop 0.006 (5F 0.858 → LOSO 0.852)
 
 **Average drop per dataset (across 6 models):**
 
@@ -178,8 +178,8 @@ Re-run the table script for the live numbers.
 
 ## MSP-Podcast caveat
 
-All 6 MSP-Podcast LOSO runs scored only +0.04 to +0.06 above the 0.507 majority-class baseline (`LOSO Lift` column in the table output). The probe is barely above chance, so the small drops on MSP-Podcast aren't evidence of clean generalization — they're evidence that the probe was barely learning anything to lose. MSP-Podcast is reported separately in §10 of the report, with macro-F1 / class-balanced retraining as future work.
+All 6 MSP-Podcast LOSO runs scored only +0.04 to +0.06 above the 0.507 majority-class baseline (`LOSO Lift` column in the table output). The probe is barely above chance, so the small drops on MSP-Podcast aren't evidence of clean generalization, they're evidence that the probe was barely learning anything to lose. MSP-Podcast is reported separately in §10 of the report, with macro-F1 / class-balanced retraining as future work.
 
 ## Source script for the underlying experiments
 
-`scripts/task4_loso.py` (already in the repo) — extracts hidden states for each layer, runs both 5-fold and LOSO logistic-regression probes, writes the per-(model, dataset) CSVs in `csv/`. Used as `python scripts/task4_loso.py --all --data_dir /scratch1/minooahm/ser_data`.
+`scripts/task4_loso.py` (already in the repo): extracts hidden states for each layer, runs both 5-fold and LOSO logistic-regression probes, writes the per-(model, dataset) CSVs in `csv/`. Used as `python scripts/task4_loso.py --all --data_dir /scratch1/minooahm/ser_data`.

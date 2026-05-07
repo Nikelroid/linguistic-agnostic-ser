@@ -1,4 +1,4 @@
-# Task 6 — Adversarial / Subspace Debiasing of Text Shortcut
+# Task 6: Adversarial / Subspace Debiasing of Text Shortcut
 
 This directory contains the per-(model, layer, lambda, regime) outputs for Task 6's two debiasing attempts and the summary plots used in the presentation.
 
@@ -8,12 +8,12 @@ Task 7A established that frozen SSL probes can take a text shortcut on EMIS inco
 
 | Version | Method | Key parameter | Outcome |
 |---|---|---|---|
-| **v2 — Adversarial GRL** | Train logreg-on-MLP probe with a Gradient Reversal Layer pushing back against a sentence-ID adversary at the shared MLP output. | GRL strength λ ∈ {0, 0.01, 0.1, 1, 10} | Best safe Δ-bias = −0.082 (HuBERT L20, λ=1.0). At λ=10, val_emo collapses to 0.67 — bias drop is meaningless. |
-| **v3 — Linear CCA projection** | Find top-k speech-side directions correlated with BERT text embeddings (no training), then project EMIS hidden states orthogonal to those directions. | k ∈ {0, 1, 2, 5, 10, 16}, two CCA training corpora (RAV+SAV, IEMOCAP) | Best Δ-bias = −0.018 (HuBERT L20, IEMOCAP CCA, k=16). |
+| **v2: Adversarial GRL** | Train logreg-on-MLP probe with a Gradient Reversal Layer pushing back against a sentence-ID adversary at the shared MLP output. | GRL strength λ ∈ {0, 0.01, 0.1, 1, 10} | Best safe Δ-bias = −0.082 (HuBERT L20, λ=1.0). At λ=10, val_emo collapses to 0.67, bias drop is meaningless. |
+| **v3: Linear CCA projection** | Find top-k speech-side directions correlated with BERT text embeddings (no training), then project EMIS hidden states orthogonal to those directions. | k ∈ {0, 1, 2, 5, 10, 16}, two CCA training corpora (RAV+SAV, IEMOCAP) | Best Δ-bias = −0.018 (HuBERT L20, IEMOCAP CCA, k=16). |
 
 Both attacks fail to push the probe off the linguistic subspace at any safe operating point. Combined message: the shortcut is robust to standard linear and adversarial debiasing.
 
-The interesting *positive* finding is upstream of the failed attacks — the **two-regime baseline comparison**:
+The interesting *positive* finding is upstream of the failed attacks, the **two-regime baseline comparison**:
 
 | Model | Layer | RAV+SAV-trained bias | EMIS-trained bias | Flips? |
 |---|---:|---:|---:|---|
@@ -22,7 +22,7 @@ The interesting *positive* finding is upstream of the failed attacks — the **t
 | WavLM | L20 | −0.268 | **+0.850** | YES |
 | Whisper | L24 | −0.251 | **+0.003** | **NO** |
 
-All four models show negative bias under RAV+SAV-trained (no text-emotion correlation in training). Three flip strongly positive when EMIS_congruent training offers a text shortcut. **Whisper alone resists the flip** — that's the disentanglement signature.
+All four models show negative bias under RAV+SAV-trained (no text-emotion correlation in training). Three flip strongly positive when EMIS_congruent training offers a text shortcut. **Whisper alone resists the flip**, that's the disentanglement signature.
 
 ## Sign convention
 
@@ -47,7 +47,7 @@ results/TASK6/
 ├── projection/
 │   ├── cca_proj_{Model}_L{N}.csv                      # v3 RAV+SAV CCA, 4 files
 │   └── cca_proj_{Model}_L{N}_iemocap.csv              # v3 IEMOCAP CCA, 4 files
-├── plots/                                             # original per-(model, regime) plots — busy, not slide-grade
+├── plots/                                             # original per-(model, regime) plots, busy, not slide-grade
 └── plots_summary/                                     # presentation-grade summary plots
     ├── task6_two_regime_swing.png                     # Figure 1
     ├── task6_lambda_sweep.png                         # Figure 2
@@ -56,7 +56,7 @@ results/TASK6/
 
 ## CSV column references
 
-### v2 — `csv/adversarial_{Model}{_emistrain}.csv`
+### v2: `csv/adversarial_{Model}{_emistrain}.csv`
 Rows: per (layer, lambda, n_seeds=5). Columns relevant to the figures:
 
 | Column | Meaning |
@@ -72,7 +72,7 @@ Rows: per (layer, lambda, n_seeds=5). Columns relevant to the figures:
 | `emis_incong_proxy_acc_mean` / `_std` | text-emotion accuracy on same |
 | `emis_incong_text_bias_mean` / `_std` | `proxy − target`, the headline metric |
 
-### v3 — `projection/cca_proj_{Model}_L{N}{_iemocap}.csv`
+### v3: `projection/cca_proj_{Model}_L{N}{_iemocap}.csv`
 Rows: per k value. Columns:
 
 | Column | Meaning |
@@ -104,7 +104,7 @@ Rows: per k value. Columns:
 4-panel grid (one per model), bias bars vs λ for the EMIS-trained regime, with `val_emo` overlay (green line) and a "emotion collapse" red shade where val_emo < 0.85. Shows the GRL only "reduces bias" at λ=10 by destroying the emotion signal itself.
 
 ### `task6_two_attacks.png` (Figure 3)
-Bar chart, 4 models × 2 attacks (GRL purple, CCA green) showing baseline-relative Δ-bias. Visualizes the joint failure of v2 and v3 attacks in one image. **Caveat**: Whisper's baseline is already +0.003, so its "Δ −0.071 from GRL" is not a meaningful debiasing — there was nothing to remove. The HuBERT/wav2vec2/WavLM bars are the real claim.
+Bar chart, 4 models × 2 attacks (GRL purple, CCA green) showing baseline-relative Δ-bias. Visualizes the joint failure of v2 and v3 attacks in one image. **Caveat**: Whisper's baseline is already +0.003, so its "Δ −0.071 from GRL" is not a meaningful debiasing, there was nothing to remove. The HuBERT/wav2vec2/WavLM bars are the real claim.
 
 ## Headline numbers (verified against CSVs 2026-04-28)
 
