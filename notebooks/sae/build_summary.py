@@ -156,6 +156,7 @@ def stats_txt():
     d6 = load_json("step6_HuBERT_CREMA-D_L13_metrics.json")
     d7 = load_json("step7_HuBERT_CREMA-D_L13_metrics.json")
     d1 = load_json("step1_HuBERT_CREMA-D_L13_metrics.json")
+    d8 = load_json("step8_EMIS_metrics.json")
     txt = f"""================================================================================
 SAE DISSECTION OF FROZEN-ENCODER EMOTION FEATURES — STATISTICAL & METHODOLOGICAL ANALYSIS
 ================================================================================
@@ -210,12 +211,18 @@ Q (iii) ACOUSTIC vs LEXICAL — the signal is ACOUSTIC:
   causal sufficiency: emotion decodes from acoustic features {d7.get('suff_acoustic_emotion'):.3f}
   vs lexical {d7.get('suff_lexical'):.3f} vs random {d7.get('suff_random'):.3f} (+{d7.get('acoustic_minus_lexical_sufficiency'):.3f}).
 
+Q (mechanism) EMIS AUDIO vs TEXT — Whisper resists the lexical shortcut:
+  per-encoder feature text-bias (text AUC - audio AUC): {d8.get('mean_text_bias_by_encoder')}
+  Whisper {d8.get('whisper_mean_text_bias')} vs SSL mean {d8.get('ssl_mean_text_bias')}
+  -> {'Whisper stays audio-grounded while SSL features lean text' if d8.get('whisper_resists_shortcut') else 'no clear separation'}.
+  Mechanistic match to the published EMIS text-bias (HuBERT +0.717 ... Whisper -0.191).
+
 3. LIMITATIONS / DEFERRED
 --------------------------------------------------------------------------------
 - Utterance-level pooling of sparse frame features: necessity-ablation of small
   feature subsets is ~null (signal distributed); sufficiency is the informative test.
-- CREMA-D substitutes for IEMOCAP (transcripts not synced) and EMIS (unavailable);
-  exact variants documented as runnable stubs (STEP6/7/8_*).
+- EMIS now run (Zenodo mirror); IEMOCAP real-transcript ablation and SpeechCraft
+  cross-lingual remain deferred (data not on cluster), with runnable stubs (STEP6/7).
 ================================================================================
 """
     with open(os.path.join(SUM, "SAE_statistical_methodological_analysis.txt"), "w") as fh:

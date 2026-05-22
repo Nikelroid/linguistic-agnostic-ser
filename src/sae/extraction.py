@@ -207,6 +207,36 @@ def extract_dataset_frames(
     return meta
 
 
+@torch.no_grad()
+def extract_pooled_dataset(encoder, dataset_name, data_dir, out_dir=DEFAULT_OUT,
+                           sample_rate=16000, limit=None):
+    """Mean-pooled per-layer activations (N, 25, H) — the EXP-style format, for the
+    text-bias layer sweep. Saves pooled_{enc}_{ds}.npy + utterances_pooled_{enc}_{ds}.npz
+    (label/text_label/actor/sentence/tts/explicit/congruent)."""
+    os.makedirs(out_dir, exist_ok=True)
+    data = load_dataset(dataset_name, data_dir, sample_rate)
+    if limit:
+        data = data[:limit]
+    fx = FrameExtractor(encoder)
+    pooled, lab, tlab, files, act, sent, tts, expl, cong = [], [], [], [], [], [], [], [], []
+    for rec in tqdm(data, desc=f"pooled {encoder}/{dataset_name}"):
+        wav = torch.from_numpy(np.asarray(rec["audio"], dtype=np.float32)).unsqueeze(0)
+        states = fx._tx.extract_from_waveform(wav, sample_rate)   # list of 25 (1, H)
+        pooled.append(np.stack([s[0] for s in states], axis=0))   # (25, H)
+        lab.append(str(rec["label"])); tlab.append(str(rec.get("text_label", "")))
+        files.append(str(rec["file"])); act.append(str(rec.get("actor", "")))
+        sent.append(str(rec.get("sentence", ""))); tts.append(str(rec.get("tts", "")))
+        expl.append(bool(rec.get("explicit", False))); cong.append(bool(rec.get("congruent", False)))
+    arr = np.stack(pooled).astype(np.float32)
+    tag = f"{encoder}_{dataset_name}"
+    np.save(os.path.join(out_dir, f"pooled_{tag}.npy"), arr)
+    np.savez(os.path.join(out_dir, f"utterances_pooled_{tag}.npz"),
+             label=np.array(lab), text_label=np.array(tlab), filename=np.array(files),
+             actor=np.array(act), sentence=np.array(sent), tts=np.array(tts),
+             explicit=np.array(expl), congruent=np.array(cong))
+    print(f"[pooled] saved {arr.shape} -> {out_dir}/pooled_{tag}.npy")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--encoder", required=True, choices=sorted(ENCODER_HF_PATHS))
@@ -217,7 +247,11 @@ def main():
     ap.add_argument("--limit", type=int, default=None, help="cap #clips (debug)")
     ap.add_argument("--max-frames-per-clip", type=int, default=None,
                     help="randomly subsample frames per clip to bound dataset size")
+    ap.add_argument("--pooled", action="store_true", help="extract mean-pooled (N,25,H) instead of per-frame")
     args = ap.parse_args()
+    if args.pooled:
+        extract_pooled_dataset(args.encoder, args.dataset, args.data_dir, out_dir=args.out, limit=args.limit)
+        return
     layers = [int(x) for x in args.layers.split(",") if x.strip() != ""]
     extract_dataset_frames(
         args.encoder, args.dataset, args.data_dir, layers,

@@ -44,5 +44,5 @@ DATA_DIR="/scratch1/$USER/ser_data/${DS}"
 
 echo "[$(date)] task $SLURM_ARRAY_TASK_ID -> encoder=$ENC dataset=$DS layer=$L (node $SLURMD_NODENAME)"
 "$PY" -c "import sae_lens, torch; print('env ok: sae_lens', sae_lens.__version__, 'cuda', torch.cuda.is_available())"
-"$PY" -u -m src.sae.extraction --encoder "$ENC" --dataset "$DS" --data-dir "$DATA_DIR" --layers "$L"
+"$PY" -u -m src.sae.extraction --encoder "$ENC" --dataset "$DS" --data-dir "$DATA_DIR" --layers "$L" ${POOLED:+--pooled}
 echo "[$(date)] done task $SLURM_ARRAY_TASK_ID"
