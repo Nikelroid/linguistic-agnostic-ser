@@ -9,3 +9,4 @@ sae-lens==6.44.0          # SAE training (StandardTrainingSAE / TopK) + SAE.enco
 transformer-lens==3.2.1   # pulled by sae-lens; not used directly for speech encoders
 opensmile==2.6.0          # eGeMAPS acoustic descriptors (acoustic-feature labeling)
 scikit-learn==1.8.0       # mutual information, logistic-probe re-fit for ablation
+matplotlib>=3.8           # all SAE plots/dashboards
