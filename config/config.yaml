@@ -39,6 +39,7 @@ dataset_config:
 dataset_paths:
   base_dir: /scratch1/kelidari/ser_data
   CREMA-D: /scratch1/kelidari/ser_data/CREMA-D   # load_cremad auto-descends into AudioWAV/
+  EMIS: /scratch1/kelidari/ser_data/EMIS         # emotionally-incongruent synthetic speech (Zenodo 19207001)
 
 training:
   batch_size: 4

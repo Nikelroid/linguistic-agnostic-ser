@@ -67,6 +67,7 @@ _LOADERS = {
     "SAVEE": dload.load_savee,
     "AESDD": dload.load_aesdd,
     "MESD": dload.load_mesd,
+    "EMIS": dload.load_emis,
 }
 
 
@@ -156,7 +157,7 @@ def extract_dataset_frames(
     fx = FrameExtractor(encoder)
     rng = np.random.default_rng(seed)
     per_layer: dict[int, list] = {l: [] for l in layers}
-    frame_utt, labels, files, actors, sentences = [], [], [], [], []
+    frame_utt, labels, files, actors, sentences, text_labels = [], [], [], [], [], []
 
     for ui, rec in enumerate(tqdm(data, desc=f"{encoder}/{dataset_name}")):
         try:
@@ -175,6 +176,7 @@ def extract_dataset_frames(
         files.append(str(rec["file"]))
         actors.append(str(rec.get("actor", "")))
         sentences.append(str(rec.get("sentence", "")))
+        text_labels.append(str(rec.get("text_label", "")))
 
     frame_index = np.concatenate(frame_utt)
     tag = f"{encoder}_{dataset_name}"
@@ -197,6 +199,7 @@ def extract_dataset_frames(
         os.path.join(out_dir, f"utterances_{tag}.npz"),
         label=np.array(labels), filename=np.array(files),
         actor=np.array(actors), sentence=np.array(sentences),
+        text_label=np.array(text_labels),
     )
     with open(os.path.join(out_dir, f"meta_{tag}.json"), "w") as fh:
         json.dump(meta, fh, indent=2)

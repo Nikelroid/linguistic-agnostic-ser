@@ -254,6 +254,54 @@ def load_cremad(path, sample_rate=16000, max_length=None):
     return data
 
 
+def load_emis(path, sample_rate=16000, max_length=None):
+    """EMIS: Emotionally Incongruent Synthetic Speech (Correa et al., 2025).
+
+    1,248 TTS clips where the TEXT emotion and the AUDIO (prosodic) emotion are
+    set independently. Filenames:
+    ``{sentence-ID}_{text-emo}_{explicit|implicit}_{audio-emo}_{ESD-spk}_{TTS}.wav``
+    e.g. ``01_angry_explicit_happy_0012_COSY.wav``. ``label`` is the AUDIO
+    (prosodic) emotion (the SER target); ``text_label`` is the spoken-text
+    emotion; ``explicit`` flags whether an emotion word appears in the text.
+    """
+    data = []
+    print("Loading EMIS...")
+    for root, dirs, files in os.walk(path):
+        for fn in files:
+            if not fn.endswith('.wav'):
+                continue
+            parts = os.path.splitext(fn)[0].split('_')
+            if len(parts) < 5:
+                continue
+            sentence_id, text_emo = parts[0], parts[1]
+            if parts[2] in ('explicit', 'implicit'):           # emotion-rich text carries this tag
+                expl, audio_emo, esd_spk = parts[2], parts[3], parts[4]
+                tts = '_'.join(parts[5:])
+                explicit_flag = expl == 'explicit'
+            else:                                              # neutral text: no explicit/implicit token
+                audio_emo, esd_spk = parts[2], parts[3]
+                tts = '_'.join(parts[4:])
+                explicit_flag = False
+            try:
+                audio, sr = load_audio_file(os.path.join(root, fn), sample_rate)
+                if max_length and len(audio) > max_length:
+                    audio = audio[:max_length]
+                data.append({
+                    'file': fn,
+                    'label': audio_emo.lower(),          # prosodic / audio emotion
+                    'text_label': text_emo.lower(),      # spoken-text emotion
+                    'audio': audio,
+                    'actor': esd_spk,
+                    'sentence': sentence_id,
+                    'tts': tts,
+                    'explicit': explicit_flag,
+                    'congruent': text_emo.lower() == audio_emo.lower(),
+                })
+            except Exception:
+                pass
+    return data
+
+
 def load_msppodcast_dimensional(path, target, sample_rate=16000, max_length=None):
     import pandas as pd
     data = []
