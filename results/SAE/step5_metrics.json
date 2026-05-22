@@ -1,0 +1,22 @@
+{
+  "encoders": [
+    "HuBERT",
+    "wav2vec2",
+    "Whisper",
+    "WavLM",
+    "MERT",
+    "w2v-BERT"
+  ],
+  "match_threshold": 0.5,
+  "n_common_utterances": 7442,
+  "emotion_feature_counts": {
+    "HuBERT": 61,
+    "wav2vec2": 70,
+    "Whisper": 79,
+    "WavLM": 145,
+    "MERT": 64,
+    "w2v-BERT": 61
+  },
+  "mean_whisper_to_ssl_overlap": 0.4025316455696203,
+  "mean_ssl_to_ssl_overlap": 0.38769720837034644
+}
