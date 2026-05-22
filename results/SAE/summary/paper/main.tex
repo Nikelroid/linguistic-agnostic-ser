@@ -40,14 +40,14 @@ We re-extract \emph{un-pooled} per-frame hidden states from six frozen large enc
 
 Emotion features are scored by the mutual information (MI) between a feature's firing and the emotion label, thresholded at $5\sigma$ over a label-permutation null. \textbf{Confound control is decisive}: a feature qualifies only if $\mathrm{MI}(\text{emotion})$ exceeds both $\mathrm{MI}(\text{sentence})$ and $\mathrm{MI}(\text{actor})$, and it is monosemantic ($\geq 0.5$ activation mass on one emotion). Significance and monosemanticity alone flag $6407$ significant / $394$ monosemantic features, but $\sim$66\% carry more sentence (phonetic) or speaker information than emotion---the documented ``SAE rediscovers phonemes, not affect'' failure~\cite{saeasr2026}. After control, $61$ genuine emotion features remain (median monosemanticity $0.59$), dominated by anger and sadness; fear and neutral drop to zero. Acoustic-vs-lexical labeling uses cross-validated ROC-AUC of a logistic classifier predicting firing from eGeMAPS~\cite{eyben2016egemaps} (acoustic) vs.\ sentence identity (lexical); $R^2$ is unusable as the pooled features are $\sim$96\% sparse.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{fig_summary.png}
-  \caption{SAE dissection (HuBERT/CREMA-D). Top: depth decode-vs-disentangle; acoustic vs lexical; cross-encoder overlap. Bottom: emotion features per encoder; cross-speaker (leave-speaker-out); causal sufficiency (acoustic vs lexical vs random).}
-  \label{fig:summary}
-\end{figure}
-
 \section{Results}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig_summary.png}
+  \caption{SAE dissection of frozen-encoder emotion features (HuBERT / CREMA-D). \textbf{Top, left to right:} depth decode-vs-disentangle (probe accuracy vs.\ \# monosemantic emotion features); emotion features acoustic vs lexical (eGeMAPS vs.\ sentence firing-AUC); cross-encoder feature overlap. \textbf{Bottom:} emotion features per encoder; cross-speaker (leave-speaker-out) generalization; causal sufficiency of acoustic vs.\ lexical vs.\ random features.}
+  \label{fig:summary}
+\end{figure*}
 \subsection{Depth: decode $\neq$ disentangle (Q\,i)}
 A 25-layer sweep separates two curves (Fig.~\ref{fig:summary}, top-left). Linear probe accuracy peaks at L10 ($0.739$); the count of monosemantic emotion features peaks earlier at L7, and monosemanticity at L2. Deep layers (L17--24) retain decodability ($\sim$0.72) but lose disentanglement (24--47 features): emotion stays linearly readable while becoming distributed. \emph{Emotion organizes into clean features before the depth at which it is best decoded.}
 
