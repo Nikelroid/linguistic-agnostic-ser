@@ -140,6 +140,62 @@ def mutual_info_features(utt_feats: np.ndarray, labels: np.ndarray, random_state
     return np.clip(mi, 0.0, None)
 
 
+def select_emotion_features(utt_feats: np.ndarray, labels: np.ndarray,
+                            confounds: "dict | None" = None, mono_min: float = 0.5,
+                            n_shuffles: int = 10, seed: int = 0):
+    """Confound-controlled emotion-feature selection.
+
+    A feature is an *emotion feature* iff its firing is (1) significantly
+    associated with emotion (MI > 5σ permutation null), (2) monosemantic
+    (>= mono_min mass on one emotion), and (3) MORE informative about emotion
+    than about each supplied confound (e.g. sentence/lexical, actor/speaker) —
+    so phonetic/lexical and speaker-driven features are filtered out. Returns
+    ``(feature_ids, info)`` where info carries mi, mono, threshold and per-
+    confound MI arrays.
+    """
+    mi = mutual_info_features(utt_feats, labels)
+    rng = np.random.default_rng(seed)
+    null = np.stack([mutual_info_features(utt_feats, rng.permutation(labels))
+                     for _ in range(n_shuffles)])
+    thresh = float(null.mean() + 5 * null.std())
+    sig = mi > thresh
+    mono = np.zeros(utt_feats.shape[1])
+    sig_ids = np.where(sig)[0]
+    if len(sig_ids):
+        mono[sig_ids] = monosemanticity(utt_feats, labels, sig_ids)
+    keep = sig & (mono >= mono_min)
+    conf_mi = {}
+    if confounds:
+        for name, c in confounds.items():
+            mc = mutual_info_features(utt_feats, np.asarray(c))
+            conf_mi[name] = mc
+            keep &= mi > mc
+    return np.where(keep)[0], {
+        "mi": mi, "mono": mono, "thresh": thresh, "confound_mi": conf_mi,
+        "n_significant": int(sig.sum()),
+        "n_sig_mono": int((sig & (mono >= mono_min)).sum()),
+    }
+
+
+def firing_auc(firing: np.ndarray, X: np.ndarray, cv: int = 5, seed: int = 42) -> float:
+    """CV ROC-AUC of logistic regression predicting a binary firing indicator
+    from X. Robust to the class imbalance of sparse features (unlike R²)."""
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import cross_val_score
+    from sklearn.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    y = firing.astype(int)
+    if y.sum() < cv or (len(y) - y.sum()) < cv:    # too few in a class for CV
+        return 0.5
+    pipe = make_pipeline(StandardScaler(),
+                         LogisticRegression(max_iter=500, class_weight="balanced"))
+    try:
+        return float(np.mean(cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc")))
+    except Exception:
+        return 0.5
+
+
 def monosemanticity(utt_feats: np.ndarray, labels: np.ndarray, feature_ids: np.ndarray) -> np.ndarray:
     """For each given feature, the fraction of its total activation mass that
     falls on its single most-associated emotion class (1.0 = perfectly
