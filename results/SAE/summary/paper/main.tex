@@ -18,7 +18,7 @@
 \renewcommand{\shortauthors}{Anonymous}
 
 \begin{abstract}
-Linear probes show emotion is decodable in the middle-to-late layers of frozen speech transformers, but not which internal features carry it, nor whether the signal is acoustic or lexical. We train TopK Sparse Autoencoders (SAEs) on \emph{per-frame} activations of six frozen large encoders and dissect their emotion features on the lexicon-controlled CREMA-D corpus (91 actors $\times$ 12 fixed sentences $\times$ 6 emotions). A confound-controlled selection---a feature's firing must be more informative about emotion than about the spoken sentence or the speaker---isolates genuine emotion features from phonetic and speaker-driven ones. We find that (i) emotion \emph{disentangles} into clean monosemantic features earlier (L2--L7) than where it is best linearly \emph{decoded} (L10); (ii) all six encoders share an acoustic emotion-feature basis that generalizes across unseen speakers; and (iii) the recovered emotion signal is acoustic, not lexical. Decodability and disentanglement are thus distinct, and emotion here is carried by speaker-invariant acoustic features.
+Linear probes show emotion is decodable in the middle-to-late layers of frozen speech transformers, but not which internal features carry it, nor whether the signal is acoustic or lexical. We train TopK Sparse Autoencoders (SAEs) on \emph{per-frame} activations of six frozen large encoders and dissect their emotion features on the lexicon-controlled CREMA-D corpus (91 actors $\times$ 12 fixed sentences $\times$ 6 emotions). A confound-controlled selection---a feature's firing must be more informative about emotion than about the spoken sentence or the speaker---isolates genuine emotion features from phonetic and speaker-driven ones. We find that (i) emotion \emph{disentangles} into clean monosemantic features earlier (L2--L7) than where it is best linearly \emph{decoded} (L10); (ii) all six encoders share an acoustic emotion-feature basis that generalizes across unseen speakers; and (iii) the recovered emotion signal is acoustic, not lexical. On the EMIS incongruent-speech benchmark we further localize the lexical shortcut to depth: it emerges only in the deep layers of the ASR-trained encoders (HuBERT/WavLM/wav2vec2), while Whisper stays audio-grounded at every layer. Decodability and disentanglement are thus distinct, and emotion here is carried by speaker-invariant acoustic features.
 \end{abstract}
 
 \keywords{speech emotion recognition, sparse autoencoders, mechanistic interpretability, probing, acoustic features, disentanglement}
@@ -53,6 +53,16 @@ All six encoders carry emotion features at their best layer (Fig.~\ref{fig:summa
 \subsection{Acoustic, not lexical (Q\,iii)}
 The positive control (fixed lexicon $\Rightarrow$ acoustic) labels $60/61$ emotion features acoustic (eGeMAPS firing-AUC $0.83$ vs.\ sentence $0.66$). Causally (Fig.~\ref{fig:summary}, bottom-right), emotion decodes from the $61$ acoustic features at $0.552$, vs.\ $0.431$ from lexical and $0.423$ from random features (6-class; full reconstruction $0.73$). Since the signal is distributed, sufficiency rather than ablation is the informative test: the recovered emotion signal is acoustic.
 
+\subsection{EMIS: the lexical shortcut is a deep-layer phenomenon (Q\,iv)}
+On EMIS (1,248 clips with text and prosodic emotion set independently) we train an emotion probe on congruent clips and test on incongruent ones; text-bias = text accuracy minus audio accuracy (positive ⇒ lexical shortcut). On raw mean-pooled activations every encoder is audio-grounded in its early/mid layers; the shortcut emerges only in the DEEP layers of the ASR-trained SSL encoders (HuBERT L20 +0.79, WavLM L20 +0.73, wav2vec2 +0.87), whereas Whisper stays audio-grounded at every depth (L24 −0.11) and the music model MERT and w2v-BERT never take it (Fig.~\ref{fig:emis}). This reproduces the published per-encoder text-bias (HuBERT +0.72 … Whisper −0.19) and localizes it to depth. A SAE-reconstruction probe spuriously inverted Whisper, so we report raw activations.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.82\textwidth]{fig_emis.png}
+  \caption{EMIS text-bias (text minus audio accuracy; train congruent / test incongruent). \textbf{Left:} across all 25 layers --- the lexical shortcut emerges only in the deep layers of HuBERT/WavLM/wav2vec2, while Whisper (red) stays audio-grounded throughout and MERT/w2v-BERT never take it. \textbf{Right:} text-bias by TTS engine at each encoder's most audio-grounded layer.}
+  \label{fig:emis}
+\end{figure*}
+
 \begin{table}[b]
   \caption{Key quantities (HuBERT / CREMA-D, layer 13 unless noted).}
   \label{tab:key}
@@ -70,12 +80,13 @@ The positive control (fixed lexicon $\Rightarrow$ acoustic) labels $60/61$ emoti
     \;mean firing-AUC acoustic / lexical & $0.83$ / $0.66$ \\
     Sufficiency: acoustic / lexical / random & $0.552 / 0.431 / 0.423$ \\
     Cross-speaker LOSO drop / actor coverage & $\approx0$ / $0.95$ \\
+    EMIS text-bias: Whisper L24 / ASR-SSL & $-0.11$ / $+0.80$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \section{Discussion and Limitations}
-Decodability and disentanglement are distinct axes: a probe reads emotion best where the representation is linearly separable (L10 and the deep layers), but the encoder packs emotion into clean monosemantic features earlier (L2--L7), sharpening the prior ``middle-to-late'' decodability result into a claim about where emotion is organised. On lexicon-controlled data all six encoders converge on a shared acoustic basis whose features survive speaker-disjoint evaluation; the Whisper-vs-SSL divergence concerns the lexical shortcut~\cite{ma2026lora}, which CREMA-D cannot pose and the deferred EMIS test targets. Three experiments await cluster data, each with a runnable stub: the IEMOCAP real-transcript ablation, the SpeechCraft cross-lingual arm, and the EMIS audio-vs-text separation. All artifacts---activations, SAEs, per-step CSVs/plots/metrics, and this paper---are released for reproduction.
+Decodability and disentanglement are distinct axes: a probe reads emotion best where the representation is linearly separable (L10 and the deep layers), but the encoder packs emotion into clean monosemantic features earlier (L2--L7), sharpening the prior ``middle-to-late'' decodability result into a claim about where emotion is organised. On lexicon-controlled data all six encoders converge on a shared acoustic basis whose features survive speaker-disjoint evaluation; the Whisper-vs-SSL divergence concerns the lexical shortcut~\cite{ma2026lora}, which CREMA-D cannot pose. The EMIS experiment (\S\,Q\,iv) does pose it and confirms the prior text-bias result, additionally localizing the shortcut to the deep layers of the ASR-trained encoders --- a depth that Whisper never reaches. A methodological caution: probing the SAE \emph{reconstruction} spuriously inverted Whisper's EMIS text-bias, so the layer sweep is run on raw activations; the SAE is the right tool for the per-feature CREMA-D analyses but not as a stand-in for raw activations in this probe. Two experiments await cluster data, each with a runnable stub: the IEMOCAP real-transcript ablation and the SpeechCraft cross-lingual arm. All artifacts---activations, SAEs, per-step CSVs/plots/metrics, and this paper---are released for reproduction.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

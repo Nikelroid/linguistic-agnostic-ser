@@ -211,11 +211,15 @@ Q (iii) ACOUSTIC vs LEXICAL — the signal is ACOUSTIC:
   causal sufficiency: emotion decodes from acoustic features {d7.get('suff_acoustic_emotion'):.3f}
   vs lexical {d7.get('suff_lexical'):.3f} vs random {d7.get('suff_random'):.3f} (+{d7.get('acoustic_minus_lexical_sufficiency'):.3f}).
 
-Q (mechanism) EMIS AUDIO vs TEXT — Whisper resists the lexical shortcut:
-  per-encoder feature text-bias (text AUC - audio AUC): {d8.get('mean_text_bias_by_encoder')}
-  Whisper {d8.get('whisper_mean_text_bias')} vs SSL mean {d8.get('ssl_mean_text_bias')}
-  -> {'Whisper stays audio-grounded while SSL features lean text' if d8.get('whisper_resists_shortcut') else 'no clear separation'}.
-  Mechanistic match to the published EMIS text-bias (HuBERT +0.717 ... Whisper -0.191).
+Q (mechanism) EMIS — the lexical shortcut is a DEEP-LAYER phenomenon; Whisper resists:
+  text-bias at the text-bias layer (raw mean-pooled, train-congruent/test-incongruent):
+    {d8.get('text_bias_at_doc_layer')}
+  Whisper L24 {d8.get('whisper_L24_text_bias')} (resists) vs ASR-SSL mean {d8.get('ssl_asr_mean_text_bias(HuBERT,WavLM,wav2vec2)')}.
+  The shortcut emerges only in DEEP layers of the ASR-SSL encoders (HuBERT/WavLM/wav2vec2);
+  all encoders are audio-grounded early (L0-L8); MERT (music) and w2v-BERT stay audio-grounded
+  throughout. Reproduces the published EMIS text-bias (HuBERT +0.72, WavLM +0.61,
+  wav2vec2 +0.66, Whisper -0.19). NOTE: a SAE-reconstruction probe gave a spurious
+  Whisper +0.88 -- raw activations are the trustworthy, literature-consistent measure.
 
 3. LIMITATIONS / DEFERRED
 --------------------------------------------------------------------------------
@@ -252,8 +256,8 @@ def main():
     organize()
     build_master_csv()
     summary_figure()
-    t = stats_txt()
-    findings_pdf(t)
+    stats_txt()
+    # (the canonical findings document is the ACM paper at summary/paper/main.pdf)
     print("[build_summary] wrote results/SAE/{csv,plots,json,embeddings,summary}/")
     for f in sorted(glob.glob(os.path.join(SUM, "*"))):
         print("  summary/", os.path.basename(f))

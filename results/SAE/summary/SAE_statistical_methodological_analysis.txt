@@ -52,10 +52,20 @@ Q (iii) ACOUSTIC vs LEXICAL — the signal is ACOUSTIC:
   causal sufficiency: emotion decodes from acoustic features 0.552
   vs lexical 0.431 vs random 0.423 (+0.121).
 
+Q (mechanism) EMIS — the lexical shortcut is a DEEP-LAYER phenomenon; Whisper resists:
+  text-bias at the text-bias layer (raw mean-pooled, train-congruent/test-incongruent):
+    {'HuBERT': 0.794, 'wav2vec2': 0.868, 'WavLM': 0.731, 'Whisper': -0.108, 'MERT': -0.603, 'w2v-BERT': -0.598}
+  Whisper L24 -0.108 (resists) vs ASR-SSL mean 0.798.
+  The shortcut emerges only in DEEP layers of the ASR-SSL encoders (HuBERT/WavLM/wav2vec2);
+  all encoders are audio-grounded early (L0-L8); MERT (music) and w2v-BERT stay audio-grounded
+  throughout. Reproduces the published EMIS text-bias (HuBERT +0.72, WavLM +0.61,
+  wav2vec2 +0.66, Whisper -0.19). NOTE: a SAE-reconstruction probe gave a spurious
+  Whisper +0.88 -- raw activations are the trustworthy, literature-consistent measure.
+
 3. LIMITATIONS / DEFERRED
 --------------------------------------------------------------------------------
 - Utterance-level pooling of sparse frame features: necessity-ablation of small
   feature subsets is ~null (signal distributed); sufficiency is the informative test.
-- CREMA-D substitutes for IEMOCAP (transcripts not synced) and EMIS (unavailable);
-  exact variants documented as runnable stubs (STEP6/7/8_*).
+- EMIS now run (Zenodo mirror); IEMOCAP real-transcript ablation and SpeechCraft
+  cross-lingual remain deferred (data not on cluster), with runnable stubs (STEP6/7).
 ================================================================================

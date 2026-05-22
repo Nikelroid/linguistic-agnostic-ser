@@ -1,0 +1,16 @@
+{
+  "tag": "w2v-BERT_EMIS_L20",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 226275,
+  "n_utterances": 1248,
+  "final_fvu": 0.13396949867312655,
+  "final_recon_mse": 0.13404685258865356,
+  "explained_variance": 0.8660305013268734,
+  "dead_features": 0,
+  "alive_features": 8192,
+  "dead_frac": 0.0,
+  "median_density_alive": 0.0023599602253894596
+}

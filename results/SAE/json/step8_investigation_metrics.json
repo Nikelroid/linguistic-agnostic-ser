@@ -1,0 +1,43 @@
+{
+  "per_encoder": {
+    "HuBERT": {
+      "min_text_bias": -0.7656695156695157,
+      "min_layer": 3,
+      "ever_resists(<=0)": true
+    },
+    "wav2vec2": {
+      "min_text_bias": -0.6289173789173789,
+      "min_layer": 3,
+      "ever_resists(<=0)": true
+    },
+    "WavLM": {
+      "min_text_bias": -0.7115384615384615,
+      "min_layer": 3,
+      "ever_resists(<=0)": true
+    },
+    "Whisper": {
+      "min_text_bias": -0.6328347578347578,
+      "min_layer": 7,
+      "ever_resists(<=0)": true
+    },
+    "MERT": {
+      "min_text_bias": -0.6780626780626782,
+      "min_layer": 4,
+      "ever_resists(<=0)": true
+    },
+    "w2v-BERT": {
+      "min_text_bias": -0.6570512820512819,
+      "min_layer": 2,
+      "ever_resists(<=0)": true
+    }
+  },
+  "whisper_ever_resists": true,
+  "encoders_that_ever_resist": [
+    "HuBERT",
+    "wav2vec2",
+    "WavLM",
+    "Whisper",
+    "MERT",
+    "w2v-BERT"
+  ]
+}

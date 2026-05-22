@@ -1,0 +1,16 @@
+{
+  "tag": "WavLM_EMIS_L20",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 226275,
+  "n_utterances": 1248,
+  "final_fvu": 0.07643945940779091,
+  "final_recon_mse": 0.07587578147649765,
+  "explained_variance": 0.923560540592209,
+  "dead_features": 0,
+  "alive_features": 8192,
+  "dead_frac": 0.0,
+  "median_density_alive": 0.0017191470555739698
+}

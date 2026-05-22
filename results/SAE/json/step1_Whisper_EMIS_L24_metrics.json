@@ -1,0 +1,16 @@
+{
+  "tag": "Whisper_EMIS_L24",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 227714,
+  "n_utterances": 1248,
+  "final_fvu": 0.059091519838643546,
+  "final_recon_mse": 0.05890240520238876,
+  "explained_variance": 0.9409084801613564,
+  "dead_features": 3,
+  "alive_features": 8189,
+  "dead_frac": 0.0003662109375,
+  "median_density_alive": 0.001730240564919153
+}

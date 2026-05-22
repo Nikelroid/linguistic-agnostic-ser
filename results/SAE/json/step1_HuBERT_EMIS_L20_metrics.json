@@ -1,0 +1,16 @@
+{
+  "tag": "HuBERT_EMIS_L20",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 226275,
+  "n_utterances": 1248,
+  "final_fvu": 0.05846068567181803,
+  "final_recon_mse": 0.057961538434028625,
+  "explained_variance": 0.9415393143281819,
+  "dead_features": 1,
+  "alive_features": 8191,
+  "dead_frac": 0.0001220703125,
+  "median_density_alive": 0.0017589216661142416
+}

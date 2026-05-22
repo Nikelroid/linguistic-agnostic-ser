@@ -1,0 +1,16 @@
+{
+  "tag": "wav2vec2_EMIS_L15",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 226275,
+  "n_utterances": 1248,
+  "final_fvu": 0.0676717856066553,
+  "final_recon_mse": 0.06710082292556763,
+  "explained_variance": 0.9323282143933447,
+  "dead_features": 0,
+  "alive_features": 8192,
+  "dead_frac": 0.0,
+  "median_density_alive": 0.0020594409457518506
+}
