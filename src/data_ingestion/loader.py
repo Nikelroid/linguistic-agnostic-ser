@@ -210,6 +210,50 @@ def load_msppodcast(path, sample_rate=16000, max_length=None, num_classes=8):
             pass
     return data
 
+def load_cremad(path, sample_rate=16000, max_length=None):
+    """CREMA-D: 91 actors x 12 fixed sentences x 6 emotions (7,442 clips).
+
+    Filenames are ``ActorID_SentenceCode_Emotion_Intensity.wav`` e.g.
+    ``1001_DFA_ANG_XX.wav``. Because the 12 carrier sentences are fixed, the
+    text channel is held constant across emotions — any recovered emotion signal
+    is necessarily acoustic. Returns extra ``actor``/``sentence``/``intensity``
+    metadata used by the lexicon-controlled SAE analysis.
+    """
+    CREMAD_EMOTION_MAP = {
+        'ANG': 'anger', 'DIS': 'disgust', 'FEA': 'fear',
+        'HAP': 'happiness', 'NEU': 'neutral', 'SAD': 'sadness',
+    }
+    data = []
+    print("Loading CREMA-D...")
+    audio_root = path
+    # Canonical layout from CheyneyComputerScience/CREMA-D is <path>/AudioWAV.
+    if os.path.isdir(os.path.join(path, 'AudioWAV')):
+        audio_root = os.path.join(path, 'AudioWAV')
+    for root, dirs, files in os.walk(audio_root):
+        for fn in files:
+            if not fn.endswith('.wav'):
+                continue
+            parts = fn.replace('.wav', '').split('_')
+            if len(parts) < 4 or parts[2] not in CREMAD_EMOTION_MAP:
+                continue
+            actor, sentence, emo, intensity = parts[0], parts[1], parts[2], parts[3]
+            try:
+                audio, sr = load_audio_file(os.path.join(root, fn), sample_rate)
+                if max_length and len(audio) > max_length:
+                    audio = audio[:max_length]
+                data.append({
+                    'file': fn,
+                    'label': CREMAD_EMOTION_MAP[emo],
+                    'audio': audio,
+                    'actor': actor,
+                    'sentence': sentence,
+                    'intensity': intensity,
+                })
+            except Exception:
+                pass
+    return data
+
+
 def load_msppodcast_dimensional(path, target, sample_rate=16000, max_length=None):
     import pandas as pd
     data = []
