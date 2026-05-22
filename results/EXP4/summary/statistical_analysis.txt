@@ -1,0 +1,66 @@
+=== COMPREHENSIVE DATA & STATISTICAL ANALYSIS ===
+
+--- 1. GENERAL OVERVIEW ---
+Total Records: 1050
+Models Evaluated: wav2vec2, HuBERT, Whisper, w2v-BERT, WavLM, MERT
+Datasets Evaluated: MESD, IEMOCAP, RAVDESS, SAVEE, AESDD, MSP-Podcast, EmoDB
+
+--- 2. OVERALL MODEL STATISTICS ---
+         Accuracy                 Weighted_F1                
+             mean     std     max        mean     std     max
+Model                                                        
+HuBERT     0.8241  0.1337  0.9888      0.8233  0.1344  0.9887
+MERT       0.7826  0.1308  0.9607      0.7813  0.1321  0.9603
+WavLM      0.8294  0.1300  0.9869      0.8287  0.1307  0.9869
+Whisper    0.8303  0.1280  0.9869      0.8295  0.1288  0.9869
+w2v-BERT   0.7744  0.1535  0.9869      0.7730  0.1549  0.9868
+wav2vec2   0.7503  0.1583  0.9757      0.7492  0.1589  0.9756
+
+--- 3. BEST LAYER PER MODEL (Max Accuracy) ---
+   Model    Layer Dataset  Accuracy  Weighted_F1
+  HuBERT Layer 11   EmoDB    0.9888       0.9887
+    MERT  Layer 6   EmoDB    0.9607       0.9603
+   WavLM  Layer 8   EmoDB    0.9869       0.9869
+ Whisper Layer 15   EmoDB    0.9869       0.9869
+w2v-BERT Layer 17   EmoDB    0.9869       0.9868
+wav2vec2  Layer 7   EmoDB    0.9757       0.9756
+
+--- 4. DATASET PERFORMANCE (Averaged across all models) ---
+             Accuracy  Weighted_F1
+Dataset                           
+EmoDB          0.9414       0.9409
+RAVDESS        0.9388       0.9389
+AESDD          0.8681       0.8677
+SAVEE          0.8022       0.8007
+MESD           0.7881       0.7874
+IEMOCAP        0.6501       0.6499
+MSP-Podcast    0.6009       0.5969
+
+--- 5. LAYER-WISE TRENDS (Median) ---
+          Accuracy  Weighted_F1
+Layer                          
+CNN         0.7360       0.7358
+Layer 1     0.7819       0.7807
+Layer 2     0.8225       0.8218
+Layer 3     0.8459       0.8457
+Layer 4     0.8575       0.8572
+Layer 5     0.8683       0.8667
+Layer 6     0.8754       0.8752
+Layer 7     0.8754       0.8754
+Layer 8     0.8776       0.8774
+Layer 9     0.8870       0.8863
+Layer 10    0.8740       0.8728
+Layer 11    0.8616       0.8607
+Layer 12    0.8472       0.8458
+Layer 13    0.8424       0.8418
+Layer 14    0.8270       0.8258
+Layer 15    0.8292       0.8284
+Layer 16    0.8385       0.8383
+Layer 17    0.8334       0.8330
+Layer 18    0.8376       0.8377
+Layer 19    0.8440       0.8439
+Layer 20    0.8306       0.8306
+Layer 21    0.8056       0.8043
+Layer 22    0.7836       0.7804
+Layer 23    0.7412       0.7406
+Layer 24    0.7128       0.7126

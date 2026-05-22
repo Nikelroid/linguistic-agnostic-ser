@@ -1,0 +1,34 @@
+=== EXP8: DIMENSIONAL REGRESSION ANALYSIS ===
+
+--- 1. GENERAL OVERVIEW ---
+Total Records: 450
+Models Evaluated: wav2vec2, HuBERT, Whisper, w2v-BERT, WavLM, MERT
+Targets Evaluated: EmoVal, EmoDom, EmoAct
+
+--- 2. OVERALL MODEL STATISTICS (RMSE) ---
+            RMSE                        
+            mean     std     min     max
+Model                                   
+HuBERT    0.7633  0.0786  0.6899  0.8982
+MERT      0.7751  0.0906  0.6910  0.9151
+WavLM     0.7606  0.0765  0.6874  0.8997
+Whisper   0.7536  0.0798  0.6822  0.8958
+w2v-BERT  0.7788  0.0844  0.6948  0.9583
+wav2vec2  0.7885  0.0828  0.6942  0.9596
+
+--- 3. BEST LAYER PER MODEL (Min RMSE) ---
+   Model    Layer Target   RMSE
+  HuBERT  Layer 3 EmoDom 0.6899
+    MERT  Layer 8 EmoDom 0.6910
+   WavLM  Layer 3 EmoDom 0.6874
+ Whisper Layer 12 EmoDom 0.6822
+w2v-BERT Layer 17 EmoDom 0.6948
+wav2vec2  Layer 5 EmoDom 0.6942
+
+--- 4. TARGET PERFORMANCE (Averaged across all models) ---
+          RMSE
+Target        
+EmoDom  0.6993
+EmoAct  0.7299
+EmoVal  0.8807
+

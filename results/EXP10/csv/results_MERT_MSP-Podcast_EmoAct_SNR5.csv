@@ -1,0 +1,26 @@
+Layer,Layer_Num,RMSE
+CNN,0,0.8048
+Layer 1,1,0.7948
+Layer 2,2,0.7847
+Layer 3,3,0.7722
+Layer 4,4,0.7649
+Layer 5,5,0.764
+Layer 6,6,0.7666
+Layer 7,7,0.7639
+Layer 8,8,0.7632
+Layer 9,9,0.7612
+Layer 10,10,0.7615
+Layer 11,11,0.761
+Layer 12,12,0.7636
+Layer 13,13,0.7685
+Layer 14,14,0.7695
+Layer 15,15,0.771
+Layer 16,16,0.7717
+Layer 17,17,0.7744
+Layer 18,18,0.7751
+Layer 19,19,0.7759
+Layer 20,20,0.7739
+Layer 21,21,0.7787
+Layer 22,22,0.7791
+Layer 23,23,0.7786
+Layer 24,24,0.7776

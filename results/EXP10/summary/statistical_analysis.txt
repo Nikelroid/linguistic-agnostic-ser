@@ -1,0 +1,52 @@
+=== EXP10: NOISY DIMENSIONAL REGRESSION FULL ANALYSIS ===
+
+--- 1. OVERALL PERFORMANCE BY SNR & TARGET (RMSE) ---
+                RMSE                
+                mean     std     min
+Target SNR                          
+EmoAct clean  0.7299  0.0274  0.7065
+       20     0.7459  0.0293  0.7160
+       10     0.7591  0.0304  0.7197
+       5      0.7700  0.0320  0.7237
+       0      0.7859  0.0338  0.7316
+EmoDom clean  0.6993  0.0167  0.6822
+       20     0.7096  0.0180  0.6877
+       10     0.7181  0.0186  0.6909
+       5      0.7250  0.0194  0.6955
+       0      0.7345  0.0198  0.7014
+EmoVal clean  0.8807  0.0241  0.8076
+       20     0.8966  0.0263  0.8220
+       10     0.9082  0.0272  0.8280
+       5      0.9172  0.0271  0.8309
+       0      0.9288  0.0265  0.8373
+
+--- 2. BEST LAYER PER MODEL AT 0dB NOISE (Min RMSE) ---
+   Model Target    Layer   RMSE
+  HuBERT EmoAct Layer 10 0.7716
+  HuBERT EmoDom Layer 10 0.7256
+  HuBERT EmoVal Layer 21 0.9076
+    MERT EmoAct Layer 10 0.7739
+    MERT EmoDom Layer 11 0.7225
+    MERT EmoVal  Layer 9 0.9440
+   WavLM EmoAct  Layer 9 0.7690
+   WavLM EmoDom  Layer 9 0.7255
+   WavLM EmoVal Layer 20 0.8954
+ Whisper EmoAct Layer 13 0.7316
+ Whisper EmoDom Layer 22 0.7014
+ Whisper EmoVal Layer 24 0.8373
+w2v-BERT EmoAct Layer 17 0.7577
+w2v-BERT EmoDom Layer 17 0.7224
+w2v-BERT EmoVal Layer 13 0.8989
+wav2vec2 EmoAct  Layer 8 0.7921
+wav2vec2 EmoDom  Layer 7 0.7386
+wav2vec2 EmoVal  Layer 9 0.9373
+
+--- 3. NOISE RESILIENCE (Delta RMSE: 0dB - Clean) ---
+Model
+Whisper     0.0279
+w2v-BERT    0.0421
+MERT        0.0603
+HuBERT      0.0612
+WavLM       0.0619
+wav2vec2    0.0710
+(Lower delta means the model is more resilient to noise)

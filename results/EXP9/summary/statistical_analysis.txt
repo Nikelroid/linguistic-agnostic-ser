@@ -1,0 +1,58 @@
+=== EXP9: METADATA PROBING FULL STATISTICAL ANALYSIS (4-Class) ===
+
+--- 1. FEATURE IMPORTANCE ---
+   Feature  Mutual_Information  RF_Importance  MI_Norm  RF_Norm
+    EmoAct            0.196563       0.251173 0.576219 0.523736
+    EmoVal            0.341125       0.479580 1.000000 1.000000
+    EmoDom            0.200130       0.220625 0.586675 0.460038
+Gender_Num            0.015148       0.048622 0.044405 0.101385
+
+--- 2. OVERALL MODEL PERFORMANCE ---
+              Model  Accuracy  Macro_F1
+Logistic_Regression  0.726641  0.584515
+      Random_Forest  0.733825  0.646489
+     MLP_Classifier  0.734502  0.637352
+
+Best Model by Accuracy: MLP_Classifier (0.7345)
+Best Model by Macro F1: Random_Forest (0.6465)
+
+--- 3. DETAILED CLASSIFICATION REPORTS ---
+
+[Logistic_Regression]
+              precision    recall  f1-score   support
+
+           A       0.85      0.72      0.78      5867
+           H       0.74      0.59      0.66     20554
+           N       0.71      0.87      0.78     37427
+           S       0.67      0.06      0.11      4081
+
+    accuracy                           0.73     67929
+   macro avg       0.74      0.56      0.58     67929
+weighted avg       0.73      0.73      0.70     67929
+
+
+[Random_Forest]
+              precision    recall  f1-score   support
+
+           A       0.85      0.75      0.80      5867
+           H       0.76      0.55      0.64     20554
+           N       0.72      0.89      0.79     37427
+           S       0.64      0.25      0.36      4081
+
+    accuracy                           0.73     67929
+   macro avg       0.74      0.61      0.65     67929
+weighted avg       0.74      0.73      0.72     67929
+
+
+[MLP_Classifier]
+              precision    recall  f1-score   support
+
+           A       0.80      0.79      0.80      5867
+           H       0.75      0.57      0.65     20554
+           N       0.72      0.87      0.79     37427
+           S       0.63      0.21      0.31      4081
+
+    accuracy                           0.73     67929
+   macro avg       0.73      0.61      0.64     67929
+weighted avg       0.73      0.73      0.72     67929
+

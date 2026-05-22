@@ -1,0 +1,56 @@
+============================================================
+NOISE AUGMENTATION ANALYSIS REPORT | EXP7
+============================================================
+
+1. BEST-LAYER ACCURACY BY MODEL × SNR (Mean ± Std)
+------------------------------------------------------------
+Model        SNR            Accuracy           F1   Best Layer
+------------------------------------------------------------
+HuBERT       Clean      0.6204±nan 0.6185±nan      0.0
+HuBERT       20 dB      0.6084±nan 0.6094±nan     21.0
+HuBERT       10 dB      0.5963±nan 0.5967±nan     21.0
+HuBERT       5 dB       0.5869±nan 0.5868±nan     16.0
+HuBERT       0 dB       0.5682±nan 0.5663±nan     16.0
+
+MERT         Clean      0.6008±nan 0.5914±nan      0.0
+MERT         20 dB      0.5808±nan 0.5718±nan      0.0
+MERT         10 dB      0.5677±nan 0.5600±nan      0.0
+MERT         5 dB       0.5579±nan 0.5544±nan      0.0
+MERT         0 dB       0.5517±nan 0.5464±nan     12.0
+
+WavLM        Clean      0.6298±nan 0.6286±nan     22.0
+WavLM        20 dB      0.6177±nan 0.6169±nan     22.0
+WavLM        10 dB      0.6079±nan 0.6054±nan     22.0
+WavLM        5 dB       0.5958±nan 0.5958±nan     21.0
+WavLM        0 dB       0.5819±nan 0.5777±nan     22.0
+
+Whisper      Clean      0.6316±nan 0.6323±nan     23.0
+Whisper      20 dB      0.6219±nan 0.6241±nan     24.0
+Whisper      10 dB      0.6174±nan 0.6204±nan     24.0
+Whisper      5 dB       0.6141±nan 0.6167±nan     24.0
+Whisper      0 dB       0.6102±nan 0.6124±nan     23.0
+
+w2v-BERT     Clean      0.6181±nan 0.6158±nan     14.0
+w2v-BERT     20 dB      0.6123±nan 0.6104±nan     14.0
+w2v-BERT     10 dB      0.6053±nan 0.6019±nan     14.0
+w2v-BERT     5 dB       0.6002±nan 0.5963±nan     14.0
+w2v-BERT     0 dB       0.5926±nan 0.5885±nan     15.0
+
+wav2vec2     Clean      0.6114±nan 0.6005±nan      0.0
+wav2vec2     20 dB      0.5841±nan 0.5835±nan     11.0
+wav2vec2     10 dB      0.5772±nan 0.5748±nan      0.0
+wav2vec2     5 dB       0.5682±nan 0.5675±nan      0.0
+wav2vec2     0 dB       0.5501±nan 0.5481±nan      8.0
+
+2. RELATIVE ACCURACY DROP FROM CLEAN (%)
+------------------------------------------------------------
+HuBERT       Mean Drop at 0dB: 8.41% | Max: 8.41%
+MERT         Mean Drop at 0dB: 8.17% | Max: 8.17%
+WavLM        Mean Drop at 0dB: 7.61% | Max: 7.61%
+Whisper      Mean Drop at 0dB: 3.39% | Max: 3.39%
+w2v-BERT     Mean Drop at 0dB: 4.13% | Max: 4.13%
+wav2vec2     Mean Drop at 0dB: 10.03% | Max: 10.03%
+
+============================================================
+END OF REPORT
+============================================================
