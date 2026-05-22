@@ -114,17 +114,30 @@ def feature_stats(feat_frames: np.ndarray) -> dict:
 
 
 def mutual_info_features(utt_feats: np.ndarray, labels: np.ndarray, random_state: int = 42) -> np.ndarray:
-    """MI between each (utterance-pooled) feature and the categorical emotion label.
+    """MI (nats) between each feature's *firing* and the categorical emotion label.
 
-    Returns an array of length d_sae. Uses sklearn's k-NN MI estimator for a
-    continuous feature vs. a discrete target.
+    TopK SAE features are sparse, so we use the activation **indicator**
+    (fires / does not fire on the utterance) and compute MI from the 2×C
+    contingency table. This is fully vectorised (two matmuls) — seconds for
+    8192 features vs. tens of minutes for a per-feature k-NN estimator — and is
+    the natural signal for sparse monosemantic features. ``random_state`` is
+    accepted for call-site compatibility but unused.
     """
-    from sklearn.feature_selection import mutual_info_classif
-    from sklearn.preprocessing import LabelEncoder
-
-    y = LabelEncoder().fit_transform(labels)
-    # mutual_info_classif treats all-zero (dead) columns as MI 0 automatically.
-    return mutual_info_classif(utt_feats, y, random_state=random_state)
+    N, F = utt_feats.shape
+    _, y = np.unique(labels, return_inverse=True)
+    C = int(y.max()) + 1
+    Y = np.zeros((N, C), dtype=np.float64)
+    Y[np.arange(N), y] = 1.0
+    A = (utt_feats > 0).astype(np.float64)            # (N, F) firing indicator
+    pc = Y.mean(0)[None, :]                            # (1, C) class priors
+    ac_c = (A.T @ Y) / N                               # (F, C) p(fire, class)
+    in_c = (Y.sum(0)[None, :] / N) - ac_c              # (F, C) p(not-fire, class)
+    p_ac = A.mean(0)[:, None]                          # (F, 1) p(fire)
+    p_in = 1.0 - p_ac                                  # (F, 1) p(not-fire)
+    eps = 1e-12
+    mi = (ac_c * np.log((ac_c + eps) / (p_ac * pc + eps))).sum(1)
+    mi += (in_c * np.log((in_c + eps) / (p_in * pc + eps))).sum(1)
+    return np.clip(mi, 0.0, None)
 
 
 def monosemanticity(utt_feats: np.ndarray, labels: np.ndarray, feature_ids: np.ndarray) -> np.ndarray:

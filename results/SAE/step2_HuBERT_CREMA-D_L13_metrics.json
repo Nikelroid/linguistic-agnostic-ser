@@ -1,0 +1,28 @@
+{
+  "tag": "HuBERT_CREMA-D_L13",
+  "pool": "mean",
+  "n_features": 8192,
+  "mi_threshold_5sigma": 0.0014369679517248686,
+  "mono_min": 0.5,
+  "n_significant": 6407,
+  "frac_significant": 0.7821044921875,
+  "n_emotion_features": 394,
+  "frac_emotion_features": 0.048095703125,
+  "max_mi": 0.17906936542206947,
+  "median_mono_emotion_feats": 0.5669611990451813,
+  "mono_counts": {
+    ">0.4": 1114,
+    ">0.5": 394,
+    ">0.6": 132,
+    ">0.7": 29
+  },
+  "emotion_feature_counts_by_dominant": {
+    "anger": 213,
+    "disgust": 87,
+    "fear": 35,
+    "happiness": 20,
+    "neutral": 5,
+    "sadness": 34
+  },
+  "verdict": "PASS"
+}
