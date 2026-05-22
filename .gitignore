@@ -29,3 +29,8 @@ __pycache__/
 !results/**/*.pdf
 !results/**/*.md
 !results/**/.gitkeep
+
+# experiment run logs and W&B cache - keep out of the repo
+wandb/
+slurm/logs/
+slurm_logs/
