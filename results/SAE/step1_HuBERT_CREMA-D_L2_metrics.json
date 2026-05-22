@@ -1,0 +1,16 @@
+{
+  "tag": "HuBERT_CREMA-D_L2",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 940273,
+  "n_utterances": 7442,
+  "final_fvu": 0.13018178525156804,
+  "final_recon_mse": 0.1296609342098236,
+  "explained_variance": 0.8698182147484319,
+  "dead_features": 37,
+  "alive_features": 8155,
+  "dead_frac": 0.0045166015625,
+  "median_density_alive": 0.0008018947688596822
+}

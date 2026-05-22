@@ -1,0 +1,16 @@
+{
+  "tag": "HuBERT_CREMA-D_L20",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 940273,
+  "n_utterances": 7442,
+  "final_fvu": 0.06179516254664687,
+  "final_recon_mse": 0.06162872910499573,
+  "explained_variance": 0.9382048374533531,
+  "dead_features": 4,
+  "alive_features": 8188,
+  "dead_frac": 0.00048828125,
+  "median_density_alive": 0.00170482402451203
+}

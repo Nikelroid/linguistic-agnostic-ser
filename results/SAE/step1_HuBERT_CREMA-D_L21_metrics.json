@@ -1,0 +1,16 @@
+{
+  "tag": "HuBERT_CREMA-D_L21",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 940273,
+  "n_utterances": 7442,
+  "final_fvu": 0.06210051040633628,
+  "final_recon_mse": 0.062048718333244324,
+  "explained_variance": 0.9378994895936638,
+  "dead_features": 6,
+  "alive_features": 8186,
+  "dead_frac": 0.000732421875,
+  "median_density_alive": 0.0017090781081664582
+}
