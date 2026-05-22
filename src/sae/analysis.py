@@ -189,7 +189,7 @@ def firing_auc(firing: np.ndarray, X: np.ndarray, cv: int = 5, seed: int = 42) -
     if y.sum() < cv or (len(y) - y.sum()) < cv:    # too few in a class for CV
         return 0.5
     pipe = make_pipeline(StandardScaler(),
-                         LogisticRegression(max_iter=500, class_weight="balanced"))
+                         LogisticRegression(max_iter=200, solver="liblinear", class_weight="balanced"))
     try:
         return float(np.mean(cross_val_score(pipe, X, y, cv=cv, scoring="roc_auc")))
     except Exception:

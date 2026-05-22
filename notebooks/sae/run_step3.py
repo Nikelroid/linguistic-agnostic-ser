@@ -70,11 +70,15 @@ def main():
 
     X_ac = load_egemaps(filenames)
     print(f"[step3] eGeMAPS {X_ac.shape}")
+    # Lexical predictor = sentence one-hot. On CREMA-D's fixed 12-sentence lexicon
+    # this is exactly the lexical content (a BERT embedding of the transcript takes
+    # only 12 distinct values, i.e. rank-12 ≡ sentence identity, but is 768-dim and
+    # makes the logistic fits non-convergent/slow). Real varying-transcript BERT is
+    # used in Step 7 (IEMOCAP) via src/sae/acoustic_lexical.bert_embed.
     uniq = sorted(set(sentences.tolist()))
-    emb = AL.bert_embed([AL.CREMAD_SENTENCES.get(c, "") for c in uniq])
-    code2vec = {c: emb[i] for i, c in enumerate(uniq)}
-    X_lex = np.stack([code2vec[c] for c in sentences]).astype(np.float32)
-    print(f"[step3] BERT lexical matrix {X_lex.shape}")
+    code2idx = {c: i for i, c in enumerate(uniq)}
+    X_lex = np.eye(len(uniq), dtype=np.float32)[[code2idx[c] for c in sentences]]
+    print(f"[step3] lexical = sentence one-hot {X_lex.shape} ({len(uniq)} fixed sentences)")
 
     rows = []
     for fid in feature_ids:
@@ -106,7 +110,7 @@ def main():
     ax.scatter(out.lexical_auc, out.acoustic_auc, c=(out.label == "acoustic"),
                cmap="coolwarm_r", s=35, edgecolor="k", linewidth=.3)
     ax.plot([0.5, 1], [0.5, 1], "k--", alpha=.5)
-    ax.set(xlabel="lexical AUC (BERT)", ylabel="acoustic AUC (eGeMAPS)",
+    ax.set(xlabel="lexical AUC (sentence)", ylabel="acoustic AUC (eGeMAPS)",
            title=f"Emotion features acoustic vs lexical ({tag})\n{n_ac}/{n} acoustic",
            xlim=(0.45, 1), ylim=(0.45, 1))
     ax.grid(alpha=.3)
