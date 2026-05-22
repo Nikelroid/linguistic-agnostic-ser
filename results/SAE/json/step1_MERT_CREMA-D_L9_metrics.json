@@ -1,0 +1,16 @@
+{
+  "tag": "MERT_CREMA-D_L9",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 1412526,
+  "n_utterances": 7442,
+  "final_fvu": 0.22328159131051842,
+  "final_recon_mse": 0.2235042154788971,
+  "explained_variance": 0.7767184086894816,
+  "dead_features": 0,
+  "alive_features": 8192,
+  "dead_frac": 0.0,
+  "median_density_alive": 0.0013858151991538563
+}
