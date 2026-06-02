@@ -51,8 +51,16 @@ behavioral findings (depth, LOSO, & the results we explain \\
 \end{tabular}
 \end{table}
 
+\begin{figure*}[t]
+  \centerline{\includegraphics[width=0.92\textwidth]{fig_method.png}}
+  \caption{The method on one page. We reuse the probing project's frozen encoders, layers, probe, and cached embeddings; the new part (top-right) reads each layer un-pooled and factors it with an SAE, then keeps only features that pass three filters, labels them acoustic or lexical, and runs five analyses.}
+  \label{fig:method}
+\end{figure*}
+
 \subsection{The SAE pipeline}
-\textbf{(1) Per-frame activations.} The probe averages each layer over time, giving one vector per clip --- far too few examples to fit a large SAE. So we re-run the same frozen encoders and keep the activations \emph{un-pooled}: one vector per audio frame, per layer (Whisper's padding frames masked). CREMA-D layer~13 alone gives $940{,}273$ frames.
+Figure~\ref{fig:method} shows the whole method at a glance; we describe each stage below.
+
+\noindent\textbf{(1) Per-frame activations.} The probe averages each layer over time, giving one vector per clip --- far too few examples to fit a large SAE. So we re-run the same frozen encoders and keep the activations \emph{un-pooled}: one vector per audio frame, per layer (Whisper's padding frames masked). CREMA-D layer~13 alone gives $940{,}273$ frames.
 
 \noindent\textbf{(2) Train the SAE.} A TopK SAE ($d_{\text{in}}{=}1024$, dictionary $8192$, $k{=}32$ active features per frame) with a unit-norm decoder and an auxiliary loss that revives dead features. It is a faithful compressor: $93\%$ of the activation variance explained, essentially no dead features (Table~\ref{tab:key}).
 
