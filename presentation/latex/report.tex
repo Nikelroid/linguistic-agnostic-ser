@@ -27,14 +27,40 @@ A known hazard is that an SAE trained on ordinary speech mostly rediscovers \emp
 
 \noindent\textbf{What we contribute.} (1) a confound-controlled recipe for finding genuine emotion features in speech SAEs; (2) the observation that disentanglement and decodability peak at \emph{different} depths; (3) an acoustic-vs-lexical label per feature plus a causal sufficiency test; and (4) a depth-resolved picture of the lexical shortcut on EMIS. Code and artifacts are released.
 
-\section{How we did it}
-\textbf{Activations.} The project's cached embeddings are averaged over time (one vector per clip), which is far too few examples to fit a large SAE. So we re-extract the \emph{un-pooled, per-frame} hidden states of all six frozen encoders --- 25 layers each (a CNN front-end plus 24 transformer layers), with Whisper's padding frames masked out. CREMA-D layer~13 alone gives $940{,}273$ frames to train on.
+\section{Method}
 
-\noindent\textbf{The SAE.} A TopK SAE ($d_{\text{in}}{=}1024$, dictionary size $8192$, $k{=}32$ active features per frame), with a unit-norm decoder and a small auxiliary loss that keeps features from dying. It is a faithful compressor: it explains \textbf{93\%} of the activation variance with essentially no dead features (Table~\ref{tab:key}).
+\subsection{Where we start: the probing project}
+This work is the direct continuation of an earlier probing study on the same six encoders. That study used one shared pipeline: \texttt{TransformerExtractor} runs each \emph{frozen} encoder and \emph{mean-pools} every layer's hidden state into one vector per clip (25 vectors per clip: a CNN front-end plus 24 transformer layers); \texttt{probe\_all\_layers} then fits a logistic-regression probe per layer (StandardScaler, 5-fold cross-validation). From that it established \emph{where} emotion is decodable and produced four behavioral findings we take as targets: a middle-to-late accuracy peak by depth, the EN$\leftrightarrow$ZH cross-lingual collapse, the MESD leave-one-speaker-out drop, and the per-encoder EMIS text-bias (Whisper resists, the SSL encoders do not). Those findings say \emph{what} happens, not \emph{why}.
 
-\noindent\textbf{Finding the emotion features --- and the confound check.} For every feature we measure how much its on/off firing tells us about the emotion label (mutual information, with a shuffle test for significance). The catch: at this scale almost everything is ``significant.'' What separates a real emotion feature from a phoneme detector is (a) \emph{monosemanticity} --- most of its activity falls on one emotion --- and (b) the \emph{confound check}: it must tell us more about emotion than about the spoken sentence (a stand-in for phonetics) \emph{or} the speaker. Significance plus monosemanticity alone flags 394 features, but two-thirds of those are really about the sentence or the speaker. After the confound check, \textbf{61} clean emotion features survive (Table~\ref{tab:key}); they are dominated by anger and sadness, while fear and neutral drop to zero --- exactly the high-arousal emotions that have the clearest acoustic signature.
+We reuse that pipeline almost verbatim and add one thing: instead of probing the pooled vector, we factor the activation into interpretable features with an SAE. Table~\ref{tab:reuse} is the exact mapping.
 
-\noindent\textbf{Acoustic or lexical?} For each emotion feature we ask whether its firing is better predicted by acoustic descriptors (eGeMAPS~\cite{eyben2016egemaps}) or by the sentence identity (the lexical content). We use classification AUC rather than $R^2$ because the features are about 96\% silent.
+\begin{table}[t]
+\caption{What we reuse from the probing project, and what is new here.}
+\label{tab:reuse}\small
+\begin{tabular}{ll}
+\toprule
+From the probing project & In this work \\ \midrule
+6 frozen encoders (\texttt{feature\_extractors}) & same encoders, read un-pooled \\
+mean-pooled hidden states, 25 layers & same layers, kept \emph{per-frame} \\
+logistic probe (scaler, 5-fold CV) & same probe: depth curve + ablation \\
+cached embeddings (EXP folders) & inventory + accuracy reference \\
+CREMA-D, MSP-Podcast, IEMOCAP & same; plus EMIS (added) \\
+behavioral findings (depth, LOSO, & the results we explain \\
+\;EN$\leftrightarrow$ZH, EMIS text-bias) & \;mechanistically \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The SAE pipeline}
+\textbf{(1) Per-frame activations.} The probe averages each layer over time, giving one vector per clip --- far too few examples to fit a large SAE. So we re-run the same frozen encoders and keep the activations \emph{un-pooled}: one vector per audio frame, per layer (Whisper's padding frames masked). CREMA-D layer~13 alone gives $940{,}273$ frames.
+
+\noindent\textbf{(2) Train the SAE.} A TopK SAE ($d_{\text{in}}{=}1024$, dictionary $8192$, $k{=}32$ active features per frame) with a unit-norm decoder and an auxiliary loss that revives dead features. It is a faithful compressor: $93\%$ of the activation variance explained, essentially no dead features (Table~\ref{tab:key}).
+
+\noindent\textbf{(3) Find emotion features (a triple filter).} A feature counts as an emotion feature only if it passes all three: (a) \emph{significant} --- its firing carries real mutual information with the emotion label (5$\sigma$ over a shuffle null); (b) \emph{monosemantic} --- at least half its activity falls on one emotion; and (c) it beats the \emph{confounds} --- it tells us more about emotion than about the spoken sentence (a stand-in for phonetics) or the speaker. Filters (a)+(b) alone flag 394 features, but two-thirds are really about the sentence or the speaker; the full filter leaves \textbf{61} clean emotion features, dominated by anger and sadness.
+
+\noindent\textbf{(4) Label each feature acoustic or lexical.} We ask whether a feature's firing is better predicted by acoustic descriptors (eGeMAPS~\cite{eyben2016egemaps}) or by the sentence identity (lexical content), using classification AUC (the features are $\sim$96\% silent, so $R^2$ is unusable).
+
+\noindent\textbf{(5) Five analyses on these features.} Depth (count features at all 25 layers, vs.\ the probe curve); cross-encoder (match features across the six models); cross-speaker (leave-one-speaker-out over 91 actors); causal (re-probe emotion from only-acoustic vs.\ only-lexical feature subsets, reusing the project's probe); and EMIS (train on congruent, test on incongruent speech, by layer).
 
 \begin{figure*}[t]
   \centering
@@ -129,7 +155,7 @@ EMIS: Whisper L24 / mean ASR-SSL text-bias & $-0.11 / +0.80$ \\
 \section{The pipeline, and what is released}
 The study runs as nine numbered, reproducible steps (Table~\ref{tab:pipeline}), each a module under \texttt{src/sae/steps/} callable as \texttt{python -m src.sae.steps <step>}. Heavy jobs (extraction, the 25-layer SAE grid) fan out as SLURM array jobs on a single V100 each. Everything needed to reproduce a number is versioned: the per-step CSVs, plots, and metrics live under \texttt{results/SAE/}; the large activation tensors and SAE checkpoints live on scratch (too big for version control) with pointers recorded. CREMA-D was pulled from a public mirror and EMIS from its open Zenodo release.
 
-\begin{table}[t]
+\begin{table}[b]
 \caption{The pipeline. Each step is one reproducible command.}
 \label{tab:pipeline}\small
 \begin{tabular}{cll}
