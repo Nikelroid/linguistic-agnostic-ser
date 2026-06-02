@@ -127,7 +127,7 @@ def main():
     ax2.axvline(disent_peak, color="crimson", ls=":", alpha=.6)
     ax2.set_ylabel("# monosemantic emotion features", color="crimson")
     l1, lab1 = ax1.get_legend_handles_labels(); l2, lab2 = ax2.get_legend_handles_labels()
-    ax1.legend(l1 + l2, lab1 + lab2, loc="lower center", framealpha=0.9)
+    ax1.legend(l1 + l2, lab1 + lab2, loc="upper right", fontsize=9, framealpha=0.9)
     ax1.grid(alpha=.3)
     fig.tight_layout(); fig.savefig(f"{ART_DIR}/step4_{args.encoder}_{args.dataset}_depth.png", dpi=120)
     plt.close(fig)
