@@ -38,7 +38,7 @@ di=$(( i % nD )); ei=$(( i / nD ))
 ENC=${ENCODERS[$ei]}; DS=${DATASETS[$di]}; L=${LAYERS[$li]}
 
 echo "[$(date)] task $SLURM_ARRAY_TASK_ID -> SAE train encoder=$ENC dataset=$DS layer=$L (node $SLURMD_NODENAME)"
-"$PY" -u notebooks/sae/run_step1.py \
+"$PY" -u -m src.sae.steps.step1_train_sae \
   --encoder "$ENC" --dataset "$DS" --layer "$L" \
   --expansion "${EXPANSION:-8}" --k "${KSPARSE:-32}" --steps "${STEPS:-4000}"
 echo "[$(date)] done task $SLURM_ARRAY_TASK_ID"

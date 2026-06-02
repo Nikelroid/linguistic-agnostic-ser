@@ -28,7 +28,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 SAE = os.path.join(ROOT, "results", "SAE")
 CSV, PLOTS, JSON, EMB, SUM = (os.path.join(SAE, d) for d in ("csv", "plots", "json", "embeddings", "summary"))
 SCRATCH = "/scratch1/kelidari/ser-experiments"
@@ -235,7 +235,7 @@ Q (mechanism) EMIS — the lexical shortcut is a DEEP-LAYER phenomenon; Whisper 
 
 
 def findings_pdf(fig_txt):
-    fnd = os.path.join(os.path.dirname(__file__), "FINDINGS.md")
+    fnd = os.path.join(ROOT, "docs", "sae", "FINDINGS.md")
     findings = open(fnd).read() if os.path.exists(fnd) else "see FINDINGS.md"
     with PdfPages(os.path.join(SUM, "SAE_FINDINGS.pdf")) as pdf:
         # page 1: title + condensed findings text
