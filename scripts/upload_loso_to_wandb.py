@@ -1,12 +1,15 @@
 """Upload per-(model,dataset) LOSO CSVs to W&B as one run each."""
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import glob
 import pandas as pd
 import wandb
 
 PROJECT = "linguistic-agnostic-ser"
 ENTITY = "AGSER"
-CSV_DIR = "/scratch1/minooahm/linguistic-agnostic-ser/results/LOSO/csv"
+CSV_DIR = os.path.join(SER_SCRATCH, "linguistic-agnostic-ser/results/LOSO/csv")
 SKIP_DATASETS = {"MESD", "MSP-Podcast"}  # rerunning with parser fix; upload separately later
 
 csv_files = sorted(glob.glob(os.path.join(CSV_DIR, "loso_*.csv")))

@@ -1,12 +1,15 @@
 """Upload any LOSO CSV not already in W&B (fills in MESD + MSP-Podcast after rerun)."""
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import glob
 import pandas as pd
 import wandb
 
 PROJECT = "linguistic-agnostic-ser"
 ENTITY = "AGSER"
-CSV_DIR = "/scratch1/minooahm/linguistic-agnostic-ser/results/LOSO/csv"
+CSV_DIR = os.path.join(SER_SCRATCH, "linguistic-agnostic-ser/results/LOSO/csv")
 
 api = wandb.Api()
 existing = set()

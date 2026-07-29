@@ -19,7 +19,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export OPENBLAS_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-cd /scratch1/minooahm/linguistic-agnostic-ser
+cd /scratch1/$USER/linguistic-agnostic-ser
 
 echo "============================================================"
 echo "  Model: $MODEL  |  task: MSP-Podcast LOSO  |  min_samples=50"
@@ -30,7 +30,7 @@ python -u scripts/task4_loso.py \
   --model "$MODEL" \
   --dataset MSP-Podcast \
   --min_speaker_samples 50 \
-  --data_dir /scratch1/minooahm/ser_data
+  --data_dir /scratch1/$USER/ser_data
 
 echo "============================================================"
 echo "  Finished: $(date)"

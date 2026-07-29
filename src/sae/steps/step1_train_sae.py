@@ -15,6 +15,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import sys
 
 import numpy as np
@@ -27,9 +30,9 @@ if _REPO not in sys.path:
 from src.sae import analysis as A           # noqa: E402
 from src.sae.sae_model import train_sae     # noqa: E402
 
-FRAMES_DIR = "/scratch1/kelidari/ser-experiments/SAE_frames"
-CKPT_DIR = "/scratch1/kelidari/ser-experiments/SAE_ckpts"
-FEAT_DIR = "/scratch1/kelidari/ser-experiments/SAE_feats"
+FRAMES_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_frames")
+CKPT_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_ckpts")
+FEAT_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_feats")
 ART_DIR = os.path.join(_REPO, "results", "SAE")    # committed plots/CSVs
 
 

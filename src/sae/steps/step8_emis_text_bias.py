@@ -18,6 +18,9 @@ from __future__ import annotations
 
 import json
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import sys
 
 import numpy as np
@@ -30,9 +33,9 @@ if _REPO not in sys.path:
 
 from src.sae.sae_model import TopKSAE  # noqa: E402
 
-FRAMES_DIR = "/scratch1/kelidari/ser-experiments/SAE_frames"
-FEAT_DIR = "/scratch1/kelidari/ser-experiments/SAE_feats"
-CKPT_DIR = "/scratch1/kelidari/ser-experiments/SAE_ckpts"
+FRAMES_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_frames")
+FEAT_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_feats")
+CKPT_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_ckpts")
 ART_DIR = os.path.join(_REPO, "results", "SAE")
 
 # Per-encoder layer ~ where the project measured the strongest text-bias.

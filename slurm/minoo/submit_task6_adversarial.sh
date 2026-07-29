@@ -18,10 +18,10 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export OPENBLAS_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-mkdir -p /scratch1/minooahm/wandb_tmp
-export TMPDIR=/scratch1/minooahm/wandb_tmp
+mkdir -p /scratch1/$USER/wandb_tmp
+export TMPDIR=/scratch1/$USER/wandb_tmp
 
-cd /scratch1/minooahm/linguistic-agnostic-ser
+cd /scratch1/$USER/linguistic-agnostic-ser
 
 echo "============================================================"
 echo "  Task 6: Adversarial Text Debiasing (v2)"
@@ -31,7 +31,7 @@ echo "============================================================"
 
 python -u scripts/task6_adversarial.py \
   --all \
-  --data_dir /scratch1/minooahm/ser_data \
+  --data_dir /scratch1/$USER/ser_data \
   --train_datasets RAVDESS,SAVEE \
   --lambdas 0,0.01,0.1,1.0,10.0 \
   --n_seeds 5 \

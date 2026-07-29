@@ -1,3 +1,7 @@
+import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 """Task 7 Part B: IEMOCAP annotator disagreement analysis.
 
 Parse per-annotator categorical labels from EmoEvaluation files.
@@ -7,8 +11,8 @@ Split clips into:
 Run layer-wise 5-fold probing on each subset and compare.
 """
 import os, glob, re, json, sys
-os.makedirs("/scratch1/minooahm/wandb_tmp", exist_ok=True)
-os.environ["TMPDIR"] = "/scratch1/minooahm/wandb_tmp"
+os.makedirs(os.path.join(SER_SCRATCH, "wandb_tmp"), exist_ok=True)
+os.environ["TMPDIR"] = os.path.join(SER_SCRATCH, "wandb_tmp")
 import numpy as np
 import pandas as pd
 from collections import Counter
@@ -20,8 +24,8 @@ import wandb
 
 MODEL = os.environ.get("MODEL", "HuBERT")
 IEMOCAP_ROOT = "/project2/msoleyma_1026/IEMOCAP_full_release"
-DATA_DIR = "/scratch1/minooahm/ser_data"
-RESULTS_DIR = "/scratch1/minooahm/linguistic-agnostic-ser/results/TASK7"
+DATA_DIR = os.path.join(SER_SCRATCH, "ser_data")
+RESULTS_DIR = os.path.join(SER_SCRATCH, "linguistic-agnostic-ser/results/TASK7")
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # ---------- parse EmoEvaluation ----------

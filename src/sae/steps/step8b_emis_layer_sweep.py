@@ -17,6 +17,9 @@ from __future__ import annotations
 
 import json
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import sys
 
 import numpy as np
@@ -26,7 +29,7 @@ _REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."
 if _REPO not in sys.path:
     sys.path.insert(0, _REPO)
 
-POOLED_DIR = "/scratch1/kelidari/ser-experiments/SAE_frames"
+POOLED_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_frames")
 ART_DIR = os.path.join(_REPO, "results", "SAE")
 ENCODERS = ["HuBERT", "wav2vec2", "WavLM", "Whisper", "MERT", "w2v-BERT"]
 SSL = ["HuBERT", "wav2vec2", "WavLM", "w2v-BERT", "MERT"]

@@ -16,6 +16,9 @@ No GPU needed. Run on login node.
 """
 import argparse
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import json
 import numpy as np
 import pandas as pd
@@ -24,8 +27,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import KFold
 
-SER_DATA = "/scratch1/minooahm/ser_data"
-REPO_ROOT = "/scratch1/minooahm/linguistic-agnostic-ser"
+SER_DATA = os.path.join(SER_SCRATCH, "ser_data")
+REPO_ROOT = os.path.join(SER_SCRATCH, "linguistic-agnostic-ser")
 
 
 def parse_emis_filename(fn):

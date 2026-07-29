@@ -1,11 +1,11 @@
 #!/bin/bash
-cd /scratch1/minooahm/linguistic-agnostic-ser
+cd /scratch1/$USER/linguistic-agnostic-ser
 export PYTHONNOUSERSITE=1
 export WANDB_SILENT=true
-mkdir -p /scratch1/minooahm/wandb_tmp
-export TMPDIR=/scratch1/minooahm/wandb_tmp
+mkdir -p /scratch1/$USER/wandb_tmp
+export TMPDIR=/scratch1/$USER/wandb_tmp
 
-PYTHON=/scratch1/minooahm/miniconda/envs/ser_env/bin/python
+PYTHON=/scratch1/$USER/miniconda/envs/ser_env/bin/python
 
 for model in WavLM MERT w2v-BERT; do
   echo ""

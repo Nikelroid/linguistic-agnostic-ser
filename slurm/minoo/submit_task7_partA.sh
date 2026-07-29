@@ -18,10 +18,10 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export MKL_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export OPENBLAS_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-mkdir -p /scratch1/minooahm/wandb_tmp
-export TMPDIR=/scratch1/minooahm/wandb_tmp
+mkdir -p /scratch1/$USER/wandb_tmp
+export TMPDIR=/scratch1/$USER/wandb_tmp
 
-cd /scratch1/minooahm/linguistic-agnostic-ser
+cd /scratch1/$USER/linguistic-agnostic-ser
 
 echo "============================================================"
 echo "  Task 7 Part A — EMIS congruent vs incongruent"

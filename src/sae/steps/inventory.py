@@ -2,7 +2,7 @@
 """Inventory the cached per-layer embedding folders for the SAE study.
 
 The SAE pipeline consumes the project's frozen-encoder hidden states, which are
-cached under ``/scratch1/kelidari/ser-experiments/EXP{N}/embeddings`` as triples:
+cached under ``/scratch1/$USER/ser-experiments/EXP{N}/embeddings`` as triples:
 
     hidden_states_{ENCODER}_{DATASET}[_SNR{level}].npy   float32  (N, 25, H)
     labels_{ENCODER}_{DATASET}[_SNR{level}].npy          str/obj  (N,)
@@ -18,7 +18,7 @@ SAE data loader, and keep its output as the committed inventory artifact.
 
 Usage:
     python notebooks/sae/inventory_exp.py
-    python notebooks/sae/inventory_exp.py --root /scratch1/kelidari/ser-experiments \
+    python notebooks/sae/inventory_exp.py --root /scratch1/$USER/ser-experiments \
         --markdown notebooks/sae/EXP_INVENTORY.md
 """
 from __future__ import annotations
@@ -26,12 +26,15 @@ from __future__ import annotations
 import argparse
 import glob
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import re
 from collections import defaultdict
 
 import numpy as np
 
-DEFAULT_ROOT = "/scratch1/kelidari/ser-experiments"
+DEFAULT_ROOT = os.path.join(SER_SCRATCH, "ser-experiments")
 KINDS = ("hidden_states", "labels", "filenames")
 _FNAME_RE = re.compile(r"^(hidden_states|labels|filenames)_(.+)\.npy$")
 

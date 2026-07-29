@@ -21,14 +21,17 @@ Notes
 Usage
 -----
     python -m src.sae.extraction --encoder HuBERT --dataset CREMA-D \
-        --data-dir /scratch1/kelidari/ser_data/CREMA-D --layers 13 \
-        --out /scratch1/kelidari/ser-experiments/SAE_frames
+        --data-dir /scratch1/$USER/ser_data/CREMA-D --layers 13 \
+        --out /scratch1/$USER/ser-experiments/SAE_frames
 """
 from __future__ import annotations
 
 import argparse
 import json
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import sys
 
 import numpy as np
@@ -43,7 +46,7 @@ if _REPO not in sys.path:
 from src.models.feature_extractors import TransformerExtractor  # noqa: E402
 from src.data_ingestion import loader as dload  # noqa: E402
 
-DEFAULT_OUT = "/scratch1/kelidari/ser-experiments/SAE_frames"
+DEFAULT_OUT = os.path.join(SER_SCRATCH, "ser-experiments/SAE_frames")
 
 # Cached-file display name -> config.yaml model key / HF path.
 ENCODER_HF_PATHS = {

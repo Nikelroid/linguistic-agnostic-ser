@@ -5,7 +5,7 @@
 Forwards the remaining args to the chosen step's own argparse. Examples:
     python -m src.sae.steps inventory --markdown docs/sae/EXP_INVENTORY.md
     python -m src.sae.steps extract --encoder HuBERT --dataset CREMA-D \
-        --data-dir /scratch1/kelidari/ser_data/CREMA-D --layers 13
+        --data-dir /scratch1/$USER/ser_data/CREMA-D --layers 13
     python -m src.sae.steps step1 --encoder HuBERT --dataset CREMA-D --layer 13
     python -m src.sae.steps step4 --encoder HuBERT --dataset CREMA-D
     python -m src.sae.steps summary

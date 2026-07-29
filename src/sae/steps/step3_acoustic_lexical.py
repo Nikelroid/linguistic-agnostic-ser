@@ -17,6 +17,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import sys
 
 import numpy as np
@@ -30,11 +33,11 @@ from src.sae import acoustic_lexical as AL  # noqa: E402
 from src.sae import analysis as A           # noqa: E402
 from src.data_ingestion.loader import load_cremad  # noqa: E402
 
-FRAMES_DIR = "/scratch1/kelidari/ser-experiments/SAE_frames"
-FEAT_DIR = "/scratch1/kelidari/ser-experiments/SAE_feats"
-CACHE_DIR = "/scratch1/kelidari/ser-experiments/SAE_aux"
+FRAMES_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_frames")
+FEAT_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_feats")
+CACHE_DIR = os.path.join(SER_SCRATCH, "ser-experiments/SAE_aux")
 ART_DIR = os.path.join(_REPO, "results", "SAE")
-DATA_DIR = "/scratch1/kelidari/ser_data/CREMA-D"
+DATA_DIR = os.path.join(SER_SCRATCH, "ser_data/CREMA-D")
 
 
 def load_egemaps(filenames):

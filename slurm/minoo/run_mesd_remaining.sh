@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /scratch1/minooahm/linguistic-agnostic-ser
+cd /scratch1/$USER/linguistic-agnostic-ser
 source ~/.bashrc
 eval "$(conda shell.bash hook)"
 conda activate ser_env
@@ -10,7 +10,7 @@ for model in wav2vec2 Whisper WavLM MERT w2v-BERT; do
   echo "============================================================"
   echo "  MESD LOSO: $model  ($(date))"
   echo "============================================================"
-  python -u scripts/task4_loso.py --model "$model" --dataset MESD --data_dir /scratch1/minooahm/ser_data
+  python -u scripts/task4_loso.py --model "$model" --dataset MESD --data_dir /scratch1/$USER/ser_data
 done
 
 echo ""

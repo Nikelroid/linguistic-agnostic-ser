@@ -1,12 +1,12 @@
 #!/bin/bash
-cd /scratch1/minooahm/linguistic-agnostic-ser
+cd /scratch1/$USER/linguistic-agnostic-ser
 source ~/.bashrc
 eval "$(conda shell.bash hook)"
 conda activate ser_env
 export PYTHONNOUSERSITE=1
 export WANDB_SILENT=true
-mkdir -p /scratch1/minooahm/wandb_tmp
-export TMPDIR=/scratch1/minooahm/wandb_tmp
+mkdir -p /scratch1/$USER/wandb_tmp
+export TMPDIR=/scratch1/$USER/wandb_tmp
 
 for model in wav2vec2 Whisper; do
   echo ""

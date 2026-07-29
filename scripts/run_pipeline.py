@@ -1,4 +1,7 @@
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import argparse
 import numpy as np
 import pandas as pd
@@ -86,7 +89,7 @@ def main(args):
 
     # --- Build results directory ---
     results_base = os.path.join("results", f"EXP{exp_id}")
-    results_base_full = f"/scratch1/kelidari/ser-experiments/EXP{exp_id}"
+    results_base_full = fos.path.join(SER_SCRATCH, "ser-experiments/EXP{exp_id}")
     os.makedirs(results_base, exist_ok=True)
     os.makedirs(results_base_full, exist_ok=True)
 

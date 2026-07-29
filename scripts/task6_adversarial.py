@@ -26,6 +26,9 @@ v2 changes from v1:
 """
 
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import json
 import argparse
 import copy
@@ -40,8 +43,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from collections import Counter
 
-os.makedirs("/scratch1/minooahm/wandb_tmp", exist_ok=True)
-os.environ["TMPDIR"] = "/scratch1/minooahm/wandb_tmp"
+os.makedirs(os.path.join(SER_SCRATCH, "wandb_tmp"), exist_ok=True)
+os.environ["TMPDIR"] = os.path.join(SER_SCRATCH, "wandb_tmp")
 
 try:
     import wandb
@@ -853,7 +856,7 @@ def plot_lambda_effect(results_df, model_name, save_dir="results/TASK6/plots", r
 def main():
     parser = argparse.ArgumentParser(description="Task 6: Adversarial Text Debiasing (v2)")
     parser.add_argument("--model", type=str, default="HuBERT")
-    parser.add_argument("--data_dir", type=str, default="/scratch1/minooahm/ser_data")
+    parser.add_argument("--data_dir", type=str, default=os.path.join(SER_SCRATCH, "ser_data"))
     parser.add_argument("--train_datasets", type=str, default="RAVDESS,SAVEE")
     parser.add_argument("--lambdas", type=str, default="0,0.01,0.1,1.0,10.0")
     parser.add_argument("--n_seeds", type=int, default=5)

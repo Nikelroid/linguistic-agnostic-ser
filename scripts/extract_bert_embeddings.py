@@ -6,12 +6,15 @@ Output: per-clip BERT embedding aligned with hidden_states_HuBERT_RAVDESS/SAVEE 
            This is sufficient for CCA which only needs distinct text-side variation.
 """
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import json
 import numpy as np
 import torch
 from transformers import BertTokenizer, BertModel
 
-SER_DATA = "/scratch1/minooahm/ser_data"
+SER_DATA = os.path.join(SER_SCRATCH, "ser_data")
 
 RAVDESS_SENTENCES = {
     "01": "Kids are talking by the door",

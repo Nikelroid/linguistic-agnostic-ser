@@ -3,6 +3,9 @@
 Used as a richer CCA training corpus for Task 6 V3 (vs RAV+SAV's 122 unique).
 """
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import re
 import glob
 import json
@@ -10,7 +13,7 @@ import numpy as np
 import torch
 from transformers import BertTokenizer, BertModel
 
-SER_DATA = "/scratch1/minooahm/ser_data"
+SER_DATA = os.path.join(SER_SCRATCH, "ser_data")
 IEMOCAP_ROOT = "/project2/msoleyma_1026/IEMOCAP_full_release"
 
 UTT_LINE_RE = re.compile(r"^(Ses\S+)\s*\[\d+\.\d+-\d+\.\d+\]:\s*(.+)$")

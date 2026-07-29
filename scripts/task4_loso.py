@@ -3,11 +3,14 @@ Task 4: Speaker-Independent Evaluation (Leave-One-Speaker-Out CV)
 Replaces 5-fold stratified CV with LOSO to check for speaker identity leakage.
 
 Usage:
-  python scripts/task4_loso.py --model HuBERT --dataset SAVEE --data_dir /scratch1/minooahm/ser_data
-  python scripts/task4_loso.py --all --data_dir /scratch1/minooahm/ser_data
+  python scripts/task4_loso.py --model HuBERT --dataset SAVEE --data_dir /scratch1/$USER/ser_data
+  python scripts/task4_loso.py --all --data_dir /scratch1/$USER/ser_data
 """
 
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import json
 import argparse
 import numpy as np
@@ -325,7 +328,7 @@ def main():
     parser = argparse.ArgumentParser(description="Task 4: LOSO Speaker-Independent Evaluation")
     parser.add_argument("--model", type=str, default="HuBERT")
     parser.add_argument("--dataset", type=str, default="SAVEE")
-    parser.add_argument("--data_dir", type=str, default="/scratch1/minooahm/ser_data")
+    parser.add_argument("--data_dir", type=str, default=os.path.join(SER_SCRATCH, "ser_data"))
     parser.add_argument("--all", action="store_true", help="Run all available model-dataset combinations")
     parser.add_argument("--min_speaker_samples", type=int, default=0, help="Drop speakers with fewer than N samples (0=keep all)")
     args = parser.parse_args()

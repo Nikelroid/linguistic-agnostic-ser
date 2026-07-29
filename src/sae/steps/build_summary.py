@@ -19,6 +19,9 @@ from __future__ import annotations
 import glob
 import json
 import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 import shutil
 
 import numpy as np
@@ -31,7 +34,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 SAE = os.path.join(ROOT, "results", "SAE")
 CSV, PLOTS, JSON, EMB, SUM = (os.path.join(SAE, d) for d in ("csv", "plots", "json", "embeddings", "summary"))
-SCRATCH = "/scratch1/kelidari/ser-experiments"
+SCRATCH = os.path.join(SER_SCRATCH, "ser-experiments")
 plt.rcParams.update({"figure.dpi": 120, "font.size": 10, "axes.grid": True, "grid.alpha": .3})
 
 

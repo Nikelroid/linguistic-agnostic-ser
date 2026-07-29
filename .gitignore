@@ -37,3 +37,9 @@ slurm_logs/
 *.bak
 *.bak2
 *.bak_premod
+
+# working notes, drafts and anything not meant to be published
+private/
+PUSH_STEPS.txt
+*_CONTEXT.txt
+*_CONTEXT.md

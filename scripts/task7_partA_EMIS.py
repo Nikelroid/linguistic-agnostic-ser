@@ -1,3 +1,7 @@
+import os
+
+SER_SCRATCH = os.environ.get(
+    "SER_SCRATCH", os.path.join("/scratch1", os.environ.get("USER", "unknown")))
 """Task 7 Part A: Congruent vs Incongruent SER on EMIS.
 
 Converted from notebooks/Task7_PartA_EMIS_clean.ipynb for Discovery execution.
@@ -12,8 +16,8 @@ Pipeline:
 """
 import os, sys, glob, argparse
 # Set TMPDIR before importing wandb so media files go to persistent scratch
-os.makedirs("/scratch1/minooahm/wandb_tmp", exist_ok=True)
-os.environ.setdefault("TMPDIR", "/scratch1/minooahm/wandb_tmp")
+os.makedirs(os.path.join(SER_SCRATCH, "wandb_tmp"), exist_ok=True)
+os.environ.setdefault("TMPDIR", os.path.join(SER_SCRATCH, "wandb_tmp"))
 
 import numpy as np
 import pandas as pd
@@ -28,7 +32,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, f1_score
 
 # Allow import of project's feature extractor
-REPO_ROOT = "/scratch1/minooahm/linguistic-agnostic-ser"
+REPO_ROOT = os.path.join(SER_SCRATCH, "linguistic-agnostic-ser")
 sys.path.insert(0, REPO_ROOT)
 from src.models.feature_extractors import TransformerExtractor
 
@@ -37,8 +41,8 @@ import wandb
 # ============================================================
 # CONFIG
 # ============================================================
-AUDIO_DIR   = "/scratch1/minooahm/ser_data/EMIS_audio"
-RESULTS_DIR = "/scratch1/minooahm/linguistic-agnostic-ser/results/TASK7"
+AUDIO_DIR   = os.path.join(SER_SCRATCH, "ser_data/EMIS_audio")
+RESULTS_DIR = os.path.join(SER_SCRATCH, "linguistic-agnostic-ser/results/TASK7")
 FEATURE_DIR = os.path.join(RESULTS_DIR, "features_EMIS")
 PLOT_DIR    = os.path.join(RESULTS_DIR, "plots_EMIS")
 
