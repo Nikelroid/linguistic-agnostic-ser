@@ -1,0 +1,14 @@
+{
+  "tag": "HuBERT_CREMA-D_L13",
+  "n_features_per_subset": 61,
+  "n_classes": 6,
+  "suff_acoustic_emotion": 0.5520048455700225,
+  "suff_lexical": 0.4314683124273345,
+  "suff_random": 0.42341083717873734,
+  "full_reconstruction": 0.7321986683709207,
+  "necessity_ablate_lexical_acc": 0.731122948215227,
+  "necessity_ablate_acoustic_emotion_acc": 0.7350184507174476,
+  "acoustic_minus_lexical_sufficiency": 0.12053653314268797,
+  "acoustic_minus_random_sufficiency": 0.12859400839128515,
+  "emotion_is_acoustic": true
+}

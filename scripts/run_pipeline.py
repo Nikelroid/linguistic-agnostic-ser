@@ -168,6 +168,9 @@ def main(args):
             data = load_aesdd(args.data_dir, sample_rate=sample_rate)
         elif args.dataset_name == 'MESD':
             data = load_mesd(args.data_dir, sample_rate=sample_rate)
+        elif args.dataset_name == 'CREMA-D':
+            from src.data_ingestion.loader import load_cremad
+            data = load_cremad(args.data_dir, sample_rate=sample_rate)
         elif args.dataset_name == 'MSP-Podcast':
             from src.data_ingestion.loader import load_msppodcast
             msp_cfg = config.get('dataset_config', {}).get('msp_podcast', {})

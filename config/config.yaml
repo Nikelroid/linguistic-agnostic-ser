@@ -28,10 +28,18 @@ datasets:
   - AESDD
   - MESD
   - MSP-Podcast
+  - CREMA-D
 
 dataset_config:
   msp_podcast:
     num_classes: 4
+
+# Absolute corpus paths (base dir is /scratch1/$USER/ser_data). The legacy
+# pipeline passes paths via --data_dir; the SAE study (src/sae/) reads these.
+dataset_paths:
+  base_dir: /scratch1/kelidari/ser_data
+  CREMA-D: /scratch1/kelidari/ser_data/CREMA-D   # load_cremad auto-descends into AudioWAV/
+  EMIS: /scratch1/kelidari/ser_data/EMIS         # emotionally-incongruent synthetic speech (Zenodo 19207001)
 
 training:
   batch_size: 4

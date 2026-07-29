@@ -1,0 +1,16 @@
+{
+  "tag": "w2v-BERT_CREMA-D_L17",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 940273,
+  "n_utterances": 7442,
+  "final_fvu": 0.11058256124762833,
+  "final_recon_mse": 0.1102522611618042,
+  "explained_variance": 0.8894174387523717,
+  "dead_features": 111,
+  "alive_features": 8081,
+  "dead_frac": 0.0135498046875,
+  "median_density_alive": 0.0004349800536652653
+}

@@ -1,0 +1,64 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{sectsty}\usepackage{enumitem}\usepackage{xcolor}\usepackage{titlesec}
+\definecolor{navy}{HTML}{1F3A6E}
+\titleformat{\section}{\large\bfseries\color{navy}}{}{0pt}{}
+\titlespacing{\section}{0pt}{12pt}{4pt}
+\setlist[itemize]{leftmargin=1.4em,topsep=2pt,itemsep=1pt}
+\newcommand{\slide}[1]{\section{#1}}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\usepackage{fancyhdr}\pagestyle{fancy}\fancyhf{}
+\rhead{\small\color{navy}SAE Dissection of SER --- Speaker Notes}\rfoot{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\color{navy} Speaker Notes}\\[2pt]
+{\large Sparse-Autoencoder Dissection of Speech Emotion Recognition}\\[2pt]
+{\small Nima Kelidari $\cdot$ Minoo Ahmadi $\cdot$ Chaitanya Parwatkar $\cdot$ Xiangxu (Henry) Lin}\\[2pt]
+{\small\itshape $\sim$10 slides, 10--12 minutes. One slide $\approx$ one idea. Key numbers in \textbf{bold}.}
+\end{center}
+\vspace{4pt}\hrule
+
+\slide{Slide 1 --- Title}
+``This is a mechanistic-interpretability study of speech emotion recognition. The one-line story: we use sparse autoencoders to go from \emph{what a probe can read out} of a frozen speech model to \emph{which internal features actually carry emotion} --- and whether that signal is acoustic or lexical.''
+
+\slide{Slide 2 --- The question}
+``Frozen speech encoders --- HuBERT, WavLM, wav2vec2, w2v-BERT, MERT, and Whisper --- top emotion-recognition benchmarks. But they were pretrained for speech recognition, so they carry a lot of \emph{text} information. Probing tells us \emph{where} emotion becomes readable, but it can't tell us three things we care about: which features encode emotion, whether the model is using acoustics (how something is said) or lexical content (what is said), and whether the story is the same across encoders and speakers. Our idea is to use sparse autoencoders to answer the \emph{mechanism} question, not just decodability.''\\
+\textit{If asked why acoustic vs.\ lexical matters:} ``Because a model that reads emotion off the words will break on sarcasm, accented speech, and low-resource languages where prosody and meaning disagree.''
+
+\slide{Slide 3 --- Method in one slide}
+``We train a TopK sparse autoencoder --- 8$\times$ over-complete, 32 active features per frame --- on the \emph{per-frame} activations of each frozen encoder, about 940 thousand frames. It reconstructs faithfully: \textbf{93\%} of variance explained, basically no dead features. The key design choice is the corpus: CREMA-D has 91 actors saying 12 \emph{fixed} sentences in 6 emotions. Because the text is held constant, any emotion signal we recover there must be acoustic --- a built-in positive control. The second idea is \emph{confound control}: we only call a feature an `emotion feature' if its firing tells us more about emotion than about the sentence (which captures phonetics) or the speaker. Without that control, about two-thirds of the so-called emotion features are really phonetic or speaker features --- the classic trap where an SAE just rediscovers phonemes. After control we keep \textbf{61} clean features, dominated by anger and sadness.''
+
+\slide{Slide 4 --- Q1: depth, decoding $\neq$ disentangling}
+``First result, about depth. A linear probe peaks \textbf{deep}, around layer 10, and stays high. But the \emph{clean, monosemantic} emotion features peak \textbf{early} --- layer 7 for the count, layer 2 for purity. In the deep layers the model is still very decodable, but the emotion has become \emph{distributed} --- smeared across directions rather than packed into a few clean features. So the headline is: emotion gets \emph{organised} into interpretable features earlier than the depth where a probe reads it best. Decodability and disentanglement are different axes.''
+
+\slide{Slide 5 --- Q2: across encoders and speakers}
+``Second, does this generalize. All six encoders have healthy emotion-feature populations, all dominated by anger and sadness. When we match features across encoders by how they fire, Whisper's overlap with the SSL models equals the SSL models' overlap with each other --- so on fixed-lexicon speech Whisper is \emph{not} special. Its known difference, in a moment, is about text. And the features are speaker-invariant: under leave-one-speaker-out across all 91 actors, accuracy basically doesn't drop, and each feature fires for about 95\% of the actors who express its emotion. That also explains a known result --- the big speaker-out collapse on MESD comes from \emph{speaker-entangled} features, exactly the ones our confound control throws away.''
+
+\slide{Slide 6 --- Q3: acoustic, not lexical}
+``Third, is the signal acoustic or lexical. The positive control says acoustic: 60 of 61 features are better predicted by eGeMAPS acoustic descriptors than by sentence identity. And causally --- if we decode emotion only from the acoustic features we get \textbf{0.55}; only from the lexical features, \textbf{0.43}; from random features, \textbf{0.42}. So the acoustic features are sufficient and the lexical ones aren't. What the probe exploits is paralinguistic delivery, not words.''
+
+\slide{Slide 7 --- Q4: EMIS, the lexical shortcut is a deep-layer thing}
+``Fourth, the lexical shortcut. EMIS is synthetic speech where the \emph{text} emotion and the \emph{voice} emotion are deliberately different. We train on the congruent clips and test on the incongruent ones, and measure text-bias: how much the model predicts the text emotion instead of the voice emotion. The new finding is that the shortcut is a \emph{deep-layer} phenomenon --- it shows up only in the deep layers of the ASR-trained SSL encoders, at plus 0.7 to 0.9. Whisper stays voice-grounded at \emph{every} layer, slightly negative even at its last layer. MERT and w2v-BERT never take it. This reproduces the published per-encoder text-bias and adds the depth story.''\\
+\textit{Say this caveat out loud:} ``One methodological note --- if you run this probe on the SAE \emph{reconstruction} instead of the raw activations, it spuriously flips Whisper. So for this test we use raw activations; the SAE is the right tool for the per-feature analysis but not as a stand-in here.''
+
+\slide{Slide 8 --- Where this sits in the literature}
+``The closest method paper is AudioSAE at EACL 2026 --- same SAE recipe, but on two encoders, and emotion is just one of four generic probe tasks. They do no emotion-feature interpretation, no confound control, no factorial corpus, no acoustic-versus-lexical split. Other SAE-on-speech papers find phonetic or singing-technique features, not affect, and don't sweep depth. The closest mechanistic SER paper uses probing and CKA but explicitly no SAEs. So our core combination --- confound-controlled SAE emotion features on a lexicon-controlled factorial corpus across six encoders, plus the depth and EMIS findings --- is, as far as we can tell, un-scooped.''
+
+\slide{Slide 9 --- Limitations and future work}
+``Honest limitations: because the signal is distributed, removing a few features doesn't hurt much, so we rely on the sufficiency test rather than ablation. We must not substitute the SAE reconstruction for raw activations in the EMIS probe. And the cross-encoder and EMIS arms use one layer per encoder, not the full 25-layer grid. Future work is mostly ready as stubs: an IEMOCAP causal ablation with real transcripts, a SpeechCraft cross-lingual study to explain the English--Chinese collapse, feature steering, and dimensional valence/arousal/dominance targets.''
+
+\slide{Slide 10 --- Takeaways}
+``Four things to remember: one, SAEs let us move SER from decodability to mechanism, and confound control is what makes it honest. Two, decoding is not disentangling --- emotion organises early but decodes best deep. Three, the emotion features are acoustic and speaker-invariant, and shared across all six encoders. Four, the lexical shortcut is a deep-layer SSL phenomenon, and Whisper resists it everywhere. Everything --- code, data pointers, all artifacts, and the report --- is on the SAE branch. Thank you.''
+
+\vspace{6pt}\hrule
+\slide{Likely Q\&A}
+\begin{itemize}
+\item \textbf{Why CREMA-D, not IEMOCAP?} Its fixed lexicon is the control that lets us \emph{separate} acoustic from lexical. IEMOCAP has real transcripts --- which is exactly why it's our planned causal-ablation follow-up.
+\item \textbf{Is 61 features too few?} It's after a deliberately strict triple filter (significant + monosemantic + beats both confounds). The point is purity, not count; the looser set of 394 is dominated by phonetics.
+\item \textbf{Does it depend on SAE hyperparameters?} Reconstruction is stable (93\% variance, $\sim$0 dead). The qualitative findings are robust; we haven't exhaustively swept $k$/expansion --- listed as future work.
+\item \textbf{How is this different from AudioSAE?} Same tool, different question: they probe four generic attributes on two models; we do confound-controlled affect-feature interpretation on six, plus the depth and EMIS-by-depth results.
+\end{itemize}
+
+\end{document}

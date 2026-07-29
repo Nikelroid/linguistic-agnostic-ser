@@ -1,0 +1,10 @@
+{
+  "encoder": "HuBERT",
+  "dataset": "CREMA-D",
+  "n_layers": 25,
+  "accuracy_peak_layer": 10,
+  "max_probe_acc": 0.7389172028567921,
+  "disentanglement_peak_layer(n_emotion_features)": 7,
+  "monosemanticity_peak_layer": 2,
+  "peaks_coincide": false
+}

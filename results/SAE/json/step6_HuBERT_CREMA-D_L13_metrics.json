@@ -1,0 +1,11 @@
+{
+  "tag": "HuBERT_CREMA-D_L13",
+  "n_actors": 91,
+  "n_emotion_features": 61,
+  "emotion_features_acc_random": 0.5507919185135438,
+  "emotion_features_acc_speaker_disjoint": 0.5508298299088288,
+  "emotion_features_loso_drop": -3.7911395284973004e-05,
+  "full_recon_loso_drop": 0.015491008402957918,
+  "median_actor_coverage": 0.945054945054945,
+  "published_mesd_loso_drop_ref": 0.3
+}

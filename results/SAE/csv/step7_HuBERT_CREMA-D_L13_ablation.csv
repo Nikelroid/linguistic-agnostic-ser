@@ -1,0 +1,7 @@
+condition,probe_acc
+suff_acoustic_emotion,0.5520048455700225
+suff_lexical,0.4314683124273345
+suff_random,0.42341083717873734
+full_reconstruction,0.7321986683709207
+necessity_ablate_lexical_acc,0.731122948215227
+necessity_ablate_acoustic_emotion_acc,0.7350184507174476

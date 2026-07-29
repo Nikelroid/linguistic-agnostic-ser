@@ -1,0 +1,11 @@
+{
+  "tag": "HuBERT_CREMA-D_L13",
+  "n_emotion_features": 61,
+  "n_acoustic": 60,
+  "n_lexical": 1,
+  "frac_acoustic": 0.9836065573770492,
+  "mean_acoustic_auc": 0.8304390614028525,
+  "mean_lexical_auc": 0.6603480111712202,
+  "mean_margin": 0.1700910502316322,
+  "verdict": "PASS"
+}

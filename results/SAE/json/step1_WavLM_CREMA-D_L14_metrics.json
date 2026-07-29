@@ -1,0 +1,16 @@
+{
+  "tag": "WavLM_CREMA-D_L14",
+  "d_in": 1024,
+  "d_sae": 8192,
+  "k": 32,
+  "expansion": 8,
+  "n_frames": 940273,
+  "n_utterances": 7442,
+  "final_fvu": 0.08814727155256935,
+  "final_recon_mse": 0.08783748745918274,
+  "explained_variance": 0.9118527284474307,
+  "dead_features": 2,
+  "alive_features": 8190,
+  "dead_frac": 0.000244140625,
+  "median_density_alive": 0.0016697278343629988
+}

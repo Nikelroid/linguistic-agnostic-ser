@@ -1,0 +1,71 @@
+================================================================================
+SAE DISSECTION OF FROZEN-ENCODER EMOTION FEATURES — STATISTICAL & METHODOLOGICAL ANALYSIS
+================================================================================
+Encoders: HuBERT/WavLM/wav2vec2/w2v-BERT/MERT/Whisper (large, frozen). Primary
+corpus: CREMA-D (91 actors x 12 fixed sentences x 6 emotions, 7,442 clips).
+
+1. METHOD
+--------------------------------------------------------------------------------
+- SAE inputs are PER-FRAME activations (not the mean-pooled EXP cache): a TopK SAE
+  on ~7k pooled vectors would be under-determined. CREMA-D L13 gives 940,273 frames.
+- SAE: TopK, d_in=1024, d_sae=8192, k=32, AuxK dead-feature revival.
+  Reconstruction FVU=0.070 (93.0% variance explained),
+  dead features 4/8192.
+- Emotion-feature MI uses the activation-firing indicator (vectorized; sparse-appropriate),
+  with a 5-sigma permutation null over 10 label shuffles.
+- CONFOUND CONTROL (key methodological point): a feature counts as an emotion
+  feature only if MI(emotion) exceeds MI(sentence/lexical) AND MI(actor/speaker),
+  on top of significance + monosemanticity>=0.5. Without it, 6407 features
+  are significant and 394 pass monosemanticity, but ~66% carry more
+  sentence/speaker than emotion information (phonetic features). After control:
+  61 genuine emotion features (median monosemanticity 0.59).
+- Acoustic-vs-lexical labeling uses cross-validated ROC-AUC of a logistic classifier
+  predicting feature firing from eGeMAPS (acoustic) vs sentence identity (lexical);
+  R^2 was abandoned (features are ~96% sparse -> degenerate/negative R^2).
+
+2. RESULTS BY RESEARCH QUESTION
+--------------------------------------------------------------------------------
+Q (i) DEPTH — decodability vs disentanglement DO NOT coincide:
+  probe-accuracy peak  = L10 (acc 0.739)
+  emotion-feature peak = L7
+  monosemanticity peak = L2
+  -> emotion disentangles into clean features earlier (L2-L7) than where it is best
+     linearly decoded (L10); deep layers keep decodability but lose disentanglement.
+
+Q (ii.1) CROSS-PARADIGM — emotion-feature counts per encoder (best layer):
+  {'HuBERT': 61, 'wav2vec2': 70, 'Whisper': 79, 'WavLM': 145, 'MERT': 64, 'w2v-BERT': 61}
+  Whisper->SSL overlap 0.403 ~= SSL->SSL 0.388
+  -> on fixed-lexicon CREMA-D Whisper is NOT distinct; its known divergence concerns
+     the lexical shortcut (deferred EMIS test), not acoustic emotion encoding.
+
+Q (ii.3) CROSS-SPEAKER — emotion features are speaker-invariant:
+  random-CV 0.551 vs speaker-disjoint 0.551
+  (LOSO drop -0.000); median actor coverage 0.95.
+  -> the published MESD-LOSO ~0.30 collapse is attributable to the speaker-entangled
+     features that confound control excludes.
+
+Q (ii.2) CROSS-LINGUAL — BLOCKED (SpeechCraft audio not on cluster). See stub.
+
+Q (iii) ACOUSTIC vs LEXICAL — the signal is ACOUSTIC:
+  positive control: 60/61 emotion features acoustic
+  (eGeMAPS AUC 0.830 vs sentence AUC 0.660).
+  causal sufficiency: emotion decodes from acoustic features 0.552
+  vs lexical 0.431 vs random 0.423 (+0.121).
+
+Q (mechanism) EMIS — the lexical shortcut is a DEEP-LAYER phenomenon; Whisper resists:
+  text-bias at the text-bias layer (raw mean-pooled, train-congruent/test-incongruent):
+    {'HuBERT': 0.794, 'wav2vec2': 0.868, 'WavLM': 0.731, 'Whisper': -0.108, 'MERT': -0.603, 'w2v-BERT': -0.598}
+  Whisper L24 -0.108 (resists) vs ASR-SSL mean 0.798.
+  The shortcut emerges only in DEEP layers of the ASR-SSL encoders (HuBERT/WavLM/wav2vec2);
+  all encoders are audio-grounded early (L0-L8); MERT (music) and w2v-BERT stay audio-grounded
+  throughout. Reproduces the published EMIS text-bias (HuBERT +0.72, WavLM +0.61,
+  wav2vec2 +0.66, Whisper -0.19). NOTE: a SAE-reconstruction probe gave a spurious
+  Whisper +0.88 -- raw activations are the trustworthy, literature-consistent measure.
+
+3. LIMITATIONS / DEFERRED
+--------------------------------------------------------------------------------
+- Utterance-level pooling of sparse frame features: necessity-ablation of small
+  feature subsets is ~null (signal distributed); sufficiency is the informative test.
+- EMIS now run (Zenodo mirror); IEMOCAP real-transcript ablation and SpeechCraft
+  cross-lingual remain deferred (data not on cluster), with runnable stubs (STEP6/7).
+================================================================================
