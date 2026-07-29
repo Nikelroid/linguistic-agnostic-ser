@@ -1,0 +1,10 @@
+# Several of us committed under more than one name or address over the project.
+# This maps them onto one identity each so `git shortlog -sne` and `git log`
+# report contribution accurately. It changes display only, never the commits.
+
+Nima Kelidari <68930046+Nikelroid@users.noreply.github.com> <Nikelroid@gmail.com>
+Minoo Ahmadi <miinou.ahmadii@gmail.com> MinooAhmadii <miinou.ahmadii@gmail.com>
+Chaitanya Parwatkar <parwatkar.chaitanya@gmail.com> parw8649 <parwatkar.chaitanya@gmail.com>
+Chaitanya Parwatkar <parwatkar.chaitanya@gmail.com> parw8649 <parw8649@users.noreply.github.com>
+Chaitanya Parwatkar <parwatkar.chaitanya@gmail.com> <parw8649@colorado.edu>
+Xiangxu (Henry) Lin <i-henry@se2.ai>
