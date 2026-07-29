@@ -30,7 +30,10 @@ __pycache__/
 !results/**/*.md
 !results/**/.gitkeep
 
-# experiment run logs and W&B cache - keep out of the repo
+# experiment run logs, W&B cache and local rollback files
 wandb/
 slurm/logs/
 slurm_logs/
+*.bak
+*.bak2
+*.bak_premod
