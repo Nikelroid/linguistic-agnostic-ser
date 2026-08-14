@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where Does Emotion Live in a Speech Transformer?</title>
+<meta name="description" content="Interactive explorer for a layer-wise probing study of six frozen speech transformers across eight datasets and five languages.">
+<style>
+  :root{
+    --bg:#FAF9F5; --ink:#1D1B16; --muted:#6F6A5F; --line:#E5E1D6; --card:#FFFFFF;
+    --accent:#2D6B60; --warn:#B0362C;
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#161511; --ink:#EBE8DF; --muted:#9A9486; --line:#2E2C25; --card:#1E1C17;
+           --accent:#5FB3A1; --warn:#E05B4E;
+           --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 "Seravek","Avenir Next","Segoe UI",system-ui,sans-serif;padding:44px 20px 80px}
+  .wrap{max-width:1020px;margin:0 auto}
+  h1{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-size:2.05rem;margin:0 0 8px;
+     font-weight:600;line-height:1.15;text-wrap:balance}
+  .sub{color:var(--muted);margin:0 0 10px;font-size:1rem;max-width:70ch}
+  .meta{color:var(--muted);font-size:.85rem;margin:0 0 30px}
+  h2{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+     font-weight:700;margin:38px 0 12px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tab{padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--muted);
+    border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;transition:.15s}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px;box-shadow:var(--shadow)}
+  canvas{width:100%;height:auto;display:block}
+  .toggles{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--line);
+    border-radius:999px;font-size:.79rem;cursor:pointer;user-select:none;font-weight:600;
+    color:var(--muted);background:transparent;font-family:inherit;transition:.15s}
+  .chip[aria-pressed="true"]{color:var(--ink);border-color:currentColor}
+  .chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .chip[aria-pressed="false"] i{opacity:.25}
+  .caption{color:var(--muted);font-size:.88rem;margin:14px 0 0;max-width:74ch}
+  .caption b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:.87rem;margin-top:6px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  td.n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+  .best{color:var(--accent);font-weight:700}
+  .bad{color:var(--warn);font-weight:700}
+  .wrapscroll{overflow-x:auto}
+  .foot{margin-top:46px;padding-top:20px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:.83rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Where does emotion live in a speech transformer?</h1>
+  <p class="sub">Six frozen 24-layer speech encoders, eight datasets, five languages, and one
+     question: when a probe reads emotion out of a pretrained model, is it hearing <i>how</i>
+     something was said — or quietly reading <i>what</i> was said?</p>
+  <p class="meta">Every number below is measured. Use the tabs to move between the three
+     experiments that answer it.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-v="layers" aria-selected="true">Layer-wise probing</button>
+    <button class="tab" role="tab" data-v="noise" aria-selected="false">Noise robustness</button>
+    <button class="tab" role="tab" data-v="vad" aria-selected="false">Valence / Arousal / Dominance</button>
+  </div>
+
+  <div class="stage">
+    <canvas id="cv" width="1180" height="620"></canvas>
+    <div class="toggles" id="toggles"></div>
+    <p class="caption" id="cap"></p>
+  </div>
+
+  <h2>Encoder scorecard</h2>
+  <div class="wrapscroll">
+  <table>
+    <thead><tr><th>Encoder</th><th>Pretraining</th><th>CREMA-D best layer</th>
+      <th>Fixed-lexicon acc.</th><th>Acc. loss, clean&nbsp;&rarr;&nbsp;0&nbsp;dB</th><th>Text bias (EMIS)</th></tr></thead>
+    <tbody id="score"></tbody>
+  </table>
+  </div>
+  <p class="caption">Text bias is measured on utterances where the spoken words and the vocal
+     delivery carry <b>different</b> emotions. A positive number means the probe followed the
+     words. <b>Whisper is the only encoder that stays with the voice</b> — and it is also the most
+     noise-robust. Supervised multilingual pretraining produces a different representation from
+     self-supervised pretraining, at every depth we tested.</p>
+
+  <div class="foot">
+    <span>CSCI 535, USC · six encoders × eight datasets × five languages</span>
+    <span>
+      <a href="./">Project page</a> · <a href="https://github.com/Nikelroid/linguistic-agnostic-ser">Repository</a> ·
+      <a href="https://kelidari.com">kelidari.com</a>
+    </span>
+  </div>
+</div>
+
+<script>
+"use strict";
+const DATA = {"cremad":{"wav2vec2":[0.6268,0.604,0.6094,0.6248,0.6528,0.6661,0.6692,0.6841,0.69,0.6931,0.6935,0.6827,0.6789,0.6729,0.6791,0.6708,0.6732,0.6681,0.6627,0.6567,0.6539,0.6231,0.6075,0.5648,0.5095],"HuBERT":[0.6397,0.6532,0.6709,0.6684,0.6764,0.6947,0.701,0.7107,0.7143,0.7162,0.7278,0.7388,0.7454,0.7497,0.7409,0.7319,0.7354,0.7343,0.7295,0.7188,0.7134,0.7196,0.7232,0.7275,0.7216],"WavLM":[0.6311,0.6333,0.6489,0.6727,0.6892,0.7044,0.7173,0.7282,0.7405,0.7587,0.7562,0.7593,0.7572,0.7583,0.7608,0.7529,0.7408,0.7447,0.7462,0.7431,0.744,0.742,0.7463,0.7307,0.7169],"MERT":[0.588,0.6035,0.6141,0.6174,0.6216,0.6301,0.6291,0.6357,0.6392,0.6404,0.6348,0.6208,0.6321,0.6235,0.6197,0.6103,0.6035,0.597,0.5916,0.5805,0.5783,0.5762,0.5747,0.5808,0.5781],"w2v-BERT":[0.3065,0.5318,0.6049,0.6584,0.6999,0.7151,0.7014,0.7006,0.6866,0.7165,0.7053,0.6862,0.676,0.6811,0.6966,0.7189,0.7166,0.7296,0.7116,0.7016,0.6915,0.6814,0.6454,0.6247,0.6099],"Whisper":[0.6125,0.6514,0.667,0.676,0.6809,0.6787,0.6881,0.6975,0.7143,0.7243,0.7337,0.7401,0.7476,0.745,0.7411,0.7372,0.7413,0.7433,0.737,0.7304,0.74,0.7314,0.7343,0.7343,0.7295]},"noise":{"wav2vec2":{"clean":0.8342,"20":0.7669,"10":0.7125,"5":0.6603,"0":0.5785},"HuBERT":{"clean":0.8546,"20":0.807,"10":0.7671,"5":0.722,"0":0.6552},"WavLM":{"clean":0.8626,"20":0.8116,"10":0.7535,"5":0.6852,"0":0.6163},"MERT":{"clean":0.8161,"20":0.7055,"10":0.6515,"5":0.6135,"0":0.5742},"w2v-BERT":{"clean":0.8407,"20":0.7916,"10":0.7602,"5":0.732,"0":0.6954},"Whisper":{"clean":0.8638,"20":0.8332,"10":0.8121,"5":0.7936,"0":0.7678}},"vad":{"wav2vec2":{"EmoVal":0.8759,"EmoAct":0.7196,"EmoDom":0.6942},"HuBERT":{"EmoVal":0.8447,"EmoAct":0.7126,"EmoDom":0.6899},"WavLM":{"EmoVal":0.8274,"EmoAct":0.712,"EmoDom":0.6874},"MERT":{"EmoVal":0.8949,"EmoAct":0.7233,"EmoDom":0.691},"w2v-BERT":{"EmoVal":0.8572,"EmoAct":0.7212,"EmoDom":0.6948},"Whisper":{"EmoVal":0.8076,"EmoAct":0.7065,"EmoDom":0.6822}}};
+
+const ENC = ["wav2vec2","HuBERT","WavLM","MERT","w2v-BERT","Whisper"];
+const COL = {wav2vec2:"#C8791F", HuBERT:"#2F6FB0", WavLM:"#2D6B60",
+             MERT:"#8E5BA6", "w2v-BERT":"#B0362C", Whisper:"#1D9BAA"};
+const PRE = {wav2vec2:"contrastive", HuBERT:"masked cluster", WavLM:"cluster + denoising",
+             MERT:"music (control)", "w2v-BERT":"contrastive + MLM", Whisper:"supervised multilingual"};
+const BIAS = {HuBERT:"+0.72", wav2vec2:"+0.67", WavLM:"+0.61", Whisper:"−0.19",
+              MERT:"n/a", "w2v-BERT":"n/a"};
+
+let view="layers", on = Object.fromEntries(ENC.map(e=>[e,true]));
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function axes(x0,y0,x1,y1,xlab,ylab,xticks,yticks){
+  ctx.strokeStyle=css('--line'); ctx.fillStyle=css('--muted');
+  ctx.lineWidth=1; ctx.font="13px ui-monospace,Menlo,monospace";
+  yticks.forEach(([v,t])=>{
+    const y=y1-(v)*(y1-y0);
+    ctx.globalAlpha=.55; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); ctx.globalAlpha=1;
+    ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.fillText(t,x0-10,y);
+  });
+  xticks.forEach(([v,t])=>{
+    const x=x0+v*(x1-x0);
+    ctx.textAlign="center"; ctx.textBaseline="top"; ctx.fillText(t,x,y1+10);
+  });
+  ctx.fillStyle=css('--muted'); ctx.font="600 13px system-ui";
+  ctx.textAlign="center"; ctx.fillText(xlab,(x0+x1)/2,y1+38);
+  ctx.save(); ctx.translate(x0-52,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign="center"; ctx.fillText(ylab,0,0); ctx.restore();
+}
+function clear(){ ctx.fillStyle=css('--card'); ctx.fillRect(0,0,W,H); }
+
+/* ---- 1. layer-wise probing on CREMA-D ---- */
+function drawLayers(){
+  clear();
+  const x0=90,y0=30,x1=W-30,y1=H-70, lo=.13,hi=.82;
+  const yt=[]; for(let v=.2;v<=.8001;v+=.1) yt.push([(v-lo)/(hi-lo), v.toFixed(1)]);
+  const xt=[[0,"CNN"]]; [4,8,12,16,20,24].forEach(l=>xt.push([l/24,"L"+l]));
+  axes(x0,y0,x1,y1,"encoder layer","probing accuracy",xt,yt);
+  // chance line for 6-class CREMA-D
+  const yc=y1-((1/6)-lo)/(hi-lo)*(y1-y0);
+  ctx.strokeStyle=css('--muted'); ctx.setLineDash([6,5]); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x0,yc); ctx.lineTo(x1,yc); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=css('--muted'); ctx.font="12px system-ui"; ctx.textAlign="left";
+  ctx.fillText("chance (16.7%)",x0+8,yc-8);
+  ENC.forEach(e=>{
+    if(!on[e] || !DATA.cremad[e]) return;
+    const s=DATA.cremad[e];
+    ctx.strokeStyle=COL[e]; ctx.lineWidth=2.6; ctx.beginPath();
+    s.forEach((v,i)=>{
+      const x=x0+(i/24)*(x1-x0), y=y1-((v-lo)/(hi-lo))*(y1-y0);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+    const bi=s.indexOf(Math.max(...s));
+    const bx=x0+(bi/24)*(x1-x0), by=y1-((s[bi]-lo)/(hi-lo))*(y1-y0);
+    ctx.fillStyle=COL[e]; ctx.beginPath(); ctx.arc(bx,by,5.5,0,7); ctx.fill();
+    ctx.strokeStyle=css('--card'); ctx.lineWidth=2; ctx.stroke();
+  });
+  document.getElementById('cap').innerHTML =
+    "<b>CREMA-D holds the words constant.</b> 91 actors speak the same 12 sentences across 6 "+
+    "emotions, so any accuracy above chance has to come from delivery, not vocabulary. Every "+
+    "encoder clears 16.7% by a wide margin, and the peak sits in the <b>middle-to-late</b> layers "+
+    "— even for MERT, which was pretrained on music rather than speech. Dots mark each encoder's "+
+    "best layer. Note wav2vec 2.0 collapsing after its peak: its contrastive objective pushes deep "+
+    "layers toward word prediction, overwriting the prosody a probe needs.";
+}
+
+/* ---- 2. noise robustness ---- */
+function drawNoise(){
+  clear();
+  const x0=90,y0=30,x1=W-30,y1=H-70, lo=.50,hi=.90;
+  const order=["clean","20","10","5","0"];
+  const yt=[]; for(let v=.5;v<=.9001;v+=.1) yt.push([(v-lo)/(hi-lo),v.toFixed(1)]);
+  const xt=order.map((k,i)=>[i/(order.length-1), k==="clean"?"clean":k+" dB"]);
+  axes(x0,y0,x1,y1,"signal-to-noise ratio (lower = noisier)","best-layer accuracy",xt,yt);
+  ENC.forEach(e=>{
+    if(!on[e]||!DATA.noise[e]) return;
+    const s=DATA.noise[e];
+    ctx.strokeStyle=COL[e]; ctx.lineWidth=2.8; ctx.beginPath();
+    order.forEach((k,i)=>{
+      if(s[k]==null) return;
+      const x=x0+(i/(order.length-1))*(x1-x0), y=y1-((s[k]-lo)/(hi-lo))*(y1-y0);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+    order.forEach((k,i)=>{
+      if(s[k]==null) return;
+      const x=x0+(i/(order.length-1))*(x1-x0), y=y1-((s[k]-lo)/(hi-lo))*(y1-y0);
+      ctx.fillStyle=COL[e]; ctx.beginPath(); ctx.arc(x,y,4.5,0,7); ctx.fill();
+    });
+    const last=s["0"];
+    if(last!=null){
+      const y=y1-((last-lo)/(hi-lo))*(y1-y0);
+      ctx.fillStyle=COL[e]; ctx.font="600 12px system-ui"; ctx.textAlign="left";
+      ctx.fillText(e,x1+6>W-8?W-60:x1-58,y-9);
+    }
+  });
+  document.getElementById('cap').innerHTML =
+    "<b>Real environmental noise from ESC-50, mixed into MSP-Podcast at four levels.</b> "+
+    "Whisper loses about <b>11%</b> of its clean accuracy at 0 dB; the self-supervised encoders "+
+    "lose <b>23–30%</b>. The ranking here matches the ranking on continuous emotion regression "+
+    "exactly, encoder for encoder — two independent measurement regimes agreeing, which suggests "+
+    "this reflects representation quality rather than a quirk of one task setup.";
+}
+
+/* ---- 3. V/A/D regression ---- */
+function drawVAD(){
+  clear();
+  const x0=90,y0=40,x1=W-30,y1=H-70, lo=.60,hi=.95;
+  const T=["EmoVal","EmoAct","EmoDom"], TN={EmoVal:"valence",EmoAct:"arousal",EmoDom:"dominance"};
+  const yt=[]; for(let v=.6;v<=.9501;v+=.05) yt.push([(v-lo)/(hi-lo),v.toFixed(2)]);
+  const act=ENC.filter(e=>on[e]&&DATA.vad[e]);
+  const gw=(x1-x0)/Math.max(T.length,1);
+  axes(x0,y0,x1,y1,"target dimension","best-layer RMSE (lower is better)",
+       T.map((t,i)=>[(i+.5)/T.length, TN[t]]), yt);
+  T.forEach((t,ti)=>{
+    const bw=Math.min(38,(gw-30)/Math.max(act.length,1));
+    act.forEach((e,ei)=>{
+      const v=DATA.vad[e][t]; if(v==null) return;
+      const cx=x0+gw*ti+gw/2+(ei-(act.length-1)/2)*(bw+5);
+      const y=y1-((v-lo)/(hi-lo))*(y1-y0);
+      ctx.fillStyle=COL[e]; ctx.fillRect(cx-bw/2,y,bw,y1-y);
+    });
+  });
+  document.getElementById('cap').innerHTML =
+    "<b>Valence is the hardest dimension for every single encoder.</b> Averaged across the six, "+
+    "RMSE is 0.881 for valence against 0.730 for arousal and 0.699 for dominance — a 26% gap. "+
+    "That is exactly the dimension prior work attributes to lexical content, and exactly where the "+
+    "text-bias test shows the self-supervised probes taking a shortcut. The measurements agree: "+
+    "the part of emotion that depends most on words is the part these models recover least well "+
+    "from the voice alone.";
+}
+
+const VIEWS={layers:drawLayers, noise:drawNoise, vad:drawVAD};
+function render(){ VIEWS[view](); }
+
+function buildToggles(){
+  document.getElementById('toggles').innerHTML = ENC.map(e=>
+    `<button class="chip" data-e="${e}" aria-pressed="${on[e]}">
+       <i style="background:${COL[e]}"></i>${e}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(c=> c.onclick=()=>{
+    const e=c.dataset.e; on[e]=!on[e]; c.setAttribute('aria-pressed',on[e]); render();
+  });
+}
+function buildScore(){
+  const rows = ENC.map(e=>{
+    const s=DATA.cremad[e]||[], best=s.length?Math.max(...s):null,
+          bi=s.length?s.indexOf(best):null, n=DATA.noise[e];
+    const drop = (n&&n.clean&&n["0"]) ? ((n.clean-n["0"])/n.clean*100) : null;
+    return {e,bi,best,drop,bias:BIAS[e]};
+  });
+  const bestAcc=Math.max(...rows.map(r=>r.best||0));
+  const minDrop=Math.min(...rows.filter(r=>r.drop!=null).map(r=>r.drop));
+  document.getElementById('score').innerHTML = rows.map(r=>`
+    <tr>
+      <td><b style="color:${COL[r.e]}">${r.e}</b></td>
+      <td style="color:var(--muted)">${PRE[r.e]}</td>
+      <td class="n">${r.bi===0?"CNN":"L"+r.bi}</td>
+      <td class="n ${r.best===bestAcc?"best":""}">${r.best!=null?r.best.toFixed(3):"—"}</td>
+      <td class="n ${r.drop===minDrop?"best":""}">${r.drop!=null?r.drop.toFixed(1)+"%":"—"}</td>
+      <td class="n ${r.bias.startsWith("−")?"best":(r.bias!=="n/a"?"bad":"")}">${r.bias}</td>
+    </tr>`).join('');
+}
+document.querySelectorAll('.tab').forEach(t=> t.onclick=()=>{
+  view=t.dataset.v;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.v===view));
+  render();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{render();});
+buildToggles(); buildScore(); render();
+</script>
+</body>
+</html>

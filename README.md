@@ -3,7 +3,7 @@
 <p align="center"><i>Where emotion lives inside a frozen speech encoder, whether that answer survives a change of language, and whether the probe is hearing the voice or reading the words</i></p>
 
 <p align="center">
-<a href="https://kelidari.com/linguistic-agnostic-ser/"><img src="https://img.shields.io/badge/▶_Explore_the_results_live-2D6B60?style=for-the-badge" alt="Interactive explorer"></a>
+<a href="https://kelidari.com/linguistic-agnostic-ser/explorer.html"><img src="https://img.shields.io/badge/▶_Explore_the_results_live-2D6B60?style=for-the-badge" alt="Interactive explorer"></a>
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@
 <h2 align="center">Explore It Yourself</h2>
 
 <p align="center">
-  <b><a href="https://kelidari.com/linguistic-agnostic-ser/">kelidari.com/linguistic-agnostic-ser</a></b>
+  <b><a href="https://kelidari.com/linguistic-agnostic-ser/explorer.html">kelidari.com/linguistic-agnostic-ser/explorer</a></b>
 </p>
 
 The three experiments that answer the question are plotted live from the result files in this
