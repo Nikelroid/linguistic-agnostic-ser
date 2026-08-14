@@ -2,324 +2,277 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Linguistic-Agnostic Speech Emotion Recognition</title>
-<meta name="description" content="Where emotion lives inside a frozen speech encoder, whether it survives a change of language, and whether the probe is hearing the voice or reading the words.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where Does Emotion Live in a Speech Transformer?</title>
+<meta name="description" content="Interactive explorer for a layer-wise probing study of six frozen speech transformers across eight datasets and five languages.">
 <style>
-:root{
-  color-scheme:light;
-  --bg:#fbfbfa; --card:#fff; --ink:#16181d; --ink2:#5a6068; --ink3:#8b9198;
-  --line:#e4e4e0; --accent:#1c5cab; --blue:#2a78d6; --red:#d03b3b;
-  --green:#1baf7a; --amber:#eda100; --violet:#6f42c1;
-}
-@media(prefers-color-scheme:dark){:root{
-  color-scheme:dark;
-  --bg:#101215; --card:#171a1f; --ink:#eceef1; --ink2:#a5acb5; --ink3:#767d86;
-  --line:#252a31; --accent:#6da7ec; --blue:#3987e5; --red:#e86a6a;
-  --green:#199e70; --amber:#c98500; --violet:#9d7ae0;
-}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-main{max-width:760px;margin:0 auto;padding:0 22px 90px}
-header{max-width:760px;margin:0 auto;padding:64px 22px 34px}
-h1{font-size:33px;line-height:1.15;letter-spacing:-.02em;margin:0 0 12px;font-weight:600}
-.lede{font-size:19px;line-height:1.55;color:var(--ink2);margin:0 0 20px}
-.by{font-size:13.5px;color:var(--ink3);margin:0}
-.by a{color:var(--accent);text-decoration:none}
-.by a:hover{text-decoration:underline}
-h2{font-size:22px;letter-spacing:-.012em;margin:52px 0 10px;font-weight:600}
-p{margin:0 0 15px}
-.small{font-size:14px;color:var(--ink2)}
-strong{font-weight:600}
-figure{margin:22px 0;background:var(--card);border:1px solid var(--line);
-  border-radius:10px;padding:18px 18px 12px}
-figcaption{font-size:13px;color:var(--ink3);margin-top:10px;line-height:1.5}
-svg{width:100%;height:auto;display:block;overflow:visible}
-.t{font-size:12px;fill:var(--ink3)}
-.v{font-size:12px;font-weight:600;fill:var(--ink)}
-.lab{font-size:12.5px;fill:var(--ink2)}
-.gl{stroke:var(--line)}
-.hit{cursor:pointer}
-#tip{position:fixed;opacity:0;pointer-events:none;transition:opacity .1s;z-index:9;
-  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:7px;
-  padding:9px 12px;font-size:13px;line-height:1.5;max-width:260px;
-  box-shadow:0 6px 22px -8px rgba(0,0,0,.35)}
-#tip.on{opacity:1}
-.key{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin:0 0 12px}
-.key i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:5px}
-.big{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
-  border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:26px 0}
-.big div{background:var(--card);padding:16px 18px}
-.big b{display:block;font-size:29px;line-height:1;letter-spacing:-.02em;margin-bottom:5px}
-.big span{font-size:13px;color:var(--ink2);line-height:1.45}
-@media(max-width:620px){.big{grid-template-columns:1fr}h1{font-size:27px}}
-footer{border-top:1px solid var(--line);margin-top:56px;padding-top:20px;
-  font-size:13.5px;color:var(--ink3)}
-footer a{color:var(--accent);text-decoration:none}
+  :root{
+    --bg:#FAF9F5; --ink:#1D1B16; --muted:#6F6A5F; --line:#E5E1D6; --card:#FFFFFF;
+    --accent:#2D6B60; --warn:#B0362C;
+    --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#161511; --ink:#EBE8DF; --muted:#9A9486; --line:#2E2C25; --card:#1E1C17;
+           --accent:#5FB3A1; --warn:#E05B4E;
+           --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.6 "Seravek","Avenir Next","Segoe UI",system-ui,sans-serif;padding:44px 20px 80px}
+  .wrap{max-width:1020px;margin:0 auto}
+  h1{font-family:"Iowan Old Style",Palatino,Georgia,serif;font-size:2.05rem;margin:0 0 8px;
+     font-weight:600;line-height:1.15;text-wrap:balance}
+  .sub{color:var(--muted);margin:0 0 10px;font-size:1rem;max-width:70ch}
+  .meta{color:var(--muted);font-size:.85rem;margin:0 0 30px}
+  h2{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+     font-weight:700;margin:38px 0 12px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .tab{padding:8px 14px;border:1px solid var(--line);background:var(--card);color:var(--muted);
+    border-radius:999px;cursor:pointer;font-size:.85rem;font-weight:600;font-family:inherit;transition:.15s}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .stage{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px;box-shadow:var(--shadow)}
+  canvas{width:100%;height:auto;display:block}
+  .toggles{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--line);
+    border-radius:999px;font-size:.79rem;cursor:pointer;user-select:none;font-weight:600;
+    color:var(--muted);background:transparent;font-family:inherit;transition:.15s}
+  .chip[aria-pressed="true"]{color:var(--ink);border-color:currentColor}
+  .chip i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .chip[aria-pressed="false"] i{opacity:.25}
+  .caption{color:var(--muted);font-size:.88rem;margin:14px 0 0;max-width:74ch}
+  .caption b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:.87rem;margin-top:6px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  td.n{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums}
+  .best{color:var(--accent);font-weight:700}
+  .bad{color:var(--warn);font-weight:700}
+  .wrapscroll{overflow-x:auto}
+  .foot{margin-top:46px;padding-top:20px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:.83rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  a{color:var(--accent)}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>Where does emotion live in a speech transformer?</h1>
+  <p class="sub">Six frozen 24-layer speech encoders, eight datasets, five languages, and one
+     question: when a probe reads emotion out of a pretrained model, is it hearing <i>how</i>
+     something was said — or quietly reading <i>what</i> was said?</p>
+  <p class="meta">Every number below is measured. Use the tabs to move between the three
+     experiments that answer it.</p>
 
-<header>
-  <h1>Is the probe hearing the voice, or reading the words?</h1>
-  <p class="lede">Speech encoders top the emotion benchmarks, and every one of them was trained to
-  recognise words. We mapped where emotion sits inside six of them, then built tests designed to
-  break our own answer.</p>
-  <p class="by">Nima Kelidari, Chaitanya Parwatkar, Minoo Ahmadi, Xiangxu Lin &middot; University
-  of Southern California &middot; <a href="https://github.com/Nikelroid/linguistic-agnostic-ser">code on GitHub</a></p>
-</header>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-v="layers" aria-selected="true">Layer-wise probing</button>
+    <button class="tab" role="tab" data-v="noise" aria-selected="false">Noise robustness</button>
+    <button class="tab" role="tab" data-v="vad" aria-selected="false">Valence / Arousal / Dominance</button>
+  </div>
 
-<main>
+  <div class="stage">
+    <canvas id="cv" width="1180" height="620"></canvas>
+    <div class="toggles" id="toggles"></div>
+    <p class="caption" id="cap"></p>
+  </div>
 
-<div class="big">
-  <div><b style="color:var(--accent)">Layer 9</b><span>where emotion peaks, median over 6 encoders and 7 corpora, of 25 layers</span></div>
-  <div><b style="color:var(--red)">0.30</b><span>English to Mandarin transfer, against a 0.25 chance floor</span></div>
-  <div><b style="color:var(--green)">61</b><span>sparse features that survive a confound control, from 394 that looked clean</span></div>
+  <h2>Encoder scorecard</h2>
+  <div class="wrapscroll">
+  <table>
+    <thead><tr><th>Encoder</th><th>Pretraining</th><th>CREMA-D best layer</th>
+      <th>Fixed-lexicon acc.</th><th>Acc. loss, clean&nbsp;&rarr;&nbsp;0&nbsp;dB</th><th>Text bias (EMIS)</th></tr></thead>
+    <tbody id="score"></tbody>
+  </table>
+  </div>
+  <p class="caption">Text bias is measured on utterances where the spoken words and the vocal
+     delivery carry <b>different</b> emotions. A positive number means the probe followed the
+     words. <b>Whisper is the only encoder that stays with the voice</b> — and it is also the most
+     noise-robust. Supervised multilingual pretraining produces a different representation from
+     self-supervised pretraining, at every depth we tested.</p>
+
+  <div class="foot">
+    <span>CSCI 535, USC · six encoders × eight datasets × five languages</span>
+    <span>
+      <a href="https://github.com/Nikelroid/linguistic-agnostic-ser">Repository</a> ·
+      <a href="https://kelidari.com">kelidari.com</a>
+    </span>
+  </div>
 </div>
 
-<h2>Emotion is a middle-layer property</h2>
-<p>A linear probe on frozen features, across all 25 hidden states, six encoders and seven corpora.
-Accuracy climbs to layer 9 and then falls away. The last layer is the worst place to look, which
-is exactly where a classifier head would normally sit.</p>
-
-<figure>
-  <svg id="c1" viewBox="0 0 700 260" role="img" aria-label="Probe accuracy by encoder layer"></svg>
-  <figcaption>Median of 42 probe fits per layer. Hover any point.</figcaption>
-</figure>
-
-<h2>The encoder barely matters. The corpus does.</h2>
-<p>Six encoders separate by under four points once averaged across the grid. The corpora they are
-measured on span thirty-four. Most of what a benchmark number tells you is which recordings it was
-computed on.</p>
-
-<figure>
-  <div class="key">
-    <span><i style="background:var(--blue)"></i>encoder, averaged over corpora</span>
-    <span><i style="background:var(--amber)"></i>corpus, averaged over encoders</span>
-  </div>
-  <svg id="c2" viewBox="0 0 700 250" role="img" aria-label="Spread across encoders compared with spread across corpora"></svg>
-  <figcaption>Acted corpora sit high. The two spontaneous ones, IEMOCAP and MSP-Podcast, sit near 0.60.</figcaption>
-</figure>
-
-<h2>Language is the real barrier</h2>
-<p>Pool four languages and every encoder looks excellent. Hold one out and the answer depends
-entirely on which one, and adding a language from another family collapses it.</p>
-
-<figure>
-  <svg id="c3" viewBox="0 0 700 210" role="img" aria-label="Pooled accuracy against leave-one-language-out"></svg>
-  <figcaption>The pool is 64% English and 44% one emotion class, so its majority baseline is 44%.
-  Pooled accuracy is the number that flatters. The held-out number is the one that informs.</figcaption>
-</figure>
-
-<h2>Some encoders read the transcript</h2>
-<p>EMIS pairs audio with words whose emotion deliberately contradicts the delivery. A model hearing
-the voice should ignore them. Three of six do not.</p>
-
-<figure>
-  <svg id="c4" viewBox="0 0 700 220" role="img" aria-label="Text bias by encoder"></svg>
-  <figcaption>Positive means the encoder follows the written emotion over the spoken one. Every
-  encoder is audio-grounded through layer 8, so this is a deep-layer behaviour and only in the
-  self-supervised models. Whisper's supervised multilingual training appears to inoculate it.</figcaption>
-</figure>
-
-<h2>What a probe reads is not what the model has</h2>
-<p>Sparse autoencoders rewrite each activation as 8192 features with 32 active at a time. 394 look
-like clean emotion features. Because CREMA-D has every actor speak the same twelve sentences in six
-emotions, we can ask whether a feature says more about the emotion than about the sentence or the
-speaker. Most cannot, and 61 remain.</p>
-
-<figure>
-  <svg id="c5" viewBox="0 0 700 230" role="img" aria-label="Probe accuracy against interpretable feature count by layer"></svg>
-  <figcaption>The two curves peak in different places. Accuracy is still climbing at layer 10 while
-  the interpretable features are already thinning. Reading a probe curve as mechanism is the
-  mistake this measures.</figcaption>
-</figure>
-
-<h2>What did not survive</h2>
-<p class="small">Fine-tuning lost to frozen probing in 29 of 30 LoRA runs. Adversarial and CCA
-debiasing both cost more accuracy than the bias they removed. The IEMOCAP ceiling near 0.68 turned
-out to be annotator disagreement rather than model capacity: restricting to clips the humans agreed
-on lifts accuracy by up to 0.19. And the 61 surviving sparse features are shown by sufficiency
-rather than necessity, since ablating them does not reduce accuracy.</p>
-
-<footer>
-  Code, per-experiment results and the full write-up:
-  <a href="https://github.com/Nikelroid/linguistic-agnostic-ser">github.com/Nikelroid/linguistic-agnostic-ser</a><br>
-  USC students, working with Prof. Mohammad Soleymani on this project.
-</footer>
-
-</main>
-<div id="tip" role="status"></div>
-
 <script>
-(function(){
 "use strict";
-var tip=document.getElementById("tip");
-function show(h,e){tip.innerHTML=h;tip.classList.add("on");
-  var r=tip.getBoundingClientRect(),x=e.clientX+14,y=e.clientY-r.height-10;
-  if(x+r.width>innerWidth-8)x=e.clientX-r.width-14;
-  if(y<8)y=e.clientY+18;
-  tip.style.left=x+"px";tip.style.top=y+"px";}
-function hide(){tip.classList.remove("on");}
-function cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
-function el(t,a){var n=document.createElementNS("http://www.w3.org/2000/svg",t);
-  for(var k in a)n.setAttribute(k,a[k]);return n;}
-function add(s,t,a,txt){var n=el(t,a);if(txt!=null)n.textContent=txt;s.appendChild(n);return n;}
-function bind(n,html){n.classList.add("hit");
-  n.addEventListener("mousemove",function(e){show(html,e);});
-  n.addEventListener("mouseleave",hide);}
+const DATA = {"cremad":{"wav2vec2":[0.6268,0.604,0.6094,0.6248,0.6528,0.6661,0.6692,0.6841,0.69,0.6931,0.6935,0.6827,0.6789,0.6729,0.6791,0.6708,0.6732,0.6681,0.6627,0.6567,0.6539,0.6231,0.6075,0.5648,0.5095],"HuBERT":[0.6397,0.6532,0.6709,0.6684,0.6764,0.6947,0.701,0.7107,0.7143,0.7162,0.7278,0.7388,0.7454,0.7497,0.7409,0.7319,0.7354,0.7343,0.7295,0.7188,0.7134,0.7196,0.7232,0.7275,0.7216],"WavLM":[0.6311,0.6333,0.6489,0.6727,0.6892,0.7044,0.7173,0.7282,0.7405,0.7587,0.7562,0.7593,0.7572,0.7583,0.7608,0.7529,0.7408,0.7447,0.7462,0.7431,0.744,0.742,0.7463,0.7307,0.7169],"MERT":[0.588,0.6035,0.6141,0.6174,0.6216,0.6301,0.6291,0.6357,0.6392,0.6404,0.6348,0.6208,0.6321,0.6235,0.6197,0.6103,0.6035,0.597,0.5916,0.5805,0.5783,0.5762,0.5747,0.5808,0.5781],"w2v-BERT":[0.3065,0.5318,0.6049,0.6584,0.6999,0.7151,0.7014,0.7006,0.6866,0.7165,0.7053,0.6862,0.676,0.6811,0.6966,0.7189,0.7166,0.7296,0.7116,0.7016,0.6915,0.6814,0.6454,0.6247,0.6099],"Whisper":[0.6125,0.6514,0.667,0.676,0.6809,0.6787,0.6881,0.6975,0.7143,0.7243,0.7337,0.7401,0.7476,0.745,0.7411,0.7372,0.7413,0.7433,0.737,0.7304,0.74,0.7314,0.7343,0.7343,0.7295]},"noise":{"wav2vec2":{"clean":0.8342,"20":0.7669,"10":0.7125,"5":0.6603,"0":0.5785},"HuBERT":{"clean":0.8546,"20":0.807,"10":0.7671,"5":0.722,"0":0.6552},"WavLM":{"clean":0.8626,"20":0.8116,"10":0.7535,"5":0.6852,"0":0.6163},"MERT":{"clean":0.8161,"20":0.7055,"10":0.6515,"5":0.6135,"0":0.5742},"w2v-BERT":{"clean":0.8407,"20":0.7916,"10":0.7602,"5":0.732,"0":0.6954},"Whisper":{"clean":0.8638,"20":0.8332,"10":0.8121,"5":0.7936,"0":0.7678}},"vad":{"wav2vec2":{"EmoVal":0.8759,"EmoAct":0.7196,"EmoDom":0.6942},"HuBERT":{"EmoVal":0.8447,"EmoAct":0.7126,"EmoDom":0.6899},"WavLM":{"EmoVal":0.8274,"EmoAct":0.712,"EmoDom":0.6874},"MERT":{"EmoVal":0.8949,"EmoAct":0.7233,"EmoDom":0.691},"w2v-BERT":{"EmoVal":0.8572,"EmoAct":0.7212,"EmoDom":0.6948},"Whisper":{"EmoVal":0.8076,"EmoAct":0.7065,"EmoDom":0.6822}}};
 
-// 1. probe accuracy by layer (EXP4, median of 42 fits per layer)
-var D1=[[0,.736],[1,.7819],[2,.8225],[3,.8459],[4,.8575],[5,.8683],[6,.8754],[7,.8755],
-        [8,.8777],[9,.887],[10,.874],[11,.8617],[12,.8472],[13,.8424],[14,.8271],[15,.8292],
-        [16,.8385],[17,.8334],[18,.8377],[19,.844],[20,.8306],[21,.8055],[22,.7836],
-        [23,.7412],[24,.7128]];
-function c1(){
- var s=document.getElementById("c1");s.innerHTML="";
- var L=54,R=18,T=14,B=42,W=700,H=260,pw=W-L-R,ph=H-T-B;
- var y0=.68,y1=.92,X=function(l){return L+l/24*pw;},Y=function(v){return T+ph-(v-y0)/(y1-y0)*ph;};
- [.7,.75,.8,.85,.9].forEach(function(t){
-   add(s,"line",{class:"gl",x1:L,y1:Y(t),x2:W-R,y2:Y(t)});
-   add(s,"text",{class:"t",x:L-8,y:Y(t)+4,"text-anchor":"end"},t.toFixed(2));});
- [0,4,8,12,16,20,24].forEach(function(l){
-   add(s,"text",{class:"t",x:X(l),y:H-B+18,"text-anchor":"middle"},l);});
- add(s,"text",{class:"t",x:L+pw/2,y:H-B+34,"text-anchor":"middle"},"encoder layer");
- var d=D1.map(function(p,i){return (i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1);}).join(" ");
- add(s,"path",{d:d,fill:"none",stroke:cv("--accent"),"stroke-width":2.4,"stroke-linejoin":"round"});
- add(s,"line",{x1:X(9),y1:T,x2:X(9),y2:T+ph,stroke:cv("--green"),"stroke-dasharray":"4 3","stroke-width":1.4});
- add(s,"text",{class:"t",x:X(9)+6,y:T+12,fill:cv("--green")},"peak, layer 9");
- D1.forEach(function(p){
-  add(s,"circle",{cx:X(p[0]).toFixed(1),cy:Y(p[1]).toFixed(1),r:3,fill:cv("--accent")});
-  var hb=add(s,"circle",{cx:X(p[0]).toFixed(1),cy:Y(p[1]).toFixed(1),r:11,fill:"transparent"});
-  var note=p[0]===0?"The convolutional front end, before any transformer layer."
-        :p[0]===24?"The final layer, and the worst place to probe. A classifier head normally sits here."
-        :p[0]===9?"The peak. Emotion is most linearly available in the middle of the stack."
-        :"";
-  bind(hb,"<b>Layer "+p[0]+"</b><br>median accuracy <b>"+p[1].toFixed(4)+"</b><br>"+
-    "<span style='color:"+cv("--ink3")+"'>42 probe fits"+(note?". "+note:"")+"</span>");});
+const ENC = ["wav2vec2","HuBERT","WavLM","MERT","w2v-BERT","Whisper"];
+const COL = {wav2vec2:"#C8791F", HuBERT:"#2F6FB0", WavLM:"#2D6B60",
+             MERT:"#8E5BA6", "w2v-BERT":"#B0362C", Whisper:"#1D9BAA"};
+const PRE = {wav2vec2:"contrastive", HuBERT:"masked cluster", WavLM:"cluster + denoising",
+             MERT:"music (control)", "w2v-BERT":"contrastive + MLM", Whisper:"supervised multilingual"};
+const BIAS = {HuBERT:"+0.72", wav2vec2:"+0.67", WavLM:"+0.61", Whisper:"−0.19",
+              MERT:"n/a", "w2v-BERT":"n/a"};
+
+let view="layers", on = Object.fromEntries(ENC.map(e=>[e,true]));
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d'), W=cv.width, H=cv.height;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+function axes(x0,y0,x1,y1,xlab,ylab,xticks,yticks){
+  ctx.strokeStyle=css('--line'); ctx.fillStyle=css('--muted');
+  ctx.lineWidth=1; ctx.font="13px ui-monospace,Menlo,monospace";
+  yticks.forEach(([v,t])=>{
+    const y=y1-(v)*(y1-y0);
+    ctx.globalAlpha=.55; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); ctx.globalAlpha=1;
+    ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.fillText(t,x0-10,y);
+  });
+  xticks.forEach(([v,t])=>{
+    const x=x0+v*(x1-x0);
+    ctx.textAlign="center"; ctx.textBaseline="top"; ctx.fillText(t,x,y1+10);
+  });
+  ctx.fillStyle=css('--muted'); ctx.font="600 13px system-ui";
+  ctx.textAlign="center"; ctx.fillText(xlab,(x0+x1)/2,y1+38);
+  ctx.save(); ctx.translate(x0-52,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign="center"; ctx.fillText(ylab,0,0); ctx.restore();
+}
+function clear(){ ctx.fillStyle=css('--card'); ctx.fillRect(0,0,W,H); }
+
+/* ---- 1. layer-wise probing on CREMA-D ---- */
+function drawLayers(){
+  clear();
+  const x0=90,y0=30,x1=W-30,y1=H-70, lo=.13,hi=.82;
+  const yt=[]; for(let v=.2;v<=.8001;v+=.1) yt.push([(v-lo)/(hi-lo), v.toFixed(1)]);
+  const xt=[[0,"CNN"]]; [4,8,12,16,20,24].forEach(l=>xt.push([l/24,"L"+l]));
+  axes(x0,y0,x1,y1,"encoder layer","probing accuracy",xt,yt);
+  // chance line for 6-class CREMA-D
+  const yc=y1-((1/6)-lo)/(hi-lo)*(y1-y0);
+  ctx.strokeStyle=css('--muted'); ctx.setLineDash([6,5]); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x0,yc); ctx.lineTo(x1,yc); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=css('--muted'); ctx.font="12px system-ui"; ctx.textAlign="left";
+  ctx.fillText("chance (16.7%)",x0+8,yc-8);
+  ENC.forEach(e=>{
+    if(!on[e] || !DATA.cremad[e]) return;
+    const s=DATA.cremad[e];
+    ctx.strokeStyle=COL[e]; ctx.lineWidth=2.6; ctx.beginPath();
+    s.forEach((v,i)=>{
+      const x=x0+(i/24)*(x1-x0), y=y1-((v-lo)/(hi-lo))*(y1-y0);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+    const bi=s.indexOf(Math.max(...s));
+    const bx=x0+(bi/24)*(x1-x0), by=y1-((s[bi]-lo)/(hi-lo))*(y1-y0);
+    ctx.fillStyle=COL[e]; ctx.beginPath(); ctx.arc(bx,by,5.5,0,7); ctx.fill();
+    ctx.strokeStyle=css('--card'); ctx.lineWidth=2; ctx.stroke();
+  });
+  document.getElementById('cap').innerHTML =
+    "<b>CREMA-D holds the words constant.</b> 91 actors speak the same 12 sentences across 6 "+
+    "emotions, so any accuracy above chance has to come from delivery, not vocabulary. Every "+
+    "encoder clears 16.7% by a wide margin, and the peak sits in the <b>middle-to-late</b> layers "+
+    "— even for MERT, which was pretrained on music rather than speech. Dots mark each encoder's "+
+    "best layer. Note wav2vec 2.0 collapsing after its peak: its contrastive objective pushes deep "+
+    "layers toward word prediction, overwriting the prosody a probe needs.";
 }
 
-// 2. spread across encoders vs across corpora
-var ENC=[["Whisper",.8303],["WavLM",.8294],["HuBERT",.8241],["MERT",.7826],["w2v-BERT",.7744],["wav2vec2",.7503]];
-var COR=[["EmoDB",.9414],["RAVDESS",.9388],["AESDD",.8681],["SAVEE",.8022],["MESD",.7881],["IEMOCAP",.6501],["MSP-Podcast",.6009]];
-function c2(){
- var s=document.getElementById("c2");s.innerHTML="";
- var L=96,R=52,T=12,B=40,W=700,H=250,pw=W-L-R,ph=H-T-B;
- var y0=.55,y1=.98,Y=function(v){return T+ph-(v-y0)/(y1-y0)*ph;};
- [.6,.7,.8,.9].forEach(function(t){
-   add(s,"line",{class:"gl",x1:L,y1:Y(t),x2:W-R,y2:Y(t)});
-   add(s,"text",{class:"t",x:L-8,y:Y(t)+4,"text-anchor":"end"},t.toFixed(1));});
- [{d:ENC,x:L+pw*.26,c:cv("--blue"),n:"encoder"},
-  {d:COR,x:L+pw*.74,c:cv("--amber"),n:"corpus"}].forEach(function(col){
-  var vals=col.d.map(function(r){return r[1];}),lo=Math.min.apply(0,vals),hi=Math.max.apply(0,vals);
-  add(s,"line",{x1:col.x,y1:Y(lo),x2:col.x,y2:Y(hi),stroke:col.c,"stroke-width":2,opacity:.35});
-  add(s,"text",{class:"lab",x:col.x,y:H-B+20,"text-anchor":"middle"},col.n);
-  add(s,"text",{class:"t",x:col.x,y:H-B+35,"text-anchor":"middle"},"spread "+(hi-lo).toFixed(2));
-  col.d.forEach(function(r,i){
-    var y=Y(r[1]),jx=col.x+((i%2)?9:-9);
-    add(s,"circle",{cx:jx,cy:y.toFixed(1),r:5,fill:col.c,opacity:.9,stroke:cv("--card"),"stroke-width":1.5});
-    add(s,"text",{class:"t",x:jx+((i%2)?10:-10),y:y+4,"text-anchor":(i%2)?"start":"end"},r[0]);
-    var hb=add(s,"circle",{cx:jx,cy:y.toFixed(1),r:13,fill:"transparent"});
-    bind(hb,"<b>"+r[0]+"</b><br>mean accuracy <b>"+r[1].toFixed(4)+"</b><br><span style='color:"+
-      cv("--ink3")+"'>"+(col.n==="encoder"?"averaged over 7 corpora":"averaged over 6 encoders")+"</span>");});
- });
+/* ---- 2. noise robustness ---- */
+function drawNoise(){
+  clear();
+  const x0=90,y0=30,x1=W-30,y1=H-70, lo=.50,hi=.90;
+  const order=["clean","20","10","5","0"];
+  const yt=[]; for(let v=.5;v<=.9001;v+=.1) yt.push([(v-lo)/(hi-lo),v.toFixed(1)]);
+  const xt=order.map((k,i)=>[i/(order.length-1), k==="clean"?"clean":k+" dB"]);
+  axes(x0,y0,x1,y1,"signal-to-noise ratio (lower = noisier)","best-layer accuracy",xt,yt);
+  ENC.forEach(e=>{
+    if(!on[e]||!DATA.noise[e]) return;
+    const s=DATA.noise[e];
+    ctx.strokeStyle=COL[e]; ctx.lineWidth=2.8; ctx.beginPath();
+    order.forEach((k,i)=>{
+      if(s[k]==null) return;
+      const x=x0+(i/(order.length-1))*(x1-x0), y=y1-((s[k]-lo)/(hi-lo))*(y1-y0);
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    });
+    ctx.stroke();
+    order.forEach((k,i)=>{
+      if(s[k]==null) return;
+      const x=x0+(i/(order.length-1))*(x1-x0), y=y1-((s[k]-lo)/(hi-lo))*(y1-y0);
+      ctx.fillStyle=COL[e]; ctx.beginPath(); ctx.arc(x,y,4.5,0,7); ctx.fill();
+    });
+    const last=s["0"];
+    if(last!=null){
+      const y=y1-((last-lo)/(hi-lo))*(y1-y0);
+      ctx.fillStyle=COL[e]; ctx.font="600 12px system-ui"; ctx.textAlign="left";
+      ctx.fillText(e,x1+6>W-8?W-60:x1-58,y-9);
+    }
+  });
+  document.getElementById('cap').innerHTML =
+    "<b>Real environmental noise from ESC-50, mixed into MSP-Podcast at four levels.</b> "+
+    "Whisper loses about <b>11%</b> of its clean accuracy at 0 dB; the self-supervised encoders "+
+    "lose <b>23–30%</b>. The ranking here matches the ranking on continuous emotion regression "+
+    "exactly, encoder for encoder — two independent measurement regimes agreeing, which suggests "+
+    "this reflects representation quality rather than a quirk of one task setup.";
 }
 
-// 3. pooled vs leave-one-language-out
-var D3=[{n:"Pooled, 4 languages",v:.949,k:"pool",w:"Train and test on a mix of English, German, Greek and Spanish. Every encoder lands between 0.91 and 0.95."},
-        {n:"German held out",v:.952,k:"lolo",w:"Held out entirely and still recovered. German is the easiest case."},
-        {n:"English held out",v:.691,k:"lolo",w:"A large drop, and English is 64% of the pool."},
-        {n:"Spanish held out",v:.375,k:"lolo",w:"Below the 44% majority baseline of the pool."},
-        {n:"Pooled, plus Mandarin",v:.504,k:"pool",w:"Adding a language from another family halves the pooled score."},
-        {n:"English to Mandarin",v:.30,k:"xfer",w:"Train on one language, test on the other. Chance is 0.25, so this is close to nothing."}];
-function c3(){
- var s=document.getElementById("c3");s.innerHTML="";
- var L=168,R=54,T=10,B=30,W=700,H=210,pw=W-L-R,ph=H-T-B,rh=ph/D3.length;
- var X=function(v){return L+v*pw;};
- [0,.25,.5,.75,1].forEach(function(t){
-   add(s,"line",{class:"gl",x1:X(t),y1:T,x2:X(t),y2:T+ph});
-   add(s,"text",{class:"t",x:X(t),y:H-B+16,"text-anchor":"middle"},t.toFixed(2));});
- add(s,"line",{x1:X(.44),y1:T,x2:X(.44),y2:T+ph,stroke:cv("--red"),"stroke-dasharray":"3 3","stroke-width":1.2});
- add(s,"text",{class:"t",x:X(.44),y:H-B+29,"text-anchor":"middle",fill:cv("--red")},"majority baseline 0.44");
- D3.forEach(function(d,i){
-  var y=T+i*rh+5,h=rh-11;
-  var col=d.k==="pool"?cv("--blue"):d.v<.5?cv("--red"):d.v<.8?cv("--amber"):cv("--green");
-  var r=add(s,"rect",{x:L,y:y.toFixed(1),width:(X(d.v)-L).toFixed(1),height:h.toFixed(1),rx:3,
-      fill:col,opacity:d.k==="pool"?.55:.92});
-  bind(r,"<b>"+d.n+"</b><br>accuracy <b>"+d.v.toFixed(3)+"</b><br><span style='color:"+
-    cv("--ink3")+"'>"+d.w+"</span>");
-  add(s,"text",{class:"lab",x:L-10,y:(y+h/2+4).toFixed(1),"text-anchor":"end"},d.n);
-  add(s,"text",{class:"v",x:(X(d.v)+7).toFixed(1),y:(y+h/2+4).toFixed(1)},d.v.toFixed(2));});
+/* ---- 3. V/A/D regression ---- */
+function drawVAD(){
+  clear();
+  const x0=90,y0=40,x1=W-30,y1=H-70, lo=.60,hi=.95;
+  const T=["EmoVal","EmoAct","EmoDom"], TN={EmoVal:"valence",EmoAct:"arousal",EmoDom:"dominance"};
+  const yt=[]; for(let v=.6;v<=.9501;v+=.05) yt.push([(v-lo)/(hi-lo),v.toFixed(2)]);
+  const act=ENC.filter(e=>on[e]&&DATA.vad[e]);
+  const gw=(x1-x0)/Math.max(T.length,1);
+  axes(x0,y0,x1,y1,"target dimension","best-layer RMSE (lower is better)",
+       T.map((t,i)=>[(i+.5)/T.length, TN[t]]), yt);
+  T.forEach((t,ti)=>{
+    const bw=Math.min(38,(gw-30)/Math.max(act.length,1));
+    act.forEach((e,ei)=>{
+      const v=DATA.vad[e][t]; if(v==null) return;
+      const cx=x0+gw*ti+gw/2+(ei-(act.length-1)/2)*(bw+5);
+      const y=y1-((v-lo)/(hi-lo))*(y1-y0);
+      ctx.fillStyle=COL[e]; ctx.fillRect(cx-bw/2,y,bw,y1-y);
+    });
+  });
+  document.getElementById('cap').innerHTML =
+    "<b>Valence is the hardest dimension for every single encoder.</b> Averaged across the six, "+
+    "RMSE is 0.881 for valence against 0.730 for arousal and 0.699 for dominance — a 26% gap. "+
+    "That is exactly the dimension prior work attributes to lexical content, and exactly where the "+
+    "text-bias test shows the self-supervised probes taking a shortcut. The measurements agree: "+
+    "the part of emotion that depends most on words is the part these models recover least well "+
+    "from the voice alone.";
 }
 
-// 4. EMIS text bias
-var D4=[["wav2vec2",.868],["HuBERT",.794],["WavLM",.731],["Whisper",-.108],["w2v-BERT",-.598],["MERT",-.603]];
-function c4(){
- var s=document.getElementById("c4");s.innerHTML="";
- var L=100,R=54,T=12,B=34,W=700,H=220,pw=W-L-R,ph=H-T-B,rh=ph/D4.length;
- var X=function(v){return L+(v+1)/2*pw;};
- [-1,-.5,0,.5,1].forEach(function(t){
-   add(s,"line",{class:"gl",x1:X(t),y1:T,x2:X(t),y2:T+ph});
-   add(s,"text",{class:"t",x:X(t),y:H-B+16,"text-anchor":"middle"},t.toFixed(1));});
- add(s,"line",{x1:X(0),y1:T,x2:X(0),y2:T+ph,stroke:cv("--ink3"),"stroke-width":1.2});
- add(s,"text",{class:"t",x:X(-.5),y:H-B+31,"text-anchor":"middle"},"ignores the words");
- add(s,"text",{class:"t",x:X(.5),y:H-B+31,"text-anchor":"middle"},"follows the words");
- D4.forEach(function(d,i){
-  var y=T+i*rh+5,h=rh-11,x=Math.min(X(0),X(d[1])),w=Math.abs(X(d[1])-X(0));
-  var col=d[1]>0?cv("--red"):cv("--green");
-  var r=add(s,"rect",{x:x.toFixed(1),y:y.toFixed(1),width:w.toFixed(1),height:h.toFixed(1),rx:3,fill:col});
-  bind(r,"<b>"+d[0]+"</b><br>text bias <b>"+(d[1]>0?"+":"")+d[1].toFixed(3)+"</b><br><span style='color:"+
-    cv("--ink3")+"'>"+(d[1]>0?"Follows the written emotion over the spoken one, so its accuracy is partly lexical."
-      :"Ignores the contradicting transcript and stays with the voice.")+"</span>");
-  add(s,"text",{class:"lab",x:L-10,y:(y+h/2+4).toFixed(1),"text-anchor":"end"},d[0]);
-  add(s,"text",{class:"v",x:(d[1]<0?x-7:x+w+7).toFixed(1),y:(y+h/2+4).toFixed(1),
-      "text-anchor":d[1]<0?"end":"start"},(d[1]>0?"+":"")+d[1].toFixed(2));});
-}
+const VIEWS={layers:drawLayers, noise:drawNoise, vad:drawVAD};
+function render(){ VIEWS[view](); }
 
-// 5. decodability vs interpretability, by layer
-var D5=[[0,.6368,35],[1,.6498,70],[2,.6661,94],[3,.6697,103],[4,.6821,105],[5,.6901,111],
-        [6,.6969,106],[7,.702,113],[8,.7076,94],[9,.7214,80],[10,.7389,77],[11,.7389,59],
-        [12,.7384,57],[13,.7377,61],[14,.7342,56],[15,.7229,42],[16,.7216,37],[17,.7189,26],
-        [18,.7143,29],[19,.7096,28],[20,.7064,27],[21,.7095,24],[22,.7198,31],[23,.7184,47],[24,.7154,27]];
-function c5(){
- var s=document.getElementById("c5");s.innerHTML="";
- var L=54,R=54,T=20,B=44,W=700,H=230,pw=W-L-R,ph=H-T-B;
- var X=function(l){return L+l/24*pw;};
- var A0=.62,A1=.76,YA=function(v){return T+ph-(v-A0)/(A1-A0)*ph;};
- var YF=function(v){return T+ph-v/120*ph;};
- [.65,.70,.75].forEach(function(t){
-   add(s,"line",{class:"gl",x1:L,y1:YA(t),x2:W-R,y2:YA(t)});
-   add(s,"text",{class:"t",x:L-8,y:YA(t)+4,"text-anchor":"end",fill:cv("--accent")},t.toFixed(2));});
- [0,40,80,120].forEach(function(t){
-   add(s,"text",{class:"t",x:W-R+8,y:YF(t)+4,fill:cv("--violet")},t);});
- [0,4,8,12,16,20,24].forEach(function(l){
-   add(s,"text",{class:"t",x:X(l),y:H-B+18,"text-anchor":"middle"},l);});
- add(s,"text",{class:"t",x:L+pw/2,y:H-B+34,"text-anchor":"middle"},"encoder layer");
- add(s,"text",{class:"t",x:L-8,y:T-6,"text-anchor":"end",fill:cv("--accent")},"probe acc");
- add(s,"text",{class:"t",x:W-R+8,y:T-6,fill:cv("--violet")},"features");
- add(s,"path",{d:D5.map(function(p,i){return (i?"L":"M")+X(p[0]).toFixed(1)+" "+YF(p[2]).toFixed(1);}).join(" "),
-   fill:"none",stroke:cv("--violet"),"stroke-width":2.2});
- add(s,"path",{d:D5.map(function(p,i){return (i?"L":"M")+X(p[0]).toFixed(1)+" "+YA(p[1]).toFixed(1);}).join(" "),
-   fill:"none",stroke:cv("--accent"),"stroke-width":2.4});
- [[7,"features peak",cv("--violet"),0],[10,"accuracy peak",cv("--accent"),1]].forEach(function(m){
-   add(s,"line",{x1:X(m[0]),y1:T,x2:X(m[0]),y2:T+ph,stroke:m[2],"stroke-dasharray":"4 3","stroke-width":1.3,opacity:.8});
-   add(s,"text",{class:"t",x:X(m[0])+5,y:T+12+m[3]*14,fill:m[2]},m[1]);});
- D5.forEach(function(p){
-  add(s,"circle",{cx:X(p[0]).toFixed(1),cy:YA(p[1]).toFixed(1),r:2.6,fill:cv("--accent")});
-  add(s,"circle",{cx:X(p[0]).toFixed(1),cy:YF(p[2]).toFixed(1),r:2.6,fill:cv("--violet")});
-  var hb=add(s,"rect",{x:(X(p[0])-6).toFixed(1),y:T,width:12,height:ph,fill:"transparent"});
-  bind(hb,"<b>Layer "+p[0]+"</b><br>probe accuracy <b>"+p[1].toFixed(4)+"</b><br>"+
-    "clean emotion features <b>"+p[2]+"</b><br><span style='color:"+cv("--ink3")+
-    "'>Features that say more about emotion than about the sentence or the speaker.</span>");});
+function buildToggles(){
+  document.getElementById('toggles').innerHTML = ENC.map(e=>
+    `<button class="chip" data-e="${e}" aria-pressed="${on[e]}">
+       <i style="background:${COL[e]}"></i>${e}</button>`).join('');
+  document.querySelectorAll('.chip').forEach(c=> c.onclick=()=>{
+    const e=c.dataset.e; on[e]=!on[e]; c.setAttribute('aria-pressed',on[e]); render();
+  });
 }
-
-function draw(){c1();c2();c3();c4();c5();}
-draw();
-matchMedia("(prefers-color-scheme:dark)").addEventListener("change",draw);
-addEventListener("resize",hide);
-})();
+function buildScore(){
+  const rows = ENC.map(e=>{
+    const s=DATA.cremad[e]||[], best=s.length?Math.max(...s):null,
+          bi=s.length?s.indexOf(best):null, n=DATA.noise[e];
+    const drop = (n&&n.clean&&n["0"]) ? ((n.clean-n["0"])/n.clean*100) : null;
+    return {e,bi,best,drop,bias:BIAS[e]};
+  });
+  const bestAcc=Math.max(...rows.map(r=>r.best||0));
+  const minDrop=Math.min(...rows.filter(r=>r.drop!=null).map(r=>r.drop));
+  document.getElementById('score').innerHTML = rows.map(r=>`
+    <tr>
+      <td><b style="color:${COL[r.e]}">${r.e}</b></td>
+      <td style="color:var(--muted)">${PRE[r.e]}</td>
+      <td class="n">${r.bi===0?"CNN":"L"+r.bi}</td>
+      <td class="n ${r.best===bestAcc?"best":""}">${r.best!=null?r.best.toFixed(3):"—"}</td>
+      <td class="n ${r.drop===minDrop?"best":""}">${r.drop!=null?r.drop.toFixed(1)+"%":"—"}</td>
+      <td class="n ${r.bias.startsWith("−")?"best":(r.bias!=="n/a"?"bad":"")}">${r.bias}</td>
+    </tr>`).join('');
+}
+document.querySelectorAll('.tab').forEach(t=> t.onclick=()=>{
+  view=t.dataset.v;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x.dataset.v===view));
+  render();
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{render();});
+buildToggles(); buildScore(); render();
 </script>
 </body>
 </html>

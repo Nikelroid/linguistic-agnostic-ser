@@ -3,6 +3,10 @@
 <p align="center"><i>Where emotion lives inside a frozen speech encoder, whether that answer survives a change of language, and whether the probe is hearing the voice or reading the words</i></p>
 
 <p align="center">
+<a href="https://kelidari.com/linguistic-agnostic-ser/"><img src="https://img.shields.io/badge/▶_Explore_the_results_live-2D6B60?style=for-the-badge" alt="Interactive explorer"></a>
+</p>
+
+<p align="center">
 <img src="https://img.shields.io/badge/python-3.10-blue?logo=python&logoColor=white" alt="Python">
 <img src="https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white" alt="PyTorch">
 <img src="https://img.shields.io/badge/Hugging_Face-Transformers-F9AB00?logo=huggingface&logoColor=white" alt="Hugging Face">
@@ -11,6 +15,24 @@
 <img src="https://img.shields.io/badge/Corpora-8-0aa" alt="Corpora">
 <img src="https://img.shields.io/badge/SLURM-HPC-orange?logo=linux&logoColor=white" alt="SLURM">
 </p>
+
+---
+
+<h2 align="center">Explore It Yourself</h2>
+
+<p align="center">
+  <b><a href="https://kelidari.com/linguistic-agnostic-ser/">kelidari.com/linguistic-agnostic-ser</a></b>
+</p>
+
+The three experiments that answer the question are plotted live from the result files in this
+repository — toggle encoders on and off, and move between layer-wise probing, noise robustness and
+dimensional regression. No install, nothing to run.
+
+The fastest way to see the finding: open the **layer-wise** tab and turn everything off except
+**wav2vec 2.0** and **Whisper**. wav2vec 2.0 climbs to a peak and then falls off a cliff through its
+deepest layers — its contrastive objective pushes those layers toward predicting words, overwriting
+the prosody a probe needs. Whisper holds its accuracy to the end. Then switch to **noise** and watch
+the same two encoders separate again, in the same direction.
 
 ---
 
